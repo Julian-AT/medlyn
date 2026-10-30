@@ -13,6 +13,8 @@ import type { ToolUIPart } from "ai";
 import type { ComponentProps, ReactNode } from "react";
 import { isValidElement } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { CodeBlock } from "./code-block";
@@ -20,7 +22,14 @@ import { CodeBlock } from "./code-block";
 export type ToolProps = ComponentProps<typeof Collapsible>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
-  <Collapsible className={cn("not-prose mb-4 w-full rounded-md border", className)} {...props} />
+  <Card
+    className={cn(
+      "mb-1 w-full gap-0 rounded-2xl border border-border bg-card py-0 shadow-none ring-0",
+      className,
+    )}
+  >
+    <Collapsible className="group/tool" {...props} />
+  </Card>
 );
 
 export type ToolHeaderProps = {
@@ -44,11 +53,13 @@ const getStatusBadge = (status: ToolUIPart["state"]) => {
   const icons: Record<ToolUIPart["state"], ReactNode> = {
     "input-streaming": <HugeiconsIcon icon={CircleIcon} className="size-4" />,
     "input-available": <HugeiconsIcon icon={ClockIcon} className="size-4 animate-pulse" />,
-    "approval-requested": <HugeiconsIcon icon={ClockIcon} className="size-4 text-yellow-600" />,
-    "approval-responded": <HugeiconsIcon icon={CheckCircleIcon} className="size-4 text-blue-600" />,
-    "output-available": <HugeiconsIcon icon={CheckCircleIcon} className="size-4 text-green-600" />,
-    "output-error": <HugeiconsIcon icon={XCircleIcon} className="size-4 text-red-600" />,
-    "output-denied": <HugeiconsIcon icon={XCircleIcon} className="size-4 text-orange-600" />,
+    "approval-requested": (
+      <HugeiconsIcon icon={ClockIcon} className="size-4 text-muted-foreground" />
+    ),
+    "approval-responded": <HugeiconsIcon icon={CheckCircleIcon} className="size-4 text-primary" />,
+    "output-available": <HugeiconsIcon icon={CheckCircleIcon} className="size-4 text-primary" />,
+    "output-error": <HugeiconsIcon icon={XCircleIcon} className="size-4 text-destructive" />,
+    "output-denied": <HugeiconsIcon icon={XCircleIcon} className="size-4 text-muted-foreground" />,
   };
 
   return (
@@ -60,19 +71,30 @@ const getStatusBadge = (status: ToolUIPart["state"]) => {
 };
 
 export const ToolHeader = ({ className, title, type, state, ...props }: ToolHeaderProps) => (
-  <CollapsibleTrigger
-    className={cn("flex w-full items-center justify-between gap-4 p-3", className)}
-    {...props}
-  >
-    <div className="flex items-center gap-2">
-      <HugeiconsIcon icon={WrenchIcon} className="size-4 text-muted-foreground" />
-      <span className="font-medium text-sm">{title ?? type.split("-").slice(1).join("-")}</span>
+  <CollapsibleTrigger asChild {...props}>
+    <Button
+      variant="ghost"
+      className={cn("h-auto w-full justify-between gap-3 rounded-2xl px-4 py-3", className)}
+    >
+      <HugeiconsIcon
+        icon={WrenchIcon}
+        size={18}
+        strokeWidth={1.75}
+        className="text-foreground/80"
+        aria-hidden="true"
+      />
+      <CardTitle className="min-w-0 flex-1 truncate text-left text-sm font-medium">
+        {title ?? type.split("-").slice(1).join(" ").replaceAll("_", " ")}
+      </CardTitle>
       {getStatusBadge(state)}
-    </div>
-    <HugeiconsIcon
-      icon={ChevronDownIcon}
-      className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180"
-    />
+      <HugeiconsIcon
+        icon={ChevronDownIcon}
+        size={16}
+        strokeWidth={1.75}
+        className="text-muted-foreground transition-transform group-data-[state=open]/tool:rotate-180"
+        aria-hidden="true"
+      />
+    </Button>
   </CollapsibleTrigger>
 );
 
