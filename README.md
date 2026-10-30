@@ -1,170 +1,193 @@
 # Medlyn
 
-Medlyn turns a clinician's role and task into one screen of relevant patient facts, each linked to its original sentence or medication table row. It reads eight German documents for one synthetic patient and presents English cards, explicit documentation gaps and adjudicated conflicts. The same evidence supports an investigation dock and a GP follow-up letter. Built for IBM Austria's Track 1 clinical documentation challenge.
+The patient facts your task needs, with sources. Medlyn turns a clinician's role
+and task into an English view of German clinical documents: located facts,
+source-labelled medication lists, explicit documentation gaps and adjudicated
+conflicts. Chat can open clinical views, inspect evidence and draft a cited GP
+follow-up letter. Built for IBM Austria's Track 1 clinical documentation challenge.
 
-<!-- Submission screenshot: the integrator adds docs/screenshot.png. -->
-![Medlyn cockpit — submission screenshot pending](docs/screenshot.png)
+This is a hackathon prototype using synthetic/demo records. Automated real
+regression reaches **15/15**, pending human screen review. Cold latency, multimodal
+agreement and synthetic evaluation coverage still miss acceptance targets. See
+[build status](docs/status.md) for measured results and their denominators.
 
-## Architecture
+## Two applications
+
+| App                 | Workspace                  | Local URL                               | Deployment example        |
+| ------------------- | -------------------------- | --------------------------------------- | ------------------------- |
+| Public landing page | `apps/www` · `@medlyn/www` | [localhost:3001](http://localhost:3001) | `https://example.com`     |
+| Patient app         | `apps/app` · `@medlyn/app` | [localhost:3000](http://localhost:3000) | `https://app.example.com` |
+
+Names above describe the final layout. The integration sweep renames the earlier
+`apps/web` / `@medlyn/web` package; until that lands, its scoped commands use the
+old name. Example domains are placeholders, not deployed demos.
+
+The public site preserves the supplied design. The patient app uses a neutral
+ElevenLabs-inspired shadcn shell with chat home/history, patient category pages,
+Situations, source inspection, reviews and letters. Research destinations remain
+publication slots where verified reports have not yet been integrated.
+
+## How it works
 
 ```mermaid
 flowchart TD
-  Files["Local synthetic documents · never committed"] --> Ingest["Ingest: normalise, segment, extract, locate, check"]
-  Ingest --> Findings["Rules + model sweep + adjudication"]
-  Ingest --> DB[(Neon Postgres)]
-  Findings --> DB
-  Input["Situation chip or typed task"] --> Lens["Live lens: window, plan, select, absence check, templates"]
-  DB --> Lens
-  DB --> Agent["Ask Medlyn · evidence tools"]
-  DB --> Letter["GP letter assembly and edits"]
-  Lens --> Validator["Shared claim validator + validation cache"]
-  Agent --> Validator
-  Letter --> Validator
-  Validator --> Screen["Streamed cockpit cards"]
-  Validator --> Answer["Cited agent answer + validated speech"]
-  Validator --> Draft["Cited GP letter"]
-  Review["Append-only review ledger"] -. overlay .-> Screen
-  Review -. annotations and change flags .-> Draft
-  Screen --> Cache["Machine lens cache"]
-  Cache --> Lens
+  Files[Local German documents and PDF scans] --> Ingest[Extract, segment, locate and check facts]
+  Ingest --> DB[(Neon evidence and findings)]
+  DB --> Window[One patient, revision and evidence window]
+  Window --> Lens[Task lens: select facts and check absences]
+  Window --> Agent[Chat and generative UI tools]
+  Window --> Letter[GP follow-up draft]
+  Lens --> Gate[Shared claim validator]
+  Agent --> Gate
+  Letter --> Gate
+  Gate --> UI[Cards, citations, chat, letter and speech]
+  Review[Append-only reviews] -. overlay .-> UI
 ```
 
-The engine precomputes evidence and findings during ingestion. Live requests select from stored facts within one evidence window, then validate claims before displaying them. Reviews are applied separately from cached machine output. See the [architecture guide](docs/architecture.md) for storage, validation and output details.
+Ingest computes evidence and findings before live requests. Models select fact IDs;
+templates write card lines. Composed answers and letter sentences pass the same
+claim validator. Every component shares the document-date evidence window.
+"Not documented" requires exhaustive lexical checks plus a successful full-text
+pass over all eligible documents; a failed check becomes "Couldn't check".
+Vector search supplements retrieval and may fall back under quota limits.
 
-The components below have implementations in the tree. Their presence does not establish end-to-end correctness or measured performance. The lens API can replay a **labelled mock** if the live engine fails before streaming; live evaluation rejects that fallback. Submission claims require a live run and human-checked metrics.
+Reviews change presentation through an append-only ledger. They do not rewrite
+source facts or validation results. The lens API labels mock fallback explicitly;
+mock output never counts as live evaluation evidence. The
+[architecture guide](docs/architecture.md) explains module boundaries, caches,
+chat tools, source provenance and current limitations.
 
-| Component | Responsibility |
-| --- | --- |
-| Engine: ingestion | Normalisation with offset mapping, segmentation, medication parsing, model extraction, quote location, semantic and negation checks, translation and concept coverage. |
-| Engine: findings | Candidate rules and model sweep followed by adjudication; retains source passages for conflicts and clarification requests. |
-| Engine: store and database | Neon tables accessed through Drizzle; the store defines the shared eligible document set. |
-| Engine: lens | Situation parsing, needs catalog and profiles, parallel fact selection, full absence checks, template rendering, NDJSON streaming and warm cache. |
-| Engine: claims | Shared claim validation, sensitive-token checks, semantic support and full cache identity. |
-| Engine: reviews | Append-only clinician decisions and a reversible display overlay. |
-| Engine: agent | Window-scoped evidence tools, timeline, arithmetic, answer gating and validated speech receipts. |
-| Engine: letter | Template-first GP letter, sentence validation, clinician annotations and review-change flags. |
-| Engine: contracts | Shared Zod schemas for facts, claims, screens, streams, reviews and letters. |
-| Web app | Next.js cockpit, source panel, review controls, letter panel and assistant-ui investigation dock; server routes connect them to the engine. |
-| Evaluation | promptfoo answer and grounding checks, citation and contradiction audits, and Playwright visibility and timing checks. |
-| A+ search (approved, in progress) | Gemini Embedding 2 vectors + ParadeDB BM25 in Neon, reciprocal rank fusion, shared evidence window; absence stage (a) and agent search. |
-| A+ multimodal (approved, in progress) | PDF/scan text extraction with page and bounding-box provenance; ordinary quote location and validation; page vectors retrieve sources. |
-| A+ synthetic data (approved, in progress) | 100k code-rendered German patient histories, exact spans and mutation labels; at most 300 LLM rewrites, about 100 patients ingested, 20 fresh sample patients in git. |
-| A+ verifier (approved, in progress) | Claim/passage dataset and MLX quantised-base LoRA on the Mac; optional local semantic backend, promoted only after held-out comparison. |
-| A+ evaluation and paper (approved, in progress) | At least 150 challenges over 50 synthetic patients; separate retrieval/verifier reports; arXiv preprint with tables generated from evaluation outputs. |
+## Quickstart
 
-[PRD v3](docs/PRD.md) defines the approved A+ scope and three-hour execution cap. The real-patient 15/15 regression and demo keep priority. A+ rows describe delivery targets until the owning lane verifies them. All visible UI uses existing shadcn/ui primitives, preset `b1aIcEuKO` and the `dashboard-01` shell; assistant-ui supplies the dock runtime and structure.
+Use Node.js 24+, pnpm 10.18.0, an OpenAI-compatible model proxy and Neon Postgres.
+Obtain the challenge corpus separately. From the repository root:
 
-## How a situation becomes a screen
+```sh
+pnpm install
+cp .env.example .env
+# Fill in proxy credentials, MODEL_REASONING, MODEL_FAST, DATABASE_URL,
+# and MEDLYN_DATA_PATH before continuing.
+pnpm smoke
+# A fresh database needs search extensions before the vector-bearing schema.
+node --env-file=.env --experimental-strip-types packages/engine/db/migrations-extra/apply.ts --extensions-only
+pnpm db:push
+node --env-file=.env --experimental-strip-types packages/engine/db/migrations-extra/apply.ts
+pnpm ingest
+pnpm warm
+# Public URLs must be exported for the landing app; use real HTTPS origins at deployment.
+export NEXT_PUBLIC_SITE_URL=http://localhost:3001
+export NEXT_PUBLIC_APP_URL=http://localhost:3000
+pnpm dev
+```
 
-1. **Fix the evidence window and parse the task.** The store includes only documents dated on or before the selected as-of date. A configured situation chip skips model parsing; free text uses the fast model.
-2. **Plan the needs.** A configured profile supplies sections and required information. For an unfamiliar role, the model chooses needs from the fixed catalog. Critical needs are added by code.
-3. **Select facts.** Section calls run in parallel over eligible facts of relevant kinds. The model returns fact IDs, completeness and an optional headline; templates produce card lines.
-4. **Check apparent gaps.** Empty selections trigger synonym search and a full-text model pass across every eligible document. Hits can trigger selection again. A complete empty search permits “Not documented”; failure or timeout produces “Couldn't check”.
-5. **Render and validate.** Templates preserve source dates, assertion and temporal status. The shared validator checks card claims and optional composed headlines; rejected headlines leave the template lines. Eligible adjudicated findings accompany the screen.
-6. **Stream and cache.** Section titles arrive first, followed by completed sections, validated headlines, findings and timings. Cacheable machine screens are stored; session reviews are applied as an overlay.
+`MEDLYN_DATA_PATH` points to a patient directory containing `patient.json`,
+`documents.json` and `documents/`, relative to the repository root or absolute.
+`pnpm ingest --data <path>` provides an explicit override. Ingest also warms the
+configured situations by default; `pnpm warm` refreshes them explicitly.
 
-Latency budgets are targets, not measured results: first card below **1.5 s**, complete cold screen below **5 s**, cached screen below **1 s**. Proxy smoke tests recorded an approximately **1.25 s** call floor, with larger-model structured calls reaching **4.4 s**. Chips avoid the parse call; sections and absence checks overlap. Typed tasks and unfamiliar roles can require extra serial calls. The challenge limit is a complete screen below **10 s**.
+Engine scripts and the patient app load the root `.env`; the landing app uses its
+build environment. Do not create package-specific `.env` files. Installation runs
+Husky preparation; verify `git config --get core.hooksPath` is `.husky/_` before
+committing. Never bypass hooks. See the [search guide](packages/engine/search/README.md)
+for extension setup, embedding backfill and synthetic imports. The configured Neon
+host rejects `pg_search`; the engine uses scoped in-process BM25 instead.
 
-## Trust model
+## Commands
 
-These are implementation requirements; evaluation checks whether they hold.
+| Command                                      | Purpose                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------ |
+| `pnpm dev` / `pnpm build`                    | Both apps in development / workspace production builds             |
+| `pnpm typecheck` / `pnpm test` / `pnpm lint` | Turbo tasks for workspaces defining those scripts                  |
+| `pnpm check` / `pnpm format`                 | Biome repository checks / formatting                               |
+| `pnpm smoke [model…]`                        | Proxy capability and latency checks                                |
+| `pnpm lens --chip <id> --no-cache`           | Cold engine lens inspection                                        |
+| `pnpm eval --suite real`                     | Real regression and blind worker; only after authorised H+7 review |
+| `pnpm eval --suite synthetic`                | Separate synthetic pipeline/retrieval/verifier reporting           |
+| `pnpm eval --suite all`                      | Both suite paths, separate reports; same blind restriction         |
+| `make -C paper` / `make -C paper test`       | Build preprint / test aggregate generation                         |
 
-1. **Located evidence:** each fact needs a quote found at exact normalised document offsets, including its numbers, dates, doses and laterality. Location failures are dropped and logged.
-2. **One claim boundary:** patient statements in cards, headlines, answers, speech and letters pass the same validator. Unsupported composed text is withheld or falls back to checked templates.
-3. **Models select; templates render:** the card model chooses evidence IDs rather than writing clinical card text.
-4. **Absence requires a complete search:** synonym search and the full-document model check must both finish. Missing documentation never proves a negative clinical finding.
-5. **One evidence window:** selection, absence searches, findings, agent tools and letters share the same eligible document IDs and corpus revision.
-6. **Independent states:** availability, assertion, temporal status, completeness, conflict and review remain separate. A recommendation is not proof that an investigation occurred.
-7. **Reviews are an overlay:** append-only decisions do not rewrite documents, facts or validation results. Evaluation uses an empty review layer.
-8. **Complete cache identity:** patient, corpus revision, evidence window, validator version, normalised claim text, cited fact IDs with content hashes, and segment IDs all participate.
-9. **Conflicts are adjudicated:** only contradictions and clarification requests reach the screen. Medication changes over time and ordinary measurement variation are not automatically contradictions.
-10. **Medication retains its source:** lists identify the originating document and date; historical lists are never presented as “current medication”.
+The real runner currently schedules held-out work automatically; it is not a
+regression-only command. Keep blind results closed until the orchestrator's H+7
+review. Browser visibility/timing requires a running patient app and a launchable
+Playwright browser. Outputs under `eval/output/` can contain patient evidence and
+remain private. Human-check numbers before publishing `METRICS.md` or paper claims.
+
+Python commands run from `ml/` using uv, ruff and pytest:
+
+```sh
+uv run python -m synth.generate --n 100000 --out data/new-corpus --workers 8
+uv run python -m synth.materialise --data data/sample --patient synth-000000 --out /private/tmp/synth-patient
+uv run python -m synth.render_pdf --data data/sample --patient synth-000000 --out /private/tmp/synth-pdf --scan
+uv run python -m synth.rewrite --data data/new-corpus --n 300
+uv run python -m verifier.build_dataset
+uv run python -m verifier.train --minutes 44
+uv run python -m verifier.evaluate --local --proxy --limit 90
+uv run python -m pytest
+uv run ruff check .
+```
+
+Generation destinations must be new; never rewrite challenge inputs. Read the
+[synthetic corpus](ml/synth/README.md) and [verifier](ml/verifier/README.md) guides
+before starting jobs. Bulk data and adapters stay local. The 100k generated
+patients are not 100k ingested records; code-checked synthetic labels are not
+human gold. The optional local verifier scores below GPT and is not promoted.
 
 ## Models and services
 
-| Service | Use and configuration |
-| --- | --- |
-| GPT models through an OpenAI-compatible proxy | `OPENAI_BASE_URL` and `OPENAI_API_KEY` configure access. `MODEL_REASONING` handles extraction, findings work and the evaluation judge; `MODEL_FAST` handles parsing, planning, selection, absence and semantic checks, translation and the agent. Model IDs are chosen in the environment. |
-| Neon Postgres + Drizzle | `DATABASE_URL` stores source evidence, facts, findings, validation results, screens, reviews and letters. `DATABASE_URL_DEMO` is reserved for the submission demo database. |
-| fish.audio | `FISH_AUDIO_API_KEY` and `FISH_AUDIO_VOICE_ID` enable TTS of validated answer text. The browser has a speech-synthesis fallback. |
-| Browser speech recognition | Feature-detected push-to-talk sends transcripts through the text path. Unsupported browsers hide voice input; no transcription model or polyfill is required. `MODEL_STT` stays empty. |
-| Gemini Embedding 2 (A+) | `GEMINI_API_KEY` enables text and page/image embeddings; vectors support retrieval and never replace located evidence. |
-| Neon hybrid indexes (A+) | pgvector stores segment vectors; ParadeDB `pg_search` provides BM25 over German/English segments. About 100 synthetic patients enter Neon; the 100k-patient dataset stays local. |
-| Local verifier (A+, optional) | `MEDLYN_VERIFIER=local` selects the trained MLX backend. About 5k examples, one epoch, a ~1.5–1.7B 4-bit Qwen3 base, seq ≤512, ≤45 min training on the M4 Pro Mac. Unset keeps GPT; switch only after equal-or-better held-out results. |
-| Synthetic proxy jobs (A+) | `MEDLYN_LLM_CONCURRENCY` limits requests per process (default 8). Synthetic jobs set it to 3 and yield to real regression work. It does not coordinate limits across processes. |
+| Service                    | Role and configuration                                                                                                                                                      |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OpenAI-compatible proxy    | `OPENAI_BASE_URL`, `OPENAI_API_KEY`; `MODEL_REASONING` for extraction/judging, `MODEL_FAST` for live selection, chat and semantic checks. No hard-coded language-model IDs. |
+| Structured engine client   | Fetch + JSON schema + Zod validation; one malformed-output retry. `MEDLYN_LLM_CONCURRENCY` defaults to 8 per process; synthetic jobs use 3.                                 |
+| AI SDK v7 and AI Elements  | Chat/tool streaming and generative clinical views; persisted validated message parts in Neon. Replaces the earlier assistant-ui dock.                                       |
+| Neon + Drizzle             | Documents, facts, findings, caches, reviews, letters and chat history. `DATABASE_URL`; optional separate frozen demo connection.                                            |
+| Gemini Embedding 2         | Optional text/page retrieval vectors through `GEMINI_API_KEY`; default pacing 80 inputs/min/process. Located text, not embeddings, establishes evidence.                    |
+| Local MLX verifier         | Quantised-base Qwen3 LoRA research and HTTP client. `MEDLYN_VERIFIER=local` gates that client, but the shared validator does not invoke it; leave unset for GPT.            |
+| fish.audio                 | Optional TTS via `FISH_AUDIO_API_KEY` and `FISH_AUDIO_VOICE_ID`; signed validated text only, browser speech synthesis fallback.                                             |
+| Browser speech recognition | Feature-detected push-to-talk uses the typed-text path; unsupported browsers hide it. `MODEL_STT` remains empty.                                                            |
 
-Engine structured calls use a thin fetch client with JSON-schema output, Zod validation and one retry for malformed output. AI SDK v7 and its OpenAI provider handle the agent's tool loop; assistant-ui supplies the dock. The A+ local verifier is an optional backend pending training and held-out evaluation; it is not a default-service change. A+ training does not require the H100.
+No self-hosted vLLM inference service is integrated. A hosted demo needs real access
+control: the reserved `DEMO_PASSWORD` setting alone is not enforced. Public origins
+are build-time configuration; patient-app noindex headers and robots rules do not
+provide authentication. See [SEO](docs/seo.md) for indexing/deployment checks.
 
-## Run locally
+## Data and licences
 
-Use Node.js 24 or newer and pnpm 10.18.0. Obtain the challenge data separately and access to the proxy and a Neon database. From the repository root:
+Challenge data must never reach git. This includes `data/`,
+`TRACK-1-clinical-documentation/`, archives, dumps, `.env` and copied document text
+in source, tests, prompts, commit messages or PR bodies. Load it at runtime and
+reference passages as `documentId@start–end`. Husky runs the data guard before
+staged Biome and ruff; commit-msg enforces Conventional Commits. A missing local
+corpus reduces the guard to path checks, not permission to publish text.
+Only the fresh 20-patient synthetic sample may be committed from bulk data.
 
-```sh
-pnpm i
-cp .env.example .env
-# Fill in .env before continuing.
-pnpm db:push
-pnpm ingest --data <path>
-pnpm warm
-pnpm dev
-# In a second terminal, after the web app starts:
-pnpm eval
-```
+The root tree has no project-wide licence declaration. Third-party package
+licences do not establish rights to the supplied landing design, media or fonts.
+The user chose to preserve them as-is and acknowledged the **ABC Marist font and
+third-party design/asset licence risk**; their reuse/distribution rights remain
+unverified. Waldenburg is not bundled; the patient app uses Inter/Geist Mono.
 
-Replace `<path>` with the patient directory containing `patient.json`, `documents.json` and `documents/`. Set `MEDLYN_DATA_PATH` in the root `.env` to the same directory, relative to the repository root or absolute. Set the proxy URL, API key, both model roles and database URL; Fish credentials are needed for Fish speech output. Scripts and the web configuration load the root `.env`.
+Selected dependency groups below reflect installed package metadata and retained
+notices, not a complete transitive licence audit:
 
-Open [localhost:3000](http://localhost:3000). Ingestion currently also warms the configured situations; `pnpm warm` explicitly refreshes them. `pnpm smoke` checks proxy capabilities and latency. `pnpm typecheck` and `pnpm test` run workspace checks.
+| Dependency or asset                                                                     | Licence / terms                                                                         |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Next.js, React, Tailwind, Motion, shadcn, Radix/Base UI, Hugeicons                      | MIT                                                                                     |
+| Recharts, TanStack Table, dnd-kit, XYFlow, Embla, cmdk, Sonner, Vaul, next-themes       | MIT                                                                                     |
+| Shiki, tokenlens, cn, clsx, tailwind-merge, tw-animate-css, nanoid, use-stick-to-bottom | MIT                                                                                     |
+| Lenis, dotLottie React                                                                  | MIT                                                                                     |
+| AI SDK (`ai`, `@ai-sdk/*`), Streamdown, class-variance-authority                        | Apache-2.0                                                                              |
+| Drizzle ORM, TypeScript, Playwright                                                     | Apache-2.0                                                                              |
+| Neon driver, Drizzle Kit, Zod, Vitest, promptfoo, Turbo, Husky, type definitions        | MIT                                                                                     |
+| Biome                                                                                   | MIT OR Apache-2.0                                                                       |
+| Lucide (retained dependencies, including landing)                                       | ISC; app code convention uses Hugeicons                                                 |
+| `gsap`, `@gsap/react`                                                                   | GSAP standard licence; preserve its installed terms                                     |
+| Geist fonts / Inter                                                                     | SIL Open Font License; retain font notices                                              |
+| Ported pynegex German negation triggers                                                 | Python Software Foundation-style terms; upstream licence/attribution retained in source |
+| MLX-LM / upstream Qwen3 weights                                                         | MIT / Apache-2.0; preserve selected conversion and adapter provenance                   |
+| ReportLab / PyMuPDF                                                                     | BSD / AGPL or commercial; address applicable distribution/hosting obligations           |
+| pgvector / optional ParadeDB                                                            | PostgreSQL / AGPL-3.0; ParadeDB is unavailable on this Neon host                        |
+| Tectonic and downloaded TeX assets                                                      | MIT engine; TeX assets retain their own licences                                        |
+| Proxy, Gemini and fish.audio                                                            | Hosted service terms; not open-weight licences                                          |
 
-`pnpm eval` writes machine results under `eval/output/`; browser checks require the web server and Playwright's Chromium to be available. Run the held-out evaluation only after the H+7 checkpoint, and do not inspect or tune against its results beforehand. Human-check results before publishing submission metrics in `METRICS.md`; targets and mock output are not results.
-
-A+ command contract (planned until the implementing lanes report verification):
-
-| Command or CLI operation | Purpose and limit |
-| --- | --- |
-| `pnpm eval --suite real` | Five real-patient regression situations; real blind results stay closed until H+7 |
-| `pnpm eval --suite synthetic` | At least 150 synthetic challenges over 50 ingested patients |
-| `pnpm eval --suite all` | Run eligible suites and emit separate reports; never bypass the real blind gate or pool scores |
-| `uv run python -m synth.generate` / `synth.materialise` | From `ml/`: generate 100k seeded patients and materialise the corpus JSON format |
-| `uv run python -m synth.render_pdf` / `synth.rewrite` | From `ml/`, planned: PDF/scan inputs; prose rewrites for at most 300 patients |
-| `uv run python -m verifier.train` / `verifier.evaluate` | From `ml/`: verifier train/eval within the cap; compare with GPT and rules |
-| `make -C paper` | Build the arXiv preprint with tectonic; tables and figures come from evaluation outputs |
-
-Run Python commands from `ml/` using uv; each module in the table needs the full `uv run python -m` prefix. Build verifier inputs with `uv run python -m verifier.build_dataset` before training. Ruff and pytest are the Python checks; use each module’s `--help` for flags. The synth PDF/rewrite entry points remain planned until delivered by that lane. Set `GEMINI_API_KEY` in the root `.env` before embedding; schema and BM25 setup can proceed without it. Leave `MEDLYN_VERIFIER` unset for GPT. Python jobs must receive the root environment; do not create per-package `.env` files.
-
-Keep bulk synthetic shards, rendered PDFs/scans, weights and adapters local and gitignored; only the fresh 20-patient synthetic sample may be committed. Never use challenge text in templates or training. Split by patient and generation family before rewriting. Real regression, real blind held-out, synthetic pipeline, retrieval and verifier results have separate denominators; no combined score. Paper numbers must be human-checked. The [PRD dependency table](docs/PRD.md#dependencies) records A+ licences, including PyMuPDF's AGPL/commercial terms and the upstream Qwen3 model licence.
-
-## Data handling
-
-Only synthetic patient data is in scope. Challenge data is loaded at runtime and must never be published in this repository. Keep `data/`, `TRACK-1-clinical-documentation/`, archives, database dumps and `.env` out of git. This also applies to copied document text in code, fixtures, prompts, commit messages and PR descriptions; use passage references such as `documentId@start–end` instead.
-
-Installation configures the pre-commit hook. Its data check blocks forbidden paths and checks staged content for 120-character source passages when the local corpus is available. Without the corpus, it checks paths only. Never bypass it. Evaluation output can contain patient evidence and must remain local. Any hosted submission demo must be password protected.
-
-## Dependency licences
-
-Direct third-party dependencies declared in the workspace manifests are listed below. Licence names were checked against installed package metadata and licence files; this is not a transitive dependency inventory. The internal `@medlyn/engine` workspace reference adds no third-party dependency.
-
-| Dependency | Use | Licence |
-| --- | --- | --- |
-| `next`, `react`, `react-dom` | Web application | MIT |
-| `tailwindcss`, `@tailwindcss/postcss` | Styling | MIT |
-| `motion` | UI animation | MIT |
-| `geist` | Fonts | SIL Open Font License 1.1 |
-| `ai`, `@ai-sdk/openai` | Agent tool loop and proxy provider | Apache-2.0 |
-| `@assistant-ui/react`, `@assistant-ui/react-ai-sdk` | Investigation dock | MIT |
-| `@neondatabase/serverless` | Database driver | MIT |
-| `drizzle-orm` | Database queries and schema | Apache-2.0 |
-| `drizzle-kit` | Schema tooling | MIT |
-| `zod` | Runtime contracts and structured output | MIT |
-| `promptfoo` | Evaluation | MIT |
-| `@playwright/test` | Browser checks | Apache-2.0 |
-| `vitest` | Unit tests | MIT |
-| `turbo` | Workspace tasks | MIT |
-| `typescript` | Type checking | Apache-2.0 |
-| `@types/node`, `@types/react`, `@types/react-dom` | Type definitions | MIT |
-| Borrowed [pynegex German trigger list](https://github.com/DFKI-NLP/pynegex/blob/a4cabe5c1203bd6b0590afca20a55c3a6a8c8c2a/pynegex/model/triggersets/cotik-de.txt) | 512 triggers ported to TypeScript with bounded-scope matching; attribution and upstream licence retained in the source | Python Software Foundation licence, including upstream notices |
-
-## What works / what doesn't
-
-### What works
-
-### What doesn't
+Start contributing with [AGENTS.md](AGENTS.md). The [documentation index](docs/README.md)
+links the specification, architecture, decisions, measured status and research guides.
