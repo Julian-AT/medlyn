@@ -6,6 +6,13 @@ import type { ComponentProps } from "react";
 import { useCallback } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { cn } from "@/lib/utils";
 
 export type ConversationProps = ComponentProps<typeof StickToBottom>;
@@ -40,23 +47,15 @@ export const ConversationEmptyState = ({
   children,
   ...props
 }: ConversationEmptyStateProps) => (
-  <div
-    className={cn(
-      "flex size-full flex-col items-center justify-center gap-3 p-8 text-center",
-      className,
-    )}
-    {...props}
-  >
+  <Empty className={cn("size-full gap-3 p-8", className)} {...props}>
     {children ?? (
-      <>
-        {icon && <div className="text-muted-foreground">{icon}</div>}
-        <div className="space-y-1">
-          <h3 className="font-medium text-sm">{title}</h3>
-          {description && <p className="text-muted-foreground text-sm">{description}</p>}
-        </div>
-      </>
+      <EmptyHeader>
+        {icon && <EmptyMedia className="text-primary">{icon}</EmptyMedia>}
+        <EmptyTitle className="text-base font-medium">{title}</EmptyTitle>
+        {description && <EmptyDescription>{description}</EmptyDescription>}
+      </EmptyHeader>
     )}
-  </div>
+  </Empty>
 );
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
@@ -81,7 +80,7 @@ export const ConversationScrollButton = ({
         variant="outline"
         {...props}
       >
-        <HugeiconsIcon icon={ArrowDownIcon} className="size-4" />
+        <HugeiconsIcon icon={ArrowDownIcon} size={18} strokeWidth={1.75} aria-hidden="true" />
       </Button>
     )
   );
