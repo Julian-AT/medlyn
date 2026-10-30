@@ -13,16 +13,17 @@ import { getDb } from "../db/client.ts";
 import { lensCache } from "../db/schema.ts";
 import { PATIENT_ID } from "../store.ts";
 
-export const ENGINE_VERSION = "lens-pipeline-15";
+export const ENGINE_VERSION = "lens-pipeline-16";
 
 export function lensCacheKey(
   situation: Situation,
   window: EvidenceWindow,
   facts: Fact[],
   segments: Segment[],
+  patientId = PATIENT_ID,
 ): string {
   return cacheKey({
-    patientId: PATIENT_ID,
+    patientId,
     corpusRevision: window.corpusRevision,
     asOf: window.asOf,
     eligibleDocumentIds: window.eligibleDocumentIds,
@@ -33,15 +34,17 @@ export function lensCacheKey(
   });
 }
 
-export async function getCache(key: string): Promise<LensScreen | null> {
+export async function getCache(key: string, patientId = PATIENT_ID): Promise<LensScreen | null> {
   const [row] = await getDb()
     .select({ screen: lensCache.screen })
     .from(lensCache)
-    .where(and(eq(lensCache.key, key), eq(lensCache.patientId, PATIENT_ID)))
+    .where(and(eq(lensCache.key, key), eq(lensCache.patientId, patientId)))
     .limit(1);
   if (!row) return null;
   const parsed = Screen.safeParse(row.screen);
-  return parsed.success && parsed.data.lensKey === key ? parsed.data : null;
+  return parsed.success && parsed.data.lensKey === key && parsed.data.patient.id === patientId
+    ? parsed.data
+    : null;
 }
 
 export async function putCache(screen: LensScreen): Promise<void> {
@@ -56,7 +59,7 @@ export async function putCache(screen: LensScreen): Promise<void> {
     .insert(lensCache)
     .values({
       key: checked.lensKey,
-      patientId: PATIENT_ID,
+      patientId: checked.patient.id,
       screen: checked,
       timings: checked.timings,
     })
