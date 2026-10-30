@@ -13,13 +13,14 @@ agreement and synthetic evaluation coverage still miss acceptance targets. See
 
 ## Two applications
 
-| App                 | Workspace                  | Local URL                               | Deployment example        |
-| ------------------- | -------------------------- | --------------------------------------- | ------------------------- |
-| Public landing page | `apps/www` · `@medlyn/www` | [localhost:3001](http://localhost:3001) | `https://example.com`     |
-| Patient app         | `apps/app` · `@medlyn/app` | [localhost:3000](http://localhost:3000) | `https://app.example.com` |
+| App                 | Workspace                  | Local URL                               | Public URL                                     |
+| ------------------- | -------------------------- | --------------------------------------- | ---------------------------------------------- |
+| Public landing page | `apps/www` · `@medlyn/www` | [localhost:3001](http://localhost:3001) | [medlyn.health](https://medlyn.health)         |
+| Patient app         | `apps/app` · `@medlyn/app` | [localhost:3000](http://localhost:3000) | [app.medlyn.health](https://app.medlyn.health) |
 
-The patient workspace is `apps/app` / `@medlyn/app`. Example domains are
-placeholders, not deployed demos.
+See the [app README](apps/app/README.md), [landing README](apps/www/README.md),
+[GitHub repository](https://github.com/Julian-AT/medlyn) and
+[hackathon track documentation](https://docs.healthcare-hackathon.eu/).
 
 The public site preserves the supplied design. The patient app uses a neutral
 ElevenLabs-inspired shadcn shell with chat home/history, patient category pages,
