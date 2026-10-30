@@ -34,9 +34,9 @@ export function SidebarNavItem({
         isActive={active}
         tooltip={item.title}
         className={cn(
-          "h-9 gap-2.5 rounded-[10px] px-2.5 text-sm/5 font-medium text-muted-foreground hover:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground",
+          "h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground",
           "data-active:bg-sidebar-accent data-active:text-foreground data-active:[&_svg]:text-foreground",
-          count !== undefined && "pr-12",
+          warning && count !== undefined && "pr-10",
         )}
       >
         <Link
@@ -48,7 +48,7 @@ export function SidebarNavItem({
           <span>{item.title}</span>
         </Link>
       </SidebarMenuButton>
-      {count !== undefined && (
+      {warning && count !== undefined && (
         <SidebarMenuBadge
           className={cn("text-muted-foreground", warning && "bg-warning text-warning-foreground")}
         >
