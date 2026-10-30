@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 export function DocumentsTable({
   documents,
   title = "Source documents",
@@ -64,21 +65,34 @@ export function DocumentsTable({
         </InputGroup>
       </CardContent>
       <CardContent className="px-0 [&>[data-slot=table-container]]:max-h-[36rem] [&_[data-slot=table-row]]:border-gray-alpha-100">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader className="sticky top-0 z-10 bg-background [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-head]]:text-muted-foreground">
             <TableRow>
-              <TableHead>Date</TableHead>
+              <TableHead className="w-28">Date</TableHead>
               <TableHead>Document</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Read</TableHead>
+              <TableHead className="w-1/4 max-sm:hidden">Department</TableHead>
+              <TableHead className="w-36">Read</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visible.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell className="font-mono text-xs">{formatDate(doc.docDate)}</TableCell>
-                <TableCell className="whitespace-normal">{doc.titleEn || doc.title}</TableCell>
-                <TableCell className="whitespace-normal text-muted-foreground">
+                <TableCell className="min-w-0">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <CardDescription
+                        tabIndex={0}
+                        className="min-w-0 truncate text-foreground"
+                        aria-label={doc.titleEn || doc.title}
+                      >
+                        {doc.titleEn || doc.title}
+                      </CardDescription>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">{doc.titleEn || doc.title}</TooltipContent>
+                  </Tooltip>
+                </TableCell>
+                <TableCell className="break-words whitespace-normal text-muted-foreground max-sm:hidden">
                   {doc.department}
                 </TableCell>
                 <TableCell>
@@ -90,7 +104,7 @@ export function DocumentsTable({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="min-h-10 rounded-full"
+                        className="h-8 rounded-control"
                       >
                         Read document
                       </Button>
