@@ -7,6 +7,7 @@ import { z } from "zod";
 import { ChatConversation } from "@/components/chat/chat-conversation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { activePatientId } from "@/lib/patient-server";
+import { visibleChatMessages } from "../../../api/chat/history-view";
 
 export const metadata: Metadata = { title: "Conversation · Medlyn" };
 
@@ -23,7 +24,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   if (owner && owner.patientId !== patientId) notFound();
   try {
     const chat = await loadChat(id, patientId);
-    const messages = await validateUIMessages({ messages: chat?.messages ?? [] });
+    const stored = visibleChatMessages(chat?.messages ?? []);
+    // A brand-new chat has no history yet, and validateUIMessages rejects an empty list.
+    const messages = stored.length ? await validateUIMessages({ messages: stored }) : [];
     return <ChatConversation key={id} id={id} initialMessages={messages} />;
   } catch (error) {
     console.warn("chat_page_unavailable", error instanceof Error ? error.name : "Unknown");
