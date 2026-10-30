@@ -59,18 +59,26 @@ export async function evidenceWindow(
   asOf?: string,
   patientId = PATIENT_ID,
 ): Promise<EvidenceWindow> {
-  const revision = await currentRevision(patientId);
-  const docs = await getDb()
-    .select({ id: t.documents.id, docDate: t.documents.docDate })
+  const db = getDb();
+  const latest = db
+    .select({ id: t.corpusRevisions.id })
+    .from(t.corpusRevisions)
+    .where(eq(t.corpusRevisions.patientId, patientId))
+    .orderBy(desc(t.corpusRevisions.createdAt))
+    .limit(1);
+  const docs = await db
+    .select({ id: t.documents.id, docDate: t.documents.docDate, revision: t.documents.revisionId })
     .from(t.documents)
-    .where(and(eq(t.documents.patientId, patientId), eq(t.documents.revisionId, revision)))
+    .where(and(eq(t.documents.patientId, patientId), eq(t.documents.revisionId, latest)))
     .orderBy(asc(t.documents.docDate));
-  if (!docs.length) throw new Error(`No documents for corpus revision ${revision}`);
-  const effective = asOf ?? docs.at(-1)!.docDate;
+  const latestDocument = docs.at(-1);
+  if (!latestDocument)
+    throw new Error(`No documents for the current corpus revision of ${patientId}`);
+  const effective = asOf ?? latestDocument.docDate;
   const window = {
     asOf: effective,
     eligibleDocumentIds: docs.filter((d) => d.docDate <= effective).map((d) => d.id),
-    corpusRevision: revision,
+    corpusRevision: docs[0].revision,
   };
   await assertWindowCurrent(window, patientId);
   return window;
