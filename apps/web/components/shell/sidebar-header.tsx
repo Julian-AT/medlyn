@@ -13,13 +13,13 @@ import { BrandMark } from "./brand-mark";
 export function ShellSidebarHeader() {
   const { setOpenMobile } = useSidebar();
   return (
-    <SidebarHeader className="px-3 pt-4 pb-2 group-data-[collapsible=icon]:px-2">
+    <SidebarHeader className="px-3 pt-4 pb-3 group-data-[collapsible=icon]:px-2">
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
             asChild
             tooltip="Medlyn home"
-            className="h-10 gap-2 px-2.5 text-xl font-bold tracking-tight text-foreground hover:bg-transparent active:bg-transparent"
+            className="h-10 gap-2 px-2 text-xl font-bold tracking-tight text-foreground hover:bg-transparent active:bg-transparent"
           >
             <Link href="/" onClick={() => setOpenMobile(false)}>
               <BrandMark />
