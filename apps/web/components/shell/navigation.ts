@@ -1,11 +1,11 @@
 import {
   Analytics01Icon,
-  BubbleChatIcon,
   Calendar03Icon,
   ChartHistogramIcon,
   Dna01Icon,
   File02Icon,
   HeartCheckIcon,
+  Home01Icon,
   Image01Icon,
   MedicalMaskIcon,
   Medicine01Icon,
@@ -18,7 +18,7 @@ import {
   UserIcon,
 } from "@hugeicons/core-free-icons";
 export const navigation = [
-  { label: "Workspace", items: [{ title: "Chat", href: "/", icon: BubbleChatIcon }] },
+  { label: "Workspace", items: [{ title: "Home", href: "/", icon: Home01Icon }] },
   {
     label: "Patient record",
     items: [
@@ -54,6 +54,6 @@ export const navigation = [
 export function routeTitle(pathname: string) {
   return (
     navigation.flatMap((group) => group.items).find((item) => item.href === pathname)?.title ??
-    "Chat"
+    "Home"
   );
 }
