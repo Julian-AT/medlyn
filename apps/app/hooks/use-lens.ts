@@ -42,7 +42,7 @@ export function useLens(initial: InitialSituation = {}) {
         signal: controller.signal,
       });
       if (!response.ok || !response.body)
-        throw new Error("The lens could not be opened. Retry your situation.");
+        throw new Error("The situation could not be checked. Retry your situation.");
       if (number !== sequence.current) return;
       setMock(response.headers.get("X-Medlyn-Mode") === "mock");
       await readLensStream(response.body, (event) => {
@@ -58,9 +58,9 @@ export function useLens(initial: InitialSituation = {}) {
           message:
             controller.signal.reason === "timeout"
               ? "The evidence check took too long. Retry your situation."
-              : error instanceof Error && error.message.startsWith("The lens")
+              : error instanceof Error && error.message.startsWith("The situation")
                 ? error.message
-                : "The lens response could not be read. Retry your situation.",
+                : "The evidence response could not be read. Retry your situation.",
           retryable: true,
         });
       }

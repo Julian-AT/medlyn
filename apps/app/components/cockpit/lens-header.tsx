@@ -1,4 +1,5 @@
 import type { Screen } from "@medlyn/engine/contracts";
+import { formatDate } from "@medlyn/engine/dates";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 export function LensHeader({
@@ -16,7 +17,7 @@ export function LensHeader({
     <Card className="rounded-none bg-transparent py-0 shadow-none ring-0">
       <CardHeader className="gap-2 px-0">
         <CardDescription className="flex flex-wrap items-center gap-2">
-          Clinical lens
+          Situation summary
           <Badge
             variant="outline"
             className={
@@ -35,16 +36,17 @@ export function LensHeader({
           </Badge>
           {screen && (
             <Badge variant="secondary">
-              {screen.window.eligibleDocumentIds.length} documents · {screen.window.asOf}
+              {screen.window.eligibleDocumentIds.length} documents ·{" "}
+              {formatDate(screen.window.asOf)}
             </Badge>
           )}
         </CardDescription>
         <CardTitle className="text-xl font-semibold tracking-tight">
           {screen?.situation.task ??
-            (error ? "Try your situation again" : "Preparing your clinical lens")}
+            (error ? "Try your situation again" : "Preparing your situation summary")}
         </CardTitle>
         <CardDescription>
-          {screen?.situation.role ?? "The eligible documents are being checked."}
+          {screen?.situation.role ?? "Checking the source documents for your role and task."}
         </CardDescription>
       </CardHeader>
     </Card>
