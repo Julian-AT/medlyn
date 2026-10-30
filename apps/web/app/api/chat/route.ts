@@ -20,6 +20,7 @@ import { z } from "zod";
 import { patientEvidence } from "@/lib/patient-evidence";
 import { patientIdFromRequest } from "../../../lib/active-patient.ts";
 import { trackUiEvidence } from "./evidence";
+import { historyBeforeQuestion } from "./history-view";
 import { chatContext } from "./patient-context";
 import { patientUiTools } from "./patient-ui-tools";
 import { evidenceTools } from "./tools";
@@ -96,6 +97,20 @@ export async function POST(request: Request) {
     if (owner && owner.patientId !== patientId)
       return Response.json({ error: "Chat not found for this patient" }, { status: 404 });
     const history = await loadChat(id, patientId);
+    const savedQuestion = history?.messages.find((message) => message.id === last.id);
+    if (
+      savedQuestion &&
+      (savedQuestion.id !== history?.messages.findLast((message) => message.role === "user")?.id ||
+        savedQuestion.parts
+          .filter((part) => part.type === "text")
+          .map((part) => String(part.text ?? ""))
+          .join("\n")
+          .trim() !== question)
+    )
+      return Response.json(
+        { error: "Only the latest question can be retried. Refresh the conversation." },
+        { status: 409 },
+      );
     const savedContext = history?.messages
       .flatMap((message) => message.parts)
       .findLast((part) => part.type === "data-evidence-context");
@@ -123,7 +138,7 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
     // History comes from Neon; client-supplied assistant text and tool output are never replayed.
-    const previous = (history?.messages ?? []).filter((message) => message.id !== last.id);
+    const previous = historyBeforeQuestion(history?.messages ?? [], last.id);
     const modelMessages: ModelMessage[] = previous.slice(-12).map((message) => ({
       role: message.role,
       content:

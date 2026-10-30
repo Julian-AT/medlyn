@@ -1,5 +1,6 @@
 import { deleteChat, loadChat } from "@medlyn/engine/agent/chat/history";
 import { patientIdFromRequest } from "../../../../lib/active-patient.ts";
+import { visibleChatMessages } from "../history-view";
 
 export const runtime = "nodejs";
 
@@ -7,7 +8,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   try {
     const chat = await loadChat((await params).id, patientIdFromRequest(request));
     return chat
-      ? Response.json(chat, { headers: { "Cache-Control": "no-store" } })
+      ? Response.json(
+          { ...chat, messages: visibleChatMessages(chat.messages) },
+          { headers: { "Cache-Control": "no-store" } },
+        )
       : Response.json({ error: "Chat not found" }, { status: 404 });
   } catch (error) {
     console.warn("chat_history_unavailable", {
