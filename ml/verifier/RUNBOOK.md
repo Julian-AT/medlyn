@@ -1,7 +1,7 @@
 # Lane E runbook
 
 Run from `/Users/julianschmidt/Developer/medlyn/ml`. Dependencies are already installed. Use the
-root `.env`; do not create a package dotenv. Never run MLX in the sandbox. Set
+root `.env`; do not create a package dotenv. Run GPU work only on the authorised Mac; submission checks do not run MLX. Set
 `UV_CACHE_DIR=/private/tmp/medlyn-uv-cache` for restricted CPU sessions; all commands below use
 `--no-sync` and do not install dependencies. GPU jobs must yield to the regression/demo.
 
@@ -11,9 +11,10 @@ root `.env`; do not create a package dotenv. Never run MLX in the sandbox. Set
   rewritten suite from 30 eligible test patients. Span/split/frozen-hash audit passes.
 - `verifier/runs/real/real-gold.examples.jsonl`: 100 test-only real-text rule-labelled claims.
   `real-gold-manifest.json` contains only counts, ids and offsets.
-- `results.json` and `results.md`: existing pilot predictions reanalysed with CIs, confusion and
-  calibration. Status explicitly says no v2 retraining. Error exports stay in ignored runs.
-- No v2 adapter, selected threshold, GPT savings or cascade regression score exists yet.
+- `results.json` and `results.md`: the completed checkpoint evaluation with CIs, confusion, calibration and
+  offline cascade projections. Error exports stay in ignored runs.
+- The full-data checkpoint and validation-selected threshold exist. The training run hit its
+  cap before finishing an epoch. Offline savings do not establish a live regression score.
 
 ## 1. Reproduce CPU checks
 

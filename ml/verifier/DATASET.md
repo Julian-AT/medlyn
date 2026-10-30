@@ -5,7 +5,7 @@ passages as supported, unsupported or contradicted; assertion and timing are tra
 
 ## Composition and provenance
 
-The local `verifier/runs/data-v2` preview contains 24,000 training, 3,000 validation and 3,000 test
+The local frozen `verifier/runs/data-v2-final` manifest contains 24,000 training, 3,000 validation and 3,000 test
 examples, balanced equally across the three labels. Source patients come from the independently
 rendered synth-v1 corpus. Generator labels and mutation ledgers supply truth; the Medlyn extractor
 does not label this benchmark. Quotes are checked against final normalised document text using
@@ -25,16 +25,15 @@ and typo dates out of train and validation. Other negatives include same-kind nu
 precise numeric/dose changes, side flips, negation scope, temporal shifts and wrong-document
 citations. Unsupported additions remain in the distribution; the model may learn their shortcut.
 
-A separate rewritten-prose test suite currently contains 900 examples from **30** eligible test
-patients, not 300. The existing corpus rewrote 300 patients across all splits (240 train, 30
-validation, 30 test); those train/validation rewrites are excluded by v2. `prepare_rewrites`
-copies 300 untouched test patients before calling the bounded existing rewriter. Rejected rewrites
-retain original text and are not claimed as rewritten patients. Build a new frozen output directory
-after that command; never replace a published test file in place. Rewritten patient documents can
-contain unchanged template spans, so this suite does not establish wholly free-form prose transfer.
+The separate rewritten-prose test family contains 900 examples from 234 eligible
+patients in the frozen manifest, below its 300-patient target. This population is
+distinct from the main corpus's cross-split rewrite count. The saved comparison samples
+bounded subsets; its method denominators are in [results.json](results.json). Rewritten
+patient documents can retain template spans, so this is not wholly free-form prose transfer.
 
-The preview's test and rewritten hashes are in `results.json.v2DataStatus.frozenTests`. Test files
-are immutable once `frozen-test.json` exists. A subsequent build refuses that output directory.
+Frozen test hashes are recorded in `results.json.evaluationIdentity.frozenTests`.
+Test files are immutable once their freeze record exists. New builds use a new output
+directory instead of replacing a published test file.
 
 ## Real-text transfer set
 
@@ -44,7 +43,7 @@ verdicts and 50 side/number/negation rule negatives. Real text exists only in ig
 UTF-16 offsets. Source corpus revision must match the database; eligibility comes exclusively from
 `store.evidenceWindow`. No review overlay is used.
 
-These are **rule labels with human review pending**. Positives inherit the engine judge's support
+These are **rule labels without independent clinician annotation**. Positives inherit the engine judge's support
 verdict and are not independent semantic gold. The set has two classes and one patient: macro-F1
 still averages all three classes (ceiling 2/3 for a perfect prediction). Claim bootstrap intervals
 are conditional on this patient and do not estimate transfer to other patients. The older cached

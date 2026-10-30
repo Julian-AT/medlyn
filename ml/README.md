@@ -1,19 +1,31 @@
 # Medlyn ML research
 
-Run Python from this directory using the installed uv environment. Root `.env` is the only
-configuration source. Bulk inputs, real text, predictions and weights remain ignored.
+Run Python from this directory with uv and the installed environment. Root `.env`
+is the only configuration source. Source text, bulk synthetic data, predictions,
+adapters and weights remain local and ignored.
 
-- [Synthetic generator](synth/README.md): deterministic patient histories and bounded prose rewrites.
-- [Verifier runbook](verifier/runbook.md): ordered CPU checks, data preparation, bounded Mac sweep,
-  evaluation and serving commands.
-- [Dataset card](verifier/dataset.md): MedlynBench-synth v1 and the test-only real-text rule set.
-- [Model card](verifier/model-card.md): model identity, intended use and measured limitations.
-- [Results](verifier/results.md): current measurements and their evaluation identities.
+| Area                 | Documentation                                                                                        |
+| :------------------- | :--------------------------------------------------------------------------------------------------- |
+| Synthetic corpus     | [Generation, materialisation, rewrites and PDF fixtures](synth/README.md)                            |
+| Verifier             | [Runbook](verifier/RUNBOOK.md), [dataset](verifier/DATASET.md), [model card](verifier/model-card.md) |
+| Measured comparison  | [Results](verifier/RESULTS.md) and [numeric aggregates](verifier/results.json)                       |
+| Quantum              | [Offline control and IBM hardware experiment](quantum/README.md)                                     |
+| Additional baselines | [Incomplete benchmark scope](bench/REPORT.md)                                                        |
 
-The v2 pipeline builds 24,000 train / 3,000 validation / 3,000 test examples. Rewritten prose is a
-separate test family; the local preview has only 30 eligible rewritten patients of the 300 target.
-There are 100 real-text rule-labelled claims; their committed manifest contains only counts and
-source references. None of those real claims enter training, selection or calibration.
+The final verifier dataset has 24,000 train, 3,000 validation and 3,000 test examples;
+the evaluation uses bounded subsets and a separate rewritten family. Real-text claims
+are test-only rule labels and never enter training or calibration. The full-data MLX
+run hit its time cap; its saved checkpoint was evaluated. Results include calibrated
+local scores, GPT and an offline cascade. GPT remains the application's default
+semantic verifier; research savings are routing projections.
 
-Current scores are the existing pilot predictions reanalysed with v2 statistics. No new MLX
-training or inference ran in the sandbox. GPT remains the application's default verifier.
+```sh
+uv run --no-sync ruff check .
+uv run --no-sync python -m pytest
+uv run --no-sync python -m synth.generate --help
+uv run --no-sync python -m verifier.evaluate --help
+```
+
+Use the runbooks for data preparation and GPU commands. Do not rerun training or
+network evaluations during submission checks. The paper reads frozen aggregate
+results, not patient text or live services.
