@@ -1,26 +1,39 @@
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
-\begin{tikzpicture}[node distance=6mm and 8mm,block/.style={draw,rectangle,
-  minimum height=10mm,text width=37mm,align=center,font=\small},
-  flow/.style={-{Latex[length=2mm]},semithick}]
-\node[block] (claim) {Patient statement\\claim and cited identifiers};
-\node[block,below=of claim] (scope) {Verify identity\\patient, revision and window};
-\node[block,below=of scope] (kind) {Dispatch by claim kind};
-\node[block,below=of kind] (semantic) {Composed claim\\compare with source context};
-\node[block,left=of semantic] (template) {Template claim\\check fields and located spans};
-\node[block,right=of semantic] (absence) {Absence claim\\lexical and full-text checks};
-\node[block,below=of semantic] (verdict) {Support verdict\\retain evidence identity};
-\node[block,below=of verdict] (release) {Release supported text};
-\node[block,left=of verdict] (fallback) {Reject, use checked template\\or mark unavailable};
-\path[flow] (claim) edge (scope) (scope) edge (kind) (kind) edge (semantic)
-  (template) edge (verdict) (semantic) edge (verdict) (absence) edge (verdict)
-  (verdict) edge node[right,font=\footnotesize]{pass} (release)
-  (verdict) edge node[above,font=\footnotesize]{fail} (fallback);
-\draw[flow] (kind.west) -| (template.north);
-\draw[flow] (kind.east) -| (absence.north);
+\begin{tikzpicture}[med diagram]
+\node[med io] (claim) at (0,-1) {Claim};
+\node[med check] (code) at (0,0) {Code\\Check};
+\node[med store] (cache) at (-3.6,0) {Cache\\Key};
+\node[med note,anchor=west] at (-3.35,1.3) {Template};
+\node[med note] at (0,1.3) {Composed};
+\node[med note,anchor=west] at (3.85,1.3) {Absence};
+\node[med check] (fields) at (-3.6,2.25) {Field\\Check};
+\node[med check] (spans) at (-3.6,3.5) {Span\\Check};
+\node[med data] (context) at (0,2.25) {Cited Facts\\+ Context};
+\node[med check] (semantic) at (0,3.5) {Semantic\\Check};
+\node[med code] (lexical) at (3.6,2.25) {Lexical\\Search};
+\node[med check] (fulltext) at (3.6,3.5) {Full-text\\Check};
+\node[med check] (verdict) at (0,5.3) {Verdict};
+\node[med io] (output) at (0,6.75) {Supported / Rejected / Unavailable};
+
+\begin{scope}[on background layer]
+  \node[med stack,fit=(fields)(spans)(context)(semantic)(lexical)(fulltext),
+    inner ysep=8mm] (checks) {};
+\end{scope}
+\path[med flow] (claim) edge (code) (cache) edge (code)
+  (fields) edge (spans) (context) edge (semantic) (lexical) edge (fulltext)
+  (verdict) edge (output);
+\draw[med wire] (code.north) to (0,.85);
+\draw[med flow] (0,.85) -| (fields.south);
+\draw[med flow] (0,.85) -| (lexical.south);
+\draw[med flow] (0,.85) to (-1.65,.85) |- (semantic.west);
+\draw[med wire] (spans.north) to (-3.6,4.55) to (3.6,4.55) to (fulltext.north);
+\draw[med wire] (semantic.north) to (0,4.55);
+\draw[med flow] (0,4.55) to (verdict.south);
 \end{tikzpicture}
-\caption{Claim validation. A documentation gap requires successful checks across the
-whole eligible record. A timeout yields an unavailable result. Clinician annotations
-and fixed nonclinical boilerplate are typed separately from patient statements.}
+\caption{Claim boundary detail. Composed claims add a semantic check to code checks.
+Absence requires exhaustive lexical and full-text checks over the eligible record.
+The cache key binds the full evidence and claim identity. Check failures cannot
+establish absence.}
 \label{fig:claims}
 \end{figure}
