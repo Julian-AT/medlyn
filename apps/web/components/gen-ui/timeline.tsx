@@ -7,6 +7,7 @@ import { CardContent, CardDescription } from "@/components/ui/card";
 import { groupEvidence } from "@/lib/group-evidence";
 import { ClaimLine } from "./claim-line";
 import { displayDates } from "./display-dates";
+import { useToolPreview } from "./hooks/use-tool-preview";
 import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
@@ -18,18 +19,13 @@ export function Timeline(props: ToolProps<UiToolOutputs["show_timeline"]>) {
     (event) => event.line,
     (event) => facts.get(event.factId),
   );
+  const preview = useToolPreview(groups.length, props.expanded, 5);
   return (
     <ToolFrame
       {...props}
       title="Timeline"
       description={output ? `As of ${displayDates(output.asOf)}` : undefined}
-      action={
-        output && (
-          <Badge variant="secondary" className="font-mono">
-            {groups.length} entries
-          </Badge>
-        )
-      }
+      action={preview.toggle}
     >
       {output?.events.length === 0 ? (
         <ToolEmpty
@@ -37,7 +33,7 @@ export function Timeline(props: ToolProps<UiToolOutputs["show_timeline"]>) {
           description="Try a different event type or open a situation. This view does not establish absence."
         />
       ) : null}
-      {groups.map(({ item: event, sources }) => (
+      {groups.slice(0, preview.limit).map(({ item: event, sources }) => (
         <CardContent
           key={event.factId}
           className="flex min-h-10 flex-col gap-3 border-b border-border p-0 pb-4"
