@@ -151,6 +151,7 @@ contract, not the other way round.
 | 30 Oct | Own verifier uses MLX-LM LoRA on a 4-bit Qwen3 base on the Mac; about 5k examples, one epoch, seq ≤512, ≤45 min training. GPT remains default unless held-out results are equal or better. |
 | 30 Oct | At least 150 synthetic challenges over 50 patients; real regression, real blind held-out, synthetic, retrieval and verifier scores never mix. Challenge data is test-only, never training. |
 | 30 Oct | Technical paper uses an arXiv preprint layout and tectonic; tables/figures come from eval outputs, published numbers human-checked; missing experiments marked unmeasured. |
+| 30 Oct | Neon rejects `pg_search` ("deprecated and no longer allowed"), so BM25 runs in-process over the evidence window's segments; Gemini Embedding 2 free tier is paced at 80 inputs/min (`GEMINI_EMBED_REQUESTS_PER_MINUTE`) |
 
 Add a row whenever the build departs from the PRD.
 
