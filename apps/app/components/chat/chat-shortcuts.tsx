@@ -10,7 +10,7 @@ import {
   TestTube01Icon,
 } from "@hugeicons/core-free-icons";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
-import { CardContent, CardDescription } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { ShortcutTile } from "./shortcut-tile";
 
 const SHORTCUTS = [
