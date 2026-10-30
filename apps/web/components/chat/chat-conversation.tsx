@@ -16,6 +16,7 @@ import { ChatActivity } from "./chat-activity";
 import { ChatComposer } from "./chat-composer";
 import { ChatMessage } from "./chat-message";
 import { useChatConversation } from "./hooks/use-chat-conversation";
+import { useInvestigationQueue } from "./hooks/use-investigation-queue";
 
 export function ChatConversation({
   id,
@@ -25,6 +26,8 @@ export function ChatConversation({
   initialMessages: UIMessage[];
 }) {
   const chat = useChatConversation(id, initialMessages);
+  const queue = useInvestigationQueue(chat.investigate, chat.stop);
+  const busy = chat.busy || Boolean(queue.state?.running);
   return (
     <ArtifactWorkspace messages={chat.messages}>
       <Card className="flex h-full min-h-0 w-full gap-0 rounded-none border-0 bg-transparent py-0 shadow-none ring-0">
@@ -42,9 +45,10 @@ export function ChatConversation({
                 <ChatMessage
                   key={message.id}
                   message={message}
+                  queue={queue}
                   autoOpenSources={!initialMessages.some((initial) => initial.id === message.id)}
                   busy={chat.busy && latest}
-                  disabled={chat.busy}
+                  disabled={busy}
                   investigate={chat.messages[index - 1]?.parts.some(
                     (part) => part.type === "text" && /\binvestigat/i.test(part.text),
                   )}
@@ -80,7 +84,11 @@ export function ChatConversation({
               </AlertDescription>
             </Alert>
           )}
-          <ChatComposer status={chat.status} onSubmit={chat.send} onStop={chat.stop} />
+          <ChatComposer
+            status={queue.state?.running && !chat.busy ? "submitted" : chat.status}
+            onSubmit={chat.send}
+            onStop={queue.state?.running ? queue.stop : chat.stop}
+          />
         </CardContent>
         <CardFooter className="mx-auto w-full max-w-3xl shrink-0 flex-wrap justify-between gap-2 bg-background px-5 py-3 sm:px-8">
           <CardDescription className="text-xs">Answers linked to source documents</CardDescription>

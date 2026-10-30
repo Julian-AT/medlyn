@@ -8,15 +8,19 @@ import { CardDescription } from "@/components/ui/card";
 import { ChatSources } from "./chat-sources";
 import { ChatToolSteps } from "./chat-tool-steps";
 import { CitedResponse } from "./cited-response";
+import { EvidenceContext } from "./evidence-context";
 import { followUpSuggestions } from "./follow-up-suggestions";
+import type { useInvestigationQueue } from "./hooks/use-investigation-queue";
 import type { ValidatedSpeech } from "./hooks/use-speech-output";
 import { InvestigationPlan } from "./investigation-plan";
+import { InvestigationQueue } from "./investigation-queue";
 import { MessageControls } from "./message-controls";
 import { messageEvidence, UNSUPPORTED_ANSWER } from "./message-evidence";
 import { SourceTool } from "./source-tool";
 
 export function ChatMessage({
   message,
+  queue,
   autoOpenSources = false,
   busy = false,
   disabled = false,
@@ -28,6 +32,7 @@ export function ChatMessage({
   speaking = false,
 }: {
   message: UIMessage;
+  queue: ReturnType<typeof useInvestigationQueue>;
   autoOpenSources?: boolean;
   busy?: boolean;
   disabled?: boolean;
@@ -79,7 +84,10 @@ export function ChatMessage({
               />
             )}
             {evidence.unavailable && <CardDescription>{UNSUPPORTED_ANSWER}</CardDescription>}
-            <ChatSources segmentIds={evidence.sources} checked={evidence.checked} />
+            <CardDescription className="flex min-h-7 flex-wrap items-center gap-2">
+              <ChatSources segmentIds={evidence.sources} checked={evidence.checked} />
+              <EvidenceContext message={message} />
+            </CardDescription>
             {!busy && (hasAnswer || evidence.unavailable || tools.length > 0) && (
               <MessageControls
                 id={message.id}
@@ -91,6 +99,17 @@ export function ChatMessage({
                 speaking={speaking}
                 onRetry={onRetry}
                 disabled={disabled}
+              />
+            )}
+            {!busy && (
+              <InvestigationQueue
+                message={message}
+                state={queue.state}
+                disabled={disabled}
+                onStart={(sourceId, questions) => {
+                  void queue.start(sourceId, questions);
+                }}
+                onStop={queue.stop}
               />
             )}
             {!busy && hasAnswer && onFollowUp && (

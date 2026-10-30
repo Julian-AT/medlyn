@@ -37,7 +37,7 @@ export function ChatActivity({ message }: { message?: UIMessage }) {
         <HugeiconsIcon
           icon={Search01Icon}
           size={18}
-          strokeWidth={1.75}
+          strokeWidth={2}
           className="text-primary"
           aria-hidden="true"
         />

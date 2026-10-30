@@ -20,6 +20,7 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
   const [speakingMessage, setSpeakingMessage] = useState<string | null>(null);
   const speech = useSpeechOutput();
   const speechEnabled = useRef(false);
+  const investigationCompleted = useRef(false);
   speechEnabled.current = autoSpeak;
   const chat = useChat({
     id,
@@ -27,6 +28,7 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
     generateId: () => crypto.randomUUID(),
     transport: new DefaultChatTransport({ api: "/api/chat", body: { patientId: patient.id } }),
     onFinish: ({ message, isAbort, isError, isDisconnect }) => {
+      investigationCompleted.current = !isAbort && !isError && !isDisconnect;
       window.dispatchEvent(new Event("medlyn:chat-saved"));
       if (speechEnabled.current && !isAbort && !isError && !isDisconnect) {
         setSpeakingMessage(message.id);
@@ -72,6 +74,12 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
     send(text: string) {
       speech.stop();
       return chat.sendMessage({ text });
+    },
+    async investigate(text: string) {
+      investigationCompleted.current = false;
+      speech.stop();
+      await chat.sendMessage({ text });
+      return investigationCompleted.current;
     },
     retry(messageId?: string) {
       speech.stop();
