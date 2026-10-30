@@ -3,6 +3,7 @@
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReviewEntry, Screen } from "@medlyn/engine/contracts";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +17,7 @@ type Props = {
   onCompare: (id: string) => void;
   onReview: ReviewHandler;
   loading: boolean;
+  error?: string | null;
 };
 
 export function QuestionsPanel({
@@ -25,6 +27,7 @@ export function QuestionsPanel({
   onCompare,
   onReview,
   loading,
+  error,
 }: Props) {
   const questions = screen?.openQuestions ?? [];
   return (
@@ -34,6 +37,12 @@ export function QuestionsPanel({
         <CardDescription>Uncertainties and missing evidence for this task.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
+        {error && (
+          <Alert variant="destructive">
+            <AlertTitle>Questions could not be checked</AlertTitle>
+            <AlertDescription>Return to Facts and retry the evidence check.</AlertDescription>
+          </Alert>
+        )}
         {questions.map((question) => (
           <Question
             key={question.id}
@@ -47,7 +56,7 @@ export function QuestionsPanel({
             onReview={onReview}
           />
         ))}
-        {!questions.length && (
+        {!questions.length && !error && (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
