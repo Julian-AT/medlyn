@@ -30,6 +30,571 @@
           "mean": 0.11973935624054219,
           "p50": 0.07458349864464253,
           "p95": 0.21904199820710346
+        },
+        "macroF1CI95": {
+          "low": 0.23027375201288244,
+          "high": 0.33572701807995925,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 30,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 25,
+            "unsupported": 5,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 0,
+            "unsupported": 30,
+            "contradicted": 0,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_shift": {
+            "n": 8,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 8
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.3397917498659808,
+              "p50": 0.1311249980062712,
+              "p95": 1.8149999959859997
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 8,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "none": {
+            "n": 30,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.1196388676665568,
+              "p50": 0.07164600174291991,
+              "p95": 0.22095900203566998
+            },
+            "confusion": {
+              "supported": {
+                "supported": 30,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.09174160077236593,
+              "p50": 0.08350050120498054,
+              "p95": 0.1625829972908832
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 10,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "number_change": {
+            "n": 3,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 3
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.14401399675989524,
+              "p50": 0.13833299453835934,
+              "p95": 0.21904199820710346
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 3,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "unsupported_addition": {
+            "n": 25,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 25
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.08347828115802258,
+              "p50": 0.07650000043213367,
+              "p95": 0.10695800301618874
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 25,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "wrong_passage": {
+            "n": 5,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 5
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.07495040044886991,
+              "p50": 0.07029200060060248,
+              "p95": 0.0976250012172386
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 5,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.06772924825781956,
+              "p50": 0.06691650196444243,
+              "p95": 0.07874999573687091
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 4,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "side_flip": {
+            "n": 4,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.08013525257410947,
+              "p50": 0.07068700142554007,
+              "p95": 0.11154200183227658
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 4,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "dose_change": {
+            "n": 1,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 1
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.06641700019827113,
+              "p50": 0.06641700019827113,
+              "p95": 0.06641700019827113
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 1,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       },
       "local_qlora": {
@@ -61,6 +626,571 @@
           "mean": 576.5759810446374,
           "p50": 563.204375001078,
           "p95": 697.6629589989898
+        },
+        "macroF1CI95": {
+          "low": 0.6695895285296735,
+          "high": 0.8275349390425215,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 17,
+            "unsupported": 0,
+            "contradicted": 13,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 30,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 9,
+            "unsupported": 0,
+            "contradicted": 21,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_shift": {
+            "n": 8,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 8
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 618.9717446259237,
+              "p50": 571.5007085054822,
+              "p95": 845.5871659971308
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 8,
+                "unavailable": 0
+              }
+            }
+          },
+          "none": {
+            "n": 30,
+            "macroF1": 0.24113475177304963,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 0.5666666666666667,
+                "f1": 0.7234042553191489,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 565.1942804336917,
+              "p50": 550.5947704987193,
+              "p95": 697.6629589989898
+            },
+            "confusion": {
+              "supported": {
+                "supported": 17,
+                "unsupported": 0,
+                "contradicted": 13,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.2222222222222222,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 0.5,
+                "f1": 0.6666666666666666,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 585.5969167001604,
+              "p50": 585.0451044971123,
+              "p95": 689.4077090037172
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 5,
+                "unsupported": 0,
+                "contradicted": 5,
+                "unavailable": 0
+              }
+            }
+          },
+          "number_change": {
+            "n": 3,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 3
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 588.6422363328165,
+              "p50": 563.2680420021643,
+              "p95": 652.5437500022235
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 3,
+                "unavailable": 0
+              }
+            }
+          },
+          "unsupported_addition": {
+            "n": 25,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 25
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 584.9863301601727,
+              "p50": 573.9500830022735,
+              "p95": 718.066125002224
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 25,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "wrong_passage": {
+            "n": 5,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 5
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 531.5763585997047,
+              "p50": 516.4479169980041,
+              "p95": 607.8244169984828
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 5,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 542.0829062495613,
+              "p50": 525.8963749984105,
+              "p95": 615.6957499988494
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 4,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "side_flip": {
+            "n": 4,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 579.2614065012458,
+              "p50": 577.2217710036784,
+              "p95": 610.3995419980492
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          },
+          "dose_change": {
+            "n": 1,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 1
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 594.4227499931003,
+              "p50": 594.4227499931003,
+              "p95": 594.4227499931003
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 1,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": 0.19146859923123793,
+          "coverage": 1.0,
+          "n": 90,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 1,
+              "confidence": 0.4975610415944718,
+              "accuracy": 0.0
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 6,
+              "confidence": 0.5670501077405629,
+              "accuracy": 0.3333333333333333
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 1,
+              "confidence": 0.6752119483160548,
+              "accuracy": 0.0
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 4,
+              "confidence": 0.7601919358780347,
+              "accuracy": 0.5
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 2,
+              "confidence": 0.8510827198792046,
+              "accuracy": 1.0
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 76,
+              "confidence": 0.9910328682987339,
+              "accuracy": 0.8157894736842105
+            }
+          ]
         }
       },
       "proxy_fast": {
@@ -92,6 +1222,571 @@
           "mean": 2026.6606282442808,
           "p50": 1745.8303124985832,
           "p95": 3636.0077499994077
+        },
+        "macroF1CI95": {
+          "low": 0.8287795992714025,
+          "high": 0.9552015928322549,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 30,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 30,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 9,
+            "unsupported": 0,
+            "contradicted": 21,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_shift": {
+            "n": 8,
+            "macroF1": 0.25641025641025644,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 0.625,
+                "f1": 0.7692307692307693,
+                "support": 8
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 2438.9145053737593,
+              "p50": 2388.6926254999707,
+              "p95": 3997.59045799874
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 3,
+                "unsupported": 0,
+                "contradicted": 5,
+                "unavailable": 0
+              }
+            }
+          },
+          "none": {
+            "n": 30,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1958.5720013992006,
+              "p50": 1962.8463339940936,
+              "p95": 2837.551082993741
+            },
+            "confusion": {
+              "supported": {
+                "supported": 30,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.1904761904761905,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 0.4,
+                "f1": 0.5714285714285715,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1379.5185874012532,
+              "p50": 1303.8595210018684,
+              "p95": 2065.5587500004913
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 6,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          },
+          "number_change": {
+            "n": 3,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 3
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1488.401971999944,
+              "p50": 1550.5480409992742,
+              "p95": 1690.0416249991395
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 3,
+                "unavailable": 0
+              }
+            }
+          },
+          "unsupported_addition": {
+            "n": 25,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 25
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 2302.2045582399005,
+              "p50": 1866.5595830025268,
+              "p95": 5198.699916996702
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 25,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "wrong_passage": {
+            "n": 5,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 5
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 2377.049933600938,
+              "p50": 1672.1401670001796,
+              "p95": 5373.869916998956
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 5,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1701.114354249512,
+              "p50": 1781.6600209989701,
+              "p95": 2089.2425420024665
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          },
+          "side_flip": {
+            "n": 4,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1865.1395315009722,
+              "p50": 1975.4505835007876,
+              "p95": 2413.7956249978743
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          },
+          "dose_change": {
+            "n": 1,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 1
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 2165.2095000026748,
+              "p50": 2165.2095000026748,
+              "p95": 2165.2095000026748
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 1,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       }
     },
@@ -125,6 +1820,214 @@
           "mean": 0.08488092862535268,
           "p50": 0.07439600085490383,
           "p95": 0.1625829972908832
+        },
+        "macroF1CI95": {
+          "low": 0.0,
+          "high": 0.0,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 0,
+            "unsupported": 14,
+            "contradicted": 0,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.09174160077236593,
+              "p50": 0.08350050120498054,
+              "p95": 0.1625829972908832
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 10,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.06772924825781956,
+              "p50": 0.06691650196444243,
+              "p95": 0.07874999573687091
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 4,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       },
       "local_qlora": {
@@ -156,6 +2059,214 @@
           "mean": 573.1643422857035,
           "p50": 568.4319584979676,
           "p95": 689.4077090037172
+        },
+        "macroF1CI95": {
+          "low": 0.08333333333333333,
+          "high": 0.25925925925925924,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 9,
+            "unsupported": 0,
+            "contradicted": 5,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.2222222222222222,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 0.5,
+                "f1": 0.6666666666666666,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 585.5969167001604,
+              "p50": 585.0451044971123,
+              "p95": 689.4077090037172
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 5,
+                "unsupported": 0,
+                "contradicted": 5,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.0,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0.0,
+                "f1": 0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 542.0829062495613,
+              "p50": 525.8963749984105,
+              "p95": 615.6957499988494
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 4,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": 0.549393919774859,
+          "coverage": 1.0,
+          "n": 14,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 1,
+              "confidence": 0.4975610415944718,
+              "accuracy": 0.0
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 1,
+              "confidence": 0.6752119483160548,
+              "accuracy": 0.0
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 2,
+              "confidence": 0.7542897734559646,
+              "accuracy": 0.0
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 1,
+              "confidence": 0.835301209874515,
+              "accuracy": 1.0
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 9,
+              "confidence": 0.9828292833222315,
+              "accuracy": 0.4444444444444444
+            }
+          ]
         }
       },
       "proxy_fast": {
@@ -187,6 +2298,214 @@
           "mean": 1471.4030922150414,
           "p50": 1399.4741250025982,
           "p95": 2089.2425420024665
+        },
+        "macroF1CI95": {
+          "low": 0.14285714285714285,
+          "high": 0.2962962962962963,
+          "replicates": 1000,
+          "unit": "patient",
+          "conditionalOnSinglePatient": false
+        },
+        "confusion": {
+          "supported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 6,
+            "unsupported": 0,
+            "contradicted": 8,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "date_typo": {
+            "n": 10,
+            "macroF1": 0.1904761904761905,
+            "classes": {
+              "supported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 0.4,
+                "f1": 0.5714285714285715,
+                "support": 10
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1379.5185874012532,
+              "p50": 1303.8595210018684,
+              "p95": 2065.5587500004913
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 6,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          },
+          "assertion_flip": {
+            "n": 4,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 4
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1701.114354249512,
+              "p50": 1781.6600209989701,
+              "p95": 2089.2425420024665
+            },
+            "confusion": {
+              "supported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 4,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       }
     },
@@ -220,6 +2539,163 @@
           "mean": 0.2084832662755313,
           "p50": 0.09256200064555742,
           "p95": 0.698957999702543
+        },
+        "macroF1CI95": {
+          "low": 0.21212121212121213,
+          "high": 0.2962962962962963,
+          "replicates": 1000,
+          "unit": "claim_within_single_patient",
+          "conditionalOnSinglePatient": true
+        },
+        "confusion": {
+          "supported": {
+            "supported": 19,
+            "unsupported": 11,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "none": {
+            "n": 30,
+            "macroF1": 0.2585034013605442,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 0.6333333333333333,
+                "f1": 0.7755102040816326,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 0.2084832662755313,
+              "p50": 0.09256200064555742,
+              "p95": 0.698957999702543
+            },
+            "confusion": {
+              "supported": {
+                "supported": 19,
+                "unsupported": 11,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       },
       "local_qlora": {
@@ -251,6 +2727,163 @@
           "mean": 520.022866732567,
           "p50": 553.0305624961329,
           "p95": 663.7531660016975
+        },
+        "macroF1CI95": {
+          "low": 0.16666666666666666,
+          "high": 0.26666666666666666,
+          "replicates": 1000,
+          "unit": "claim_within_single_patient",
+          "conditionalOnSinglePatient": true
+        },
+        "confusion": {
+          "supported": {
+            "supported": 15,
+            "unsupported": 0,
+            "contradicted": 13,
+            "unavailable": 2
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "none": {
+            "n": 30,
+            "macroF1": 0.2222222222222222,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 0.5,
+                "f1": 0.6666666666666666,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0.0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 0.9333333333333333,
+            "errors": 2,
+            "latencyMs": {
+              "mean": 520.022866732567,
+              "p50": 553.0305624961329,
+              "p95": 663.7531660016975
+            },
+            "confusion": {
+              "supported": {
+                "supported": 15,
+                "unsupported": 0,
+                "contradicted": 13,
+                "unavailable": 2
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": 0.287799319612905,
+          "coverage": 0.9333333333333333,
+          "n": 28,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 1,
+              "confidence": 0.49991614840756216,
+              "accuracy": 1.0
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 2,
+              "confidence": 0.553846882741097,
+              "accuracy": 0.5
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 6,
+              "confidence": 0.6670465599884725,
+              "accuracy": 0.3333333333333333
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 6,
+              "confidence": 0.7331857042105187,
+              "accuracy": 0.16666666666666666
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 4,
+              "confidence": 0.8407751043372087,
+              "accuracy": 0.5
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 9,
+              "confidence": 0.9651232588382138,
+              "accuracy": 0.8888888888888888
+            }
+          ]
         }
       },
       "proxy_fast": {
@@ -282,6 +2915,163 @@
           "mean": 1893.985859733948,
           "p50": 1775.8306030045787,
           "p95": 2920.226707996335
+        },
+        "macroF1CI95": {
+          "low": 0.3333333333333333,
+          "high": 0.3333333333333333,
+          "replicates": 1000,
+          "unit": "claim_within_single_patient",
+          "conditionalOnSinglePatient": true
+        },
+        "confusion": {
+          "supported": {
+            "supported": 30,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "unsupported": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          },
+          "contradicted": {
+            "supported": 0,
+            "unsupported": 0,
+            "contradicted": 0,
+            "unavailable": 0
+          }
+        },
+        "perMutation": {
+          "none": {
+            "n": 30,
+            "macroF1": 0.3333333333333333,
+            "classes": {
+              "supported": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "support": 30
+              },
+              "unsupported": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              },
+              "contradicted": {
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "support": 0
+              }
+            },
+            "coverage": 1.0,
+            "errors": 0,
+            "latencyMs": {
+              "mean": 1893.985859733948,
+              "p50": 1775.8306030045787,
+              "p95": 2920.226707996335
+            },
+            "confusion": {
+              "supported": {
+                "supported": 30,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "unsupported": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              },
+              "contradicted": {
+                "supported": 0,
+                "unsupported": 0,
+                "contradicted": 0,
+                "unavailable": 0
+              }
+            }
+          }
+        },
+        "calibration": {
+          "ece": null,
+          "coverage": 0.0,
+          "n": 0,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "count": 0,
+              "confidence": null,
+              "accuracy": null
+            }
+          ]
         }
       }
     }
@@ -292,7 +3082,8 @@
     "testSha256": "ca47fb282520be47d5826b44e7178ebb6b59de8e721cf77915b9adb0ab12f8b1",
     "heldOutMutationTypes": ["assertion_flip", "date_typo"],
     "seed": 37,
-    "judgeIdentity": "a72c650c3176101fc5cdfee929e195dcfae08d835b271bcd2806552cfb730cab"
+    "judgeIdentity": "a72c650c3176101fc5cdfee929e195dcfae08d835b271bcd2806552cfb730cab",
+    "datasetVersion": 1
   },
   "cost": {
     "proxyCalls": 7,
@@ -307,5 +3098,146 @@
     "Code-check pass is necessary but does not entail support",
     "Local probabilities are uncalibrated closed-set sequence scores",
     "Macro F1 uses all three labels even in subsets with absent classes; inspect per-class support"
-  ]
+  ],
+  "errorAnalysis": {
+    "synthetic_heldout_families": {
+      "rules_only": {
+        "exported": 30,
+        "reviewStatus": "pending human annotation"
+      },
+      "local_qlora": {
+        "exported": 22,
+        "reviewStatus": "pending human annotation"
+      },
+      "proxy_fast": {
+        "exported": 9,
+        "reviewStatus": "pending human annotation"
+      }
+    },
+    "real_patient_weak_labels": {
+      "rules_only": {
+        "exported": 11,
+        "reviewStatus": "pending human annotation"
+      },
+      "local_qlora": {
+        "exported": 15,
+        "reviewStatus": "pending human annotation"
+      },
+      "proxy_fast": {
+        "exported": 0,
+        "reviewStatus": "pending human annotation"
+      }
+    }
+  },
+  "version": 2,
+  "status": "pilot_v1_predictions_reanalysed_no_retraining",
+  "v2TrainingStatus": "pending GPU-enabled orchestrator run",
+  "cascadeStatus": "unmeasured; no validation policy fitted",
+  "v2DataStatus": {
+    "splits": {
+      "train": {
+        "rows": 24000,
+        "patients": 899,
+        "labels": {
+          "unsupported": 8000,
+          "contradicted": 8000,
+          "supported": 8000
+        },
+        "mutations": {
+          "unsupported_addition": 6767,
+          "number_swap": 1159,
+          "none": 8000,
+          "wrong_document_citation": 1233,
+          "side_flip": 747,
+          "date_shift": 3764,
+          "number_change": 1449,
+          "negation_scope": 851,
+          "temporal_shift": 30
+        }
+      },
+      "valid": {
+        "rows": 3000,
+        "patients": 116,
+        "labels": {
+          "unsupported": 1000,
+          "contradicted": 1000,
+          "supported": 1000
+        },
+        "mutations": {
+          "unsupported_addition": 845,
+          "number_swap": 142,
+          "number_change": 181,
+          "none": 1000,
+          "date_shift": 475,
+          "negation_scope": 126,
+          "wrong_document_citation": 155,
+          "side_flip": 73,
+          "temporal_shift": 3
+        }
+      },
+      "test": {
+        "rows": 3000,
+        "patients": 87,
+        "labels": {
+          "contradicted": 1000,
+          "unsupported": 1000,
+          "supported": 1000
+        },
+        "mutations": {
+          "number_change": 128,
+          "unsupported_addition": 820,
+          "none": 1000,
+          "wrong_document_citation": 180,
+          "number_swap": 89,
+          "date_shift": 289,
+          "date_typo": 260,
+          "assertion_flip": 71,
+          "side_flip": 82,
+          "negation_scope": 78,
+          "temporal_shift": 3
+        }
+      },
+      "rewritten": {
+        "rows": 900,
+        "patients": 30,
+        "labels": {
+          "contradicted": 300,
+          "supported": 300,
+          "unsupported": 300
+        },
+        "mutations": {
+          "date_typo": 86,
+          "none": 300,
+          "date_shift": 90,
+          "unsupported_addition": 236,
+          "number_change": 44,
+          "side_flip": 16,
+          "wrong_document_citation": 64,
+          "negation_scope": 17,
+          "assertion_flip": 21,
+          "number_swap": 26
+        }
+      }
+    },
+    "rewrittenPatientsAvailable": 30,
+    "rewrittenPatientsTarget": 300,
+    "frozenTests": {
+      "test.examples.jsonl": "d6f7934c3ee17b47732632ed009d446ff1fa0daaaac6f199b19bf67f2da77fc1",
+      "rewritten.examples.jsonl": "671d7cd6deb30eb7bfe5ccfa4f230a4d3dd48909309303f4eb1d2791836faf69"
+    }
+  },
+  "realRuleSet": {
+    "status": "rule_labelled_human_review_pending",
+    "n": 100,
+    "labels": {
+      "contradicted": 50,
+      "supported": 50
+    },
+    "mutations": {
+      "side_flip": 12,
+      "none": 50,
+      "assertion_flip": 19,
+      "number_change": 19
+    }
+  }
 }
