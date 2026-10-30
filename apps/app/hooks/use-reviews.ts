@@ -1,6 +1,12 @@
 "use client";
 
 import { ReviewEntry, type ReviewRequest, type Screen } from "@medlyn/engine/contracts";
+import { loadReviews } from "@medlyn/engine/review/load";
+import {
+  emptyReviewLoad,
+  reduceReviewLoad,
+  visibleReviewLoad,
+} from "@medlyn/engine/review/load-state";
 import {
   activeReviews,
   dismissedItems,
@@ -8,35 +14,54 @@ import {
   reviewAnnotations,
   reviewTargetHash,
 } from "@medlyn/engine/review/overlay";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { reviewScope } from "@medlyn/engine/review/session";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ReviewHandler } from "@/components/cockpit/review-controls";
+import { DEFAULT_PATIENT_ID } from "@/lib/active-patient";
 
-export function useReviews(raw: Screen | null, sessionId: string) {
-  const [entries, setEntries] = useState<ReviewEntry[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const activeSession = useRef(sessionId);
-  activeSession.current = sessionId;
-  const version = useRef(0);
+export function useReviews(raw: Screen | null, sessionId: string, patientId: string) {
+  const scope = reviewScope(sessionId, patientId);
+  const [state, dispatch] = useReducer(reduceReviewLoad, emptyReviewLoad);
+  const { entries, error, status } = visibleReviewLoad(state, scope);
+  const [reload, setReload] = useState(0);
+  const retry = useCallback(() => setReload((value) => value + 1), []);
+  const activeScope = useRef(scope);
+  activeScope.current = scope;
+  const sequence = useRef(0);
   useEffect(() => {
-    setEntries([]);
-    setError(null);
-    if (!sessionId) return;
-    let alive = true;
-    const initialVersion = version.current;
-    fetch(`/api/review?sessionId=${encodeURIComponent(sessionId)}`)
-      .then(async (response) => {
-        if (!response.ok) throw new Error("Saved reviews could not be loaded.");
-        const values = ReviewEntry.array().parse(await response.json());
-        if (alive && initialVersion === version.current) setEntries(values);
+    const requestId = ++sequence.current + reload;
+    dispatch({ type: "start", scope, requestId });
+    if (!scope) return;
+    if (patientId !== DEFAULT_PATIENT_ID) {
+      dispatch({ type: "loaded", scope, requestId, entries: [] });
+      return;
+    }
+    const controller = new AbortController();
+    void loadReviews(sessionId, patientId, controller.signal)
+      .then((values) => {
+        if (!controller.signal.aborted && activeScope.current === scope)
+          dispatch({ type: "loaded", scope, requestId, entries: values });
       })
-      .catch((cause) => {
-        if (alive) setError(cause instanceof Error ? cause.message : "Review service unavailable.");
+      .catch(() => {
+        if (!controller.signal.aborted && activeScope.current === scope)
+          dispatch({ type: "failed", scope, requestId });
       });
+    return () => controller.abort();
+  }, [scope, sessionId, patientId, reload]);
+  useEffect(() => {
+    if (!error || !scope) return;
+    const id = `review-load:${scope}`;
+    toast.error(error, {
+      id,
+      duration: Number.POSITIVE_INFINITY,
+      closeButton: true,
+      action: { label: "Retry", onClick: retry },
+    });
     return () => {
-      alive = false;
+      toast.dismiss(id);
     };
-  }, [sessionId]);
+  }, [error, scope, retry]);
   const screen = useMemo(() => (raw ? overlayScreen(raw, entries) : null), [raw, entries]);
   const dismissed = useMemo(() => (raw ? dismissedItems(raw, entries) : []), [raw, entries]);
   const onReview: ReviewHandler = async (targetType, targetId, action, extras) => {
@@ -71,36 +96,36 @@ export function useReviews(raw: Screen | null, sessionId: string) {
     });
   };
   async function saveReview(request: ReviewRequest) {
-    if (!sessionId || request.sessionId !== sessionId)
+    if (!scope || request.sessionId !== sessionId)
       throw new Error("The review session changed. Reload this item.");
-    if (activeSession.current !== sessionId)
+    if (activeScope.current !== scope)
       throw new Error("The patient changed. Review the selected patient's situation.");
-    const response = await fetch("/api/review", {
+    const response = await fetch(`/api/review?patientId=${encodeURIComponent(patientId)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error ?? "The review could not be saved.");
-    if (activeSession.current !== sessionId) return;
-    version.current++;
-    setEntries((previous) => [...previous, ReviewEntry.parse(body)]);
-    setError(null);
+    if (activeScope.current !== scope) return;
+    const entry = ReviewEntry.parse(body);
+    if (entry.sessionId !== sessionId) throw new Error("The review session changed.");
+    dispatch({ type: "saved", scope, entry });
+    retry();
     toast.success(request.action === "leave_open" ? "Acknowledged, unresolved" : "Review saved");
   }
   async function reset() {
     try {
-      const response = await fetch(`/api/review?sessionId=${encodeURIComponent(sessionId)}`, {
-        method: "DELETE",
-      });
+      if (!scope || activeScope.current !== scope)
+        throw new Error("The review session is not ready.");
+      const query = new URLSearchParams({ sessionId, patientId });
+      const response = await fetch(`/api/review?${query}`, { method: "DELETE" });
       if (!response.ok) throw new Error("The review layer could not be reset.");
-      if (activeSession.current !== sessionId) return;
-      version.current++;
-      setEntries([]);
-      setError(null);
+      if (activeScope.current !== scope) return;
+      dispatch({ type: "reset", scope });
       toast.success("Review layer reset");
     } catch (cause) {
-      if (activeSession.current !== sessionId) return;
+      if (activeScope.current !== scope) return;
       toast.error(cause instanceof Error ? cause.message : "Review reset unavailable.");
     }
   }
@@ -111,6 +136,8 @@ export function useReviews(raw: Screen | null, sessionId: string) {
     count: activeReviews(entries).length,
     dismissed,
     error,
+    loading: status === "loading",
+    retry,
     onReview,
     saveReview,
     reset,

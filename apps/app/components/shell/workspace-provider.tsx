@@ -1,5 +1,6 @@
 "use client";
 import type { Screen } from "@medlyn/engine/contracts";
+import { sessionForPatient, validReviewSession } from "@medlyn/engine/review/session";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -16,20 +17,26 @@ type Workspace = {
 const WorkspaceContext = createContext<Workspace | null>(null);
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { patient } = useActivePatient();
-  const [sessionId, setSessionId] = useState("");
+  const [session, setSession] = useState<{ patientId: string; id: string } | null>(null);
+  const sessionId = sessionForPatient(session, patient.id);
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const [screen, setScreen] = useState<Screen | null>(null);
-  const reviews = useReviews(screen, sessionId);
+  const reviews = useReviews(
+    screen?.patient.id === patient.id ? screen : null,
+    sessionId,
+    patient.id,
+  );
   useEffect(() => {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
     let id: string = crypto.randomUUID();
     try {
-      id = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? id;
+      const saved = sessionStorage.getItem(`medlyn-session:${patient.id}`);
+      if (validReviewSession(saved)) id = saved;
       sessionStorage.setItem(`medlyn-session:${patient.id}`, id);
     } catch {
       console.info("review_session_memory_only");
     }
-    setSessionId(id);
+    setSession({ patientId: patient.id, id });
   }, [patient.id]);
   function toggleTheme() {
     const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
