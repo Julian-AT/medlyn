@@ -1,9 +1,12 @@
 import { loadChat } from "@medlyn/engine/agent/chat/history";
 import { validateUIMessages } from "ai";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { ChatConversation } from "@/components/chat/chat-conversation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+export const metadata: Metadata = { title: "Conversation · Medlyn" };
 
 export const dynamic = "force-dynamic";
 
