@@ -37,10 +37,6 @@ export function ChatHistoryRow({
   async function remove() {
     setDeleting(true);
     try {
-      const response = await fetch(`/api/chat/${encodeURIComponent(chat.id)}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("The chat could not be deleted. Try again.");
       onDelete(chat.id);
       if (pathname === href) router.push("/");
       toast.success("Chat deleted");
