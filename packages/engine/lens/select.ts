@@ -82,10 +82,30 @@ export function validateSelections(
       ...new Set(selection.missing.filter((field) => need.requiredFields?.includes(field))),
     ];
   }
-  return needs.map(
-    (need) =>
-      output.needs.find((selection) => selection.needId === need.id) ?? emptySelection(need),
-  );
+  return needs.map((need) => {
+    const selection =
+      output.needs.find((entry) => entry.needId === need.id) ?? emptySelection(need);
+    if (need.id !== "weight_trend") return selection;
+    // A trend needs every documented point; dropping an endpoint changes the calculated delta.
+    const weights = facts.filter((fact) => {
+      const value = Number(String(fact.attrs.value ?? "").replace(",", "."));
+      return (
+        fact.kind === "measurement" &&
+        fact.assertion === "present" &&
+        !["planned", "recommended"].includes(fact.temporalStatus) &&
+        fact.support === "supported" &&
+        fact.locationOk &&
+        /\b(weight|gewicht|körpergewicht)\b/iu.test(fact.labelEn) &&
+        String(fact.attrs.unit).toLowerCase() === "kg" &&
+        Number.isFinite(value) &&
+        value > 0
+      );
+    });
+    return {
+      ...selection,
+      factIds: [...new Set([...selection.factIds, ...weights.map((fact) => fact.id)])],
+    };
+  });
 }
 
 export function expandFactAliases(
