@@ -10,6 +10,7 @@ import {
   SidebarGroupLabel,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { useSidebarGroup } from "./hooks/use-sidebar-group";
 
 export function CollapsibleSidebarGroup({
@@ -32,17 +33,20 @@ export function CollapsibleSidebarGroup({
   return (
     <Collapsible asChild {...preference} open={iconOnly || preference.open}>
       <SidebarGroup
-        className={hideWhenCollapsed ? "group-data-[collapsible=icon]:hidden" : undefined}
+        className={cn(
+          "p-0 px-3 group-data-[collapsible=icon]:px-2",
+          hideWhenCollapsed && "group-data-[collapsible=icon]:hidden",
+        )}
       >
         <SidebarGroupLabel
           asChild
-          className="text-xs text-muted-foreground group-data-[collapsible=icon]:hidden"
+          className="mb-1.5 h-5 rounded-none px-1.5 text-sm/5 font-medium text-sidebar-foreground group-data-[collapsible=icon]:hidden"
         >
           <CollapsibleTrigger className="group/section gap-2">
             {label}
             <HugeiconsIcon
               icon={ArrowDown01Icon}
-              strokeWidth={1.75}
+              strokeWidth={1.5}
               className="ml-auto transition-transform group-data-[state=closed]/section:-rotate-90 motion-reduce:transition-none"
             />
           </CollapsibleTrigger>

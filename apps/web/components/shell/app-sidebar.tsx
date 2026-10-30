@@ -33,8 +33,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="print:hidden">
       <ShellSidebarHeader />
-      <SidebarContent className="gap-1">
-        <SidebarGroup className="py-0">
+      <SidebarContent className="gap-5 pb-3 [&_[data-slot=sidebar-menu]]:gap-1">
+        <SidebarGroup className="p-0 px-3 group-data-[collapsible=icon]:px-2">
           <SidebarMenu>
             <SidebarNavItem item={navigation[0].items[0]} />
           </SidebarMenu>
