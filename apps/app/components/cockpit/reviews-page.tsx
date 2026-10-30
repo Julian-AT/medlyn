@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useReviews } from "@/hooks/use-reviews";
 
 const actions = {
   accept: "Confirmed",
@@ -31,8 +30,7 @@ const targets = {
   letter_claim: "Letter sentence",
 };
 export function ReviewsPage() {
-  const { sessionId } = useWorkspace();
-  const reviews = useReviews(null, sessionId);
+  const { reviews } = useWorkspace();
   const entries = activeReviews(reviews.entries);
   return (
     <PageShell>
@@ -64,12 +62,14 @@ export function ReviewsPage() {
           <TableBody>
             {entries.map((entry) => (
               <TableRow key={entry.id}>
-                <TableCell className="whitespace-normal">{targets[entry.targetType]}</TableCell>
+                <TableCell className="whitespace-normal">
+                  {targets[entry.targetType]} · {entry.targetId}
+                </TableCell>
                 <TableCell className="whitespace-normal">
                   <Badge variant="outline">{actions[entry.action]}</Badge>
                 </TableCell>
                 <TableCell className="whitespace-normal">
-                  {entry.reason?.replaceAll("_", " ") || "—"}
+                  {entry.reasonText ?? entry.reason?.replaceAll("_", " ") ?? "—"}
                 </TableCell>
                 <TableCell>{entry.author}</TableCell>
                 <TableCell className="whitespace-normal tabular-nums">
