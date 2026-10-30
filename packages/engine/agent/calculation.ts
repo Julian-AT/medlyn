@@ -1,6 +1,6 @@
 import type { Claim, Fact } from "../contracts.ts";
+import { type ClaimCtx, trendLines } from "../lens/templates.ts";
 import { arithmetic, numericValues } from "./arithmetic.ts";
-import { trendLines, type ClaimCtx } from "../lens/templates.ts";
 
 export type CalculationOperand = {
   value: number;

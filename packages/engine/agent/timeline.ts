@@ -4,7 +4,9 @@ export function matchingFacts(facts: Fact[], query: string): Fact[] {
   const tokens = normalise(query).split(/\s+/).filter(Boolean);
   if (!tokens.length) return [];
   return facts.filter((fact) => {
-    const text = normalise(`${fact.entityId ?? ""} ${fact.kind} ${fact.labelEn} ${JSON.stringify(fact.attrs)} ${fact.quote}`);
+    const text = normalise(
+      `${fact.entityId ?? ""} ${fact.kind} ${fact.labelEn} ${JSON.stringify(fact.attrs)} ${fact.quote}`,
+    );
     return tokens.every((token) => text.includes(token));
   });
 }

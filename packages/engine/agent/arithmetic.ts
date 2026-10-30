@@ -1,6 +1,7 @@
 /** A bounded recursive-descent parser. Only finite decimal arithmetic is accepted. */
 export function arithmetic(expression: string): number {
-  if (!expression.trim() || expression.length > 500) throw new Error("Invalid arithmetic expression");
+  if (!expression.trim() || expression.length > 500)
+    throw new Error("Invalid arithmetic expression");
   const tokens = expression.match(/\d+(?:\.\d+)?|\.\d+|[()+*/-]|\S/g) ?? [];
   let index = 0;
   let depth = 0;
@@ -45,5 +46,7 @@ export function arithmetic(expression: string): number {
 }
 
 export function numericValues(text: string): number[] {
-  return [...text.matchAll(/(?:\d+(?:[.,]\d+)?|[.,]\d+)/g)].map(([value]) => Number(value.replace(",", ".")));
+  return [...text.matchAll(/(?:\d+(?:[.,]\d+)?|[.,]\d+)/g)].map(([value]) =>
+    Number(value.replace(",", ".")),
+  );
 }

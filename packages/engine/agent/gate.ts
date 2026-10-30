@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { AbsenceResult, Claim, EvidenceWindow, Fact } from "../contracts.ts";
 import { formatDate } from "../dates.ts";
 import { PATIENT_ID } from "../store.ts";
-import { calculationClaim, type Calculation } from "./calculation.ts";
+import { type Calculation, calculationClaim } from "./calculation.ts";
 
 export type GateEvidence = {
   factIds: string[];
@@ -18,14 +18,35 @@ export type SentenceValidator = (claims: Claim[]) => Promise<Claim[]>;
 export function splitSentences(text: string): string[] {
   const result: string[] = [];
   const abbreviations = new Set([
-    "dr.", "mr.", "mrs.", "ms.", "prof.", "e.g.", "i.e.", "vs.", "approx.",
-    "jan.", "feb.", "mar.", "apr.", "jun.", "jul.", "aug.", "sep.", "oct.", "nov.", "dec.",
+    "dr.",
+    "mr.",
+    "mrs.",
+    "ms.",
+    "prof.",
+    "e.g.",
+    "i.e.",
+    "vs.",
+    "approx.",
+    "jan.",
+    "feb.",
+    "mar.",
+    "apr.",
+    "jun.",
+    "jul.",
+    "aug.",
+    "sep.",
+    "oct.",
+    "nov.",
+    "dec.",
   ]);
   const normalised = text.replace(
     /([.!?])\s*((?:\[[^\]\n]+\][ \t]*)+)/g,
     (_, punctuation: string, citations: string) => ` ${citations.trim()}${punctuation} `,
   );
-  for (const line of normalised.split(/\n+/).map((value) => value.trim()).filter(Boolean)) {
+  for (const line of normalised
+    .split(/\n+/)
+    .map((value) => value.trim())
+    .filter(Boolean)) {
     let start = 0;
     for (const match of line.matchAll(/[.!?](?=\s|$)/g)) {
       const end = match.index + 1;
@@ -82,19 +103,28 @@ export async function gateAnswer(
       .filter(Boolean);
     if (!ids.length || ids.some((id) => !facts.has(id) && !segments.has(id))) continue;
     // Absence is rendered only from a completed full-corpus check.
-    if (/not documented|no (?:record|documentation|evidence)|couldn.t check/i.test(sentence)) continue;
+    if (/not documented|no (?:record|documentation|evidence)|couldn.t check/i.test(sentence))
+      continue;
     const factIds = ids.filter((id) => facts.has(id));
-    const segmentIds = [...new Set([
-      ...ids.filter((id) => segments.has(id)),
-      ...factIds.flatMap((id) => evidence.factSegments?.[id] ? [evidence.factSegments[id]] : []),
-    ])];
-    candidates.push(draft(
-      sentence.replace(/\s*\[[^\]]+\]/g, "").trim(), "composed", factIds, segmentIds,
-    ));
+    const segmentIds = [
+      ...new Set([
+        ...ids.filter((id) => segments.has(id)),
+        ...factIds.flatMap((id) =>
+          evidence.factSegments?.[id] ? [evidence.factSegments[id]] : [],
+        ),
+      ]),
+    ];
+    candidates.push(
+      draft(sentence.replace(/\s*\[[^\]]+\]/g, "").trim(), "composed", factIds, segmentIds),
+    );
   }
   for (const absence of evidence.absences) {
-    if (absence.status !== "not_documented" || absence.searched.asOf !== window.asOf
-      || absence.searched.eligible !== window.eligibleDocumentIds.length) continue;
+    if (
+      absence.status !== "not_documented" ||
+      absence.searched.asOf !== window.asOf ||
+      absence.searched.eligible !== window.eligibleDocumentIds.length
+    )
+      continue;
     const completion = absence.concept.match(
       /^documented completion after \d{4}-\d{2}-\d{2} of:\s*(.+?)\.(?:\s|$)/i,
     );
@@ -107,12 +137,17 @@ export async function gateAnswer(
   }
   const checked = candidates.length ? await validate(candidates) : [];
   const byId = new Map(checked.map((claim) => [claim.id, claim]));
-  const claims = candidates.flatMap((candidate) => {
-    const checkedClaim = byId.get(candidate.id);
-    return checkedClaim && checkedClaim.text === candidate.text && isVisible(checkedClaim)
-      ? [checkedClaim] : [];
-  }).slice(0, spoken ? 2 : 12);
-  const action = claims.length && claims.every((claim) => claim.kind !== "absence")
-    ? "Add to the GP letter" : "Leave open";
+  const claims = candidates
+    .flatMap((candidate) => {
+      const checkedClaim = byId.get(candidate.id);
+      return checkedClaim && checkedClaim.text === candidate.text && isVisible(checkedClaim)
+        ? [checkedClaim]
+        : [];
+    })
+    .slice(0, spoken ? 2 : 12);
+  const action =
+    claims.length && claims.every((claim) => claim.kind !== "absence")
+      ? "Add to the GP letter"
+      : "Leave open";
   return { claims, nextAction: action };
 }
