@@ -10,6 +10,7 @@ import { EvidenceWorkspace } from "./evidence-workspace";
 import { FindingDialog } from "./finding-dialog";
 import { LensHeader } from "./lens-header";
 import { SituationInput } from "./situation-input";
+import { WorkflowLinks } from "./workflow-links";
 
 export function SituationsWorkspace({ chip, text }: { chip?: string; text?: string }) {
   const { patient } = useActivePatient();
@@ -51,6 +52,7 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
         loading={lens.loading}
         error={lens.state.error}
       />
+      {screen && lens.state.complete && !lens.loading && <WorkflowLinks lensKey={screen.lensKey} />}
       <EvidenceWorkspace
         lens={lens}
         reviews={reviews}
