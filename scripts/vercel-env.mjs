@@ -17,8 +17,8 @@ const secretNames = new Set([
 
 export function projectEnvironment(project, source) {
   const publicEnv = {
-    NEXT_PUBLIC_SITE_URL: source.NEXT_PUBLIC_SITE_URL || "https://aim.julianschmidt.cv",
-    NEXT_PUBLIC_APP_URL: source.NEXT_PUBLIC_APP_URL || "https://app.aim.julianschmidt.cv",
+    NEXT_PUBLIC_SITE_URL: source.NEXT_PUBLIC_SITE_URL || "https://medlyn.health",
+    NEXT_PUBLIC_APP_URL: source.NEXT_PUBLIC_APP_URL || "https://app.medlyn.health",
   };
   if (project === "www") return publicEnv;
   if (project !== "app") throw new Error("Project must be app or www");

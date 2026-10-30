@@ -7,10 +7,10 @@ and runs on Node.js. All existing database API routes export `runtime = "nodejs"
 Local development remains open when demo authentication is unconfigured;
 production always fails closed.
 
-| Project name | Root Directory                             | Domain                     | Workspace filter |
-| ------------ | ------------------------------------------ | -------------------------- | ---------------- |
-| `medlyn-www` | `apps/www`                                 | `aim.julianschmidt.cv`     | `@medlyn/www`    |
-| `medlyn-app` | `apps/web` (or `apps/app` after the sweep) | `app.aim.julianschmidt.cv` | `@medlyn/web`    |
+| Project name | Root Directory                             | Domain              | Workspace filter |
+| ------------ | ------------------------------------------ | ------------------- | ---------------- |
+| `medlyn-www` | `apps/www`                                 | `medlyn.health`     | `@medlyn/www`    |
+| `medlyn-app` | `apps/web` (or `apps/app` after the sweep) | `app.medlyn.health` | `@medlyn/web`    |
 
 Use Node.js **24.x** in both projects' Build and Deployment settings. Enable
 **Include source files outside of the Root Directory in the Build Step**, so the
@@ -75,8 +75,8 @@ Fill the root `.env`, using `.env.example` as the inventory. Never create packag
 - `DEMO_PASSWORD` and `DEMO_SESSION_SECRET`. Generate the signing secret once with
   `openssl rand -hex 32` and put it in the root `.env`. It must be at least
   32 characters. Changing either credential revokes existing sessions.
-- `NEXT_PUBLIC_SITE_URL=https://aim.julianschmidt.cv` and
-  `NEXT_PUBLIC_APP_URL=https://app.aim.julianschmidt.cv`. Both must be set **before
+- `NEXT_PUBLIC_SITE_URL=https://medlyn.health` and
+  `NEXT_PUBLIC_APP_URL=https://app.medlyn.health`. Both must be set **before
   building** so metadata and cross-app links use the deployed origins.
 
 Optional app variables are `GEMINI_API_KEY`, `GEMINI_EMBED_REQUESTS_PER_MINUTE`,
@@ -120,8 +120,9 @@ node scripts/vercel-env.mjs --project app --app-dir "$MEDLYN_APP_DIR" --apply
 vercel deploy --prod --project medlyn-www
 vercel deploy --prod --project medlyn-app
 
-vercel domains add aim.julianschmidt.cv medlyn-www
-vercel domains add app.aim.julianschmidt.cv medlyn-app
+vercel domains add medlyn.health medlyn-www
+vercel domains add www.medlyn.health medlyn-www
+vercel domains add app.medlyn.health medlyn-app
 ```
 
 For CLI versions without the global `--project` flag, read `orgId` and `projectId`
@@ -136,30 +137,31 @@ database changes. Do not set an Edge runtime for Neon routes.
 
 ## Registrar DNS
 
-Create these records in the DNS zone for `julianschmidt.cv`:
+Create these records in the DNS zone for `medlyn.health` at Spaceship:
 
-| Type  | Name      | Target                 |
-| ----- | --------- | ---------------------- |
-| CNAME | `aim`     | `cname.vercel-dns.com` |
-| CNAME | `app.aim` | `cname.vercel-dns.com` |
+| Type  | Name  | Target                 |
+| ----- | ----- | ---------------------- |
+| A     | `@`   | `76.76.21.21`          |
+| CNAME | `www` | `cname.vercel-dns.com` |
+| CNAME | `app` | `cname.vercel-dns.com` |
 
 Remove conflicting records for the same names. If Vercel supplies a project-specific
 CNAME target or an ownership TXT challenge, use the values shown by
 `vercel domains inspect <domain>`. Confirm both domains after DNS propagates:
 
 ```sh
-vercel domains inspect aim.julianschmidt.cv
-vercel domains inspect app.aim.julianschmidt.cv
+vercel domains inspect medlyn.health
+vercel domains inspect app.medlyn.health
 ```
 
 ## Verify the deployment
 
 ```sh
-curl -I https://aim.julianschmidt.cv
-curl -I https://app.aim.julianschmidt.cv/patient
-curl -i https://app.aim.julianschmidt.cv/api/patient/list
-curl -i -X POST https://app.aim.julianschmidt.cv/api/lens
-curl -i -X POST https://app.aim.julianschmidt.cv/api/chat
+curl -I https://medlyn.health
+curl -I https://app.medlyn.health/patient
+curl -i https://app.medlyn.health/api/patient/list
+curl -i -X POST https://app.medlyn.health/api/lens
+curl -i -X POST https://app.medlyn.health/api/chat
 ```
 
 Expect a public landing page, a `303` redirect to `/login` for the patient page,
