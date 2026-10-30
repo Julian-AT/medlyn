@@ -68,16 +68,17 @@ export function FactCard({
       data-card-id={card.id}
       data-need-id={card.needId}
       className={cn(
-        "h-full rounded-2xl border shadow-none ring-0",
-        card.availability === "not_documented" && "border border-dashed ring-0",
+        "h-full rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0",
+        card.critical && "border-destructive/20",
+        card.availability === "not_documented" && "border-dashed shadow-none",
       )}
     >
       <CardHeader>
-        <CardTitle className="font-semibold tracking-tight">{card.title}</CardTitle>
-        <CardDescription>{card.why}</CardDescription>
+        <CardTitle className="text-sm font-semibold tracking-tight">{card.title}</CardTitle>
+        <CardDescription className="text-xs/relaxed">{card.why}</CardDescription>
         {card.critical && (
           <CardAction>
-            <Badge variant="destructive">
+            <Badge variant="destructive" className="bg-destructive/10 text-destructive">
               <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={2} aria-hidden="true" />
               Critical
             </Badge>
@@ -88,8 +89,8 @@ export function FactCard({
             <HugeiconsIcon
               icon={CheckmarkCircle02Icon}
               size={18}
-              strokeWidth={1.75}
-              className="text-primary"
+              strokeWidth={2}
+              className="text-muted-foreground"
               aria-label="Source-linked facts"
             />
           </CardAction>
@@ -127,7 +128,7 @@ export function FactCard({
             <AlertTitle>Couldn't check</AlertTitle>
             <AlertDescription>
               <p>The evidence check did not complete.</p>
-              <Button variant="outline" size="sm" onClick={onRetry}>
+              <Button className="rounded-full" variant="outline" size="sm" onClick={onRetry}>
                 Retry check
               </Button>
             </AlertDescription>
