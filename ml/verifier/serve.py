@@ -49,10 +49,44 @@ def main():
     parser.add_argument("--model", default=BASE)
     parser.add_argument("--adapters", type=str, default=str(VERIFIER_DIR / "adapters"))
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--policy", type=str)
+    parser.add_argument("--selection", type=str)
     args = parser.parse_args()
     from pathlib import Path
 
+    if args.selection:
+        selection_path = Path(args.selection)
+        selection = json.loads(selection_path.read_text())
+        winner = selection.get("winner")
+        if selection.get("selectionSplit") != "valid" or not winner:
+            raise ValueError("No completed validation-selected adapter")
+        args.model = winner["model"]
+        args.adapters = str(selection_path.parent / winner["id"] / "adapters")
     verifier = Verifier(args.model, Path(args.adapters))
+    if args.policy:
+        from .artifacts import model_identity
+        from .statistics import scaled
+
+        policy = json.loads(Path(args.policy).read_text())
+        identity = model_identity(args.model, Path(args.adapters))
+        if policy.get("verifierIdentity") != identity or policy.get("selectionSplit") != "valid":
+            raise ValueError("Policy is not bound to this model and validation split")
+        raw_verify = verifier.verify
+
+        def calibrated_verify(claim, passages):
+            result = raw_verify(claim, passages)
+            probabilities = scaled(result["probabilities"], policy["temperature"])
+            return {
+                **result,
+                "probabilities": probabilities,
+                "probability": probabilities[result["label"]],
+                "probabilityKind": "temperature_scaled_closed_set_score",
+                "verifierIdentity": identity,
+                "calibrationTemperature": policy["temperature"],
+                "calibrationValidationSha256": policy["validationSha256"],
+            }
+
+        verifier.verify = calibrated_verify
     server = HTTPServer(("127.0.0.1", args.port), handler_for(verifier))
     server.timeout = 30
     print(f"Verifier listening on http://127.0.0.1:{args.port}", flush=True)
