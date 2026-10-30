@@ -67,7 +67,16 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy, hideS
         )}
         {claim.flag && (
           <Alert className="mt-2 border-warning/40">
-            <AlertTitle>{claim.flag.reason.replaceAll("_", " ")}</AlertTitle>
+            <AlertTitle>
+              {
+                {
+                  fact_corrected: "A source fact was corrected",
+                  finding_dismissed: "This clarification was dismissed",
+                  source_changed: "Source changed — review this sentence",
+                  edit_unsupported: "Edit kept as a clinician note",
+                }[claim.flag.reason]
+              }
+            </AlertTitle>
             <AlertDescription>
               {claim.flag.proposedText && `Proposed edit: ${claim.flag.proposedText}`}
             </AlertDescription>
