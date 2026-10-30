@@ -6,6 +6,7 @@ import { llmErrorDetails, usesOfficialOpenAI } from "@medlyn/engine/llm/client";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
+  hasToolCall,
   type ModelMessage,
   stepCountIs,
   streamText,
@@ -14,16 +15,17 @@ import {
 import { z } from "zod";
 import { patientEvidence } from "@/lib/patient-evidence";
 import { patientIdFromRequest } from "../../../lib/active-patient.ts";
+import { beforeDeadline } from "./deadline";
 import { trackUiEvidence } from "./evidence";
 import { conversationLensKey, historyBeforeQuestion } from "./history-view";
 import { chatContext } from "./patient-context";
 import { patientUiTools } from "./patient-ui-tools";
 import { smallTalkResponse } from "./small-talk";
 import { evidenceTools } from "./tools";
-import { writeValidatedStream } from "./validated-stream";
+import { VISUAL_TOOLS, writeValidatedStream } from "./validated-stream";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 const Input = z.object({
   id: z.string().uuid(),
   patientId: z
@@ -62,6 +64,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const signal = AbortSignal.any([request.signal, AbortSignal.timeout(45_000)]);
   const parsed = Input.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Invalid chat request" }, { status: 400 });
   const { id, messages } = parsed.data;
@@ -71,7 +74,6 @@ export async function POST(request: Request) {
       { error: "The active patient changed. Start a new conversation." },
       { status: 409 },
     );
-  const chip = CHIPS.find((entry) => entry.id === parsed.data.chipId);
   const last = messages.at(-1);
   const question = last?.parts
     .filter((part) => part.type === "text")
@@ -83,13 +85,19 @@ export async function POST(request: Request) {
   }
   const greeting = smallTalkResponse(question);
   if (greeting) return greeting;
+  const chip = CHIPS.find((entry) =>
+    parsed.data.chipId ? entry.id === parsed.data.chipId : entry.text === question,
+  );
   const model = process.env.MODEL_FAST;
   if (!model || !process.env.OPENAI_BASE_URL)
     return Response.json({ error: "Chat model unavailable" }, { status: 503 });
   try {
     const lensKey = conversationLensKey(messages.slice(0, -1), parsed.data.lensKey);
-    const { window, claimIds } = await chatContext(lensKey, patientId);
-    const sources = await patientEvidence(patientId, window);
+    const { window, claimIds } = await beforeDeadline(
+      () => chatContext(lensKey, patientId),
+      signal,
+    );
+    const sources = await beforeDeadline(() => patientEvidence(patientId, window), signal);
     const { tools: agentTools, evidence } = evidenceTools(window, patientId);
     const tools: ToolSet = {
       ...agentTools,
@@ -125,15 +133,24 @@ export async function POST(request: Request) {
 Only call tools when the user asks about the patient or a clinical task. Greetings, thanks, identity and help requests need a brief non-clinical response without tools. Use UI tools to show data visually; prefer showing over telling. For role/task requests use open_lens. For weight changes use show_lab_trend; for medication lists use show_medications; for contradictions use show_findings; for GP letters use draft_letter. UI tool outputs already contain validated templates; do not repeat their contents in prose. Use check_documented for documentation questions. Never expose internal reasoning. Previous assistant messages are conversation context only: retrieve their evidence again before making any factual claim.`,
           messages: modelMessages,
           tools,
-          stopWhen: stepCountIs(6),
+          toolChoice: chip ? { type: "tool", toolName: "open_lens" } : "auto",
+          stopWhen: [stepCountIs(6), hasToolCall(...VISUAL_TOOLS)],
           providerOptions: usesOfficialOpenAI()
             ? { openai: { reasoningEffort: "none", store: false } }
             : undefined,
           onError: ({ error }) => console.warn("chat_model_failed", llmErrorDetails(error)),
-          abortSignal: AbortSignal.any([request.signal, AbortSignal.timeout(105_000)]),
+          abortSignal: signal,
           maxOutputTokens: 1600,
         });
-        await writeValidatedStream(result.stream, writer, evidence, window, claimIds, patientId);
+        await writeValidatedStream(
+          result.stream,
+          writer,
+          evidence,
+          window,
+          claimIds,
+          patientId,
+          signal,
+        );
         writer.write({ type: "finish", finishReason: "stop" });
       },
       onError: (error) => {
