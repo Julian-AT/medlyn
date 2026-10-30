@@ -14,7 +14,7 @@ export function ClaimList({ items }: { items: Item[] }) {
   return (
     <CardContent role="list" className="flex flex-col gap-4 p-0">
       {groupEvidence(items, (item) => item.line, factOf).map(({ item, sources }) => (
-        <CardContent key={item.line.id} role="listitem" className="px-0">
+        <CardContent key={item.line.id} role="listitem" className="min-h-10 p-0">
           <ClaimLine
             {...item}
             sources={sources.flatMap((entry) =>
