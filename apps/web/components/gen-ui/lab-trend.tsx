@@ -11,6 +11,7 @@ import { groupEvidence } from "@/lib/group-evidence";
 import { ClaimLine } from "./claim-line";
 import { displayDates } from "./display-dates";
 import { showSource } from "./source-chip";
+import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 type Point = UiToolOutputs["show_lab_trend"]["points"][number];
@@ -38,6 +39,7 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
   return (
     <ToolFrame
       {...props}
+      layout="chart"
       artifact={props.toolCallId ? { kind: "chart", id: props.toolCallId } : undefined}
       title={output?.measure.replaceAll("_", " ") || "Measurement trend"}
       description={output ? `As of ${displayDates(output.asOf)}` : undefined}
@@ -50,12 +52,13 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
       }
     >
       {output?.points.length === 0 ? (
-        <CardDescription>
-          No numeric points to display. This view is not an absence check.
-        </CardDescription>
+        <ToolEmpty
+          title="No numeric points to display"
+          description="Try another measurement. This view does not establish absence."
+        />
       ) : null}
       {[...groups].map(([label, points]) => (
-        <CardContent key={label} className="flex flex-col gap-3 px-0">
+        <CardContent key={label} className="flex flex-col gap-3 p-0">
           <CardDescription className="text-xs font-medium">{label}</CardDescription>
           <ChartContainer config={config} className="h-48 w-full tabular-nums">
             <LineChart data={points} accessibilityLayer>
