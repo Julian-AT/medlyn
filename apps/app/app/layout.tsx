@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static theme script must run before hydration to avoid a flash
           dangerouslySetInnerHTML={{
-            __html: `try { document.documentElement.classList.toggle('dark', localStorage.getItem('medlyn-theme') === 'dark'); } catch (error) { document.documentElement.classList.remove('dark'); }`,
+            __html: `try { if (localStorage.getItem('medlyn-theme') === 'dark') document.documentElement.classList.add('dark'); } catch (error) { document.documentElement.classList.remove('dark'); }`,
           }}
         />
       </head>
