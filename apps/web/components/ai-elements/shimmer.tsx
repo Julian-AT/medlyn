@@ -1,53 +1,28 @@
 "use client";
 
-import { motion } from "motion/react";
-import { type CSSProperties, type ElementType, type JSX, memo, useMemo } from "react";
+import { type ElementType, memo } from "react";
+import { CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export type TextShimmerProps = {
   children: string;
   as?: ElementType;
   className?: string;
-  duration?: number;
-  spread?: number;
 };
 
-const ShimmerComponent = ({
+export const Shimmer = memo(function Shimmer({
   children,
-  as: Component = "p",
+  as: Component = CardDescription,
   className,
-  duration = 2,
-  spread = 2,
-}: TextShimmerProps) => {
-  const MotionComponent = motion.create(Component as keyof JSX.IntrinsicElements);
-
-  const dynamicSpread = useMemo(() => (children?.length ?? 0) * spread, [children, spread]);
-
+}: TextShimmerProps) {
   return (
-    <MotionComponent
-      animate={{ backgroundPosition: "0% center" }}
+    <Component
       className={cn(
-        "relative inline-block bg-[length:250%_100%,auto] bg-clip-text text-transparent",
-        "[--bg:linear-gradient(90deg,#0000_calc(50%-var(--spread)),var(--color-background),#0000_calc(50%+var(--spread)))] [background-repeat:no-repeat,padding-box]",
+        "bg-linear-to-r from-muted-foreground via-primary to-muted-foreground bg-clip-text text-transparent motion-safe:animate-pulse",
         className,
       )}
-      initial={{ backgroundPosition: "100% center" }}
-      style={
-        {
-          "--spread": `${dynamicSpread}px`,
-          backgroundImage:
-            "var(--bg), linear-gradient(var(--color-muted-foreground), var(--color-muted-foreground))",
-        } as CSSProperties
-      }
-      transition={{
-        repeat: Number.POSITIVE_INFINITY,
-        duration,
-        ease: "linear",
-      }}
     >
       {children}
-    </MotionComponent>
+    </Component>
   );
-};
-
-export const Shimmer = memo(ShimmerComponent);
+});
