@@ -44,7 +44,7 @@ export function RecentChats() {
         {now &&
           groupChats(chats, now).map((group) => (
             <SidebarMenu key={group.label} className="pb-2">
-              <SidebarGroupLabel asChild className="h-7 text-xs text-muted-foreground">
+              <SidebarGroupLabel asChild className="h-7 px-2 text-xs text-muted-foreground">
                 <li>{group.label}</li>
               </SidebarGroupLabel>
               {group.chats.map((chat) => (
