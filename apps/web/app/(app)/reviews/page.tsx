@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { WorkflowPage } from "@/components/shell/workflow-page";
+import { ReviewsPage } from "@/components/cockpit/reviews-page";
 export const metadata: Metadata = { title: "Reviews · Medlyn" };
 
 export default function Page() {
-  return <WorkflowPage view="reviews" />;
+  return <ReviewsPage />;
 }
