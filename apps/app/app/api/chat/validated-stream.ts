@@ -3,6 +3,7 @@ import type { AgentEvidence } from "@medlyn/engine/agent/tools";
 import { speechReceipt } from "@medlyn/engine/agent/voice";
 import { validateClaims } from "@medlyn/engine/claims/validate";
 import { AgentTools, type EvidenceWindow } from "@medlyn/engine/contracts";
+import { llmErrorDetails } from "@medlyn/engine/llm/client";
 import { loadSegments, PATIENT_ID } from "@medlyn/engine/store";
 import type { TextStreamPart, ToolSet, UIMessageStreamWriter } from "ai";
 
@@ -97,6 +98,7 @@ export async function writeValidatedStream(
       });
     }
     if (part.type === "tool-error" && visibleTools.has(part.toolCallId)) {
+      console.warn("chat_tool_failed", { tool: part.toolName, ...llmErrorDetails(part.error) });
       writer.write({
         type: "tool-output-error",
         toolCallId: part.toolCallId,
