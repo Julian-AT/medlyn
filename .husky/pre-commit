@@ -1,0 +1,1 @@
+node scripts/check-data.mjs && pnpm exec biome check --staged --no-errors-on-unmatched && (cd ml && uv run --no-sync ruff check --quiet .)
