@@ -53,6 +53,7 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
     <MotionConfig reducedMotion="user">
       <PageShell>
         <PageHeading
+          category="situations"
           title="Situations"
           description="Choose your clinical task. Read the relevant facts with their evidence attached."
         />

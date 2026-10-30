@@ -52,7 +52,7 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
               submit(text);
             }}
           >
-            <InputGroup className="h-12 rounded-xl">
+            <InputGroup className="h-12 rounded-xl border-0 bg-gray-alpha-100 shadow-none">
               <InputGroupAddon>
                 <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
               </InputGroupAddon>
@@ -117,7 +117,7 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
               const chip = CHIPS.find((chip) => chip.id === id);
               if (chip) submit(chip.text, chip.id);
             }}
-            variant="outline"
+            variant="default"
             spacing={1}
             className="flex flex-wrap justify-start gap-2"
             aria-label="Clinical situations"
@@ -126,7 +126,7 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
               <ToggleGroupItem
                 key={chip.id}
                 value={chip.id}
-                className="h-8 rounded-lg px-3 text-xs font-medium data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+                className="h-8 rounded-full bg-gray-alpha-100 px-3 text-xs font-medium text-muted-foreground data-[state=on]:bg-foreground data-[state=on]:text-background"
               >
                 {chip.label}
               </ToggleGroupItem>
