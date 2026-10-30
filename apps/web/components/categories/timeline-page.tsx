@@ -16,6 +16,7 @@ export async function TimelinePage() {
   return (
     <PageShell>
       <PageHeading
+        category="timeline"
         title="Timeline"
         description="Dated facts in sequence. Planned events retain their stated status."
       />
