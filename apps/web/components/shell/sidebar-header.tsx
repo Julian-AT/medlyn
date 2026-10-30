@@ -36,7 +36,7 @@ export function ShellSidebarHeader() {
         className="h-8 justify-start gap-2 rounded-[10px] px-2 text-sm font-medium group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:[&>span]:hidden"
       >
         <Link href="/" aria-label="New chat" onClick={() => setOpenMobile(false)}>
-          <HugeiconsIcon icon={Add01Icon} strokeWidth={1.5} data-icon="inline-start" />
+          <HugeiconsIcon icon={Add01Icon} strokeWidth={2} data-icon="inline-start" />
           <span>New chat</span>
         </Link>
       </Button>

@@ -64,7 +64,7 @@ export function ChatHistoryRow({
           aria-current={pathname === href ? "page" : undefined}
           onClick={() => setOpenMobile(false)}
         >
-          <HugeiconsIcon icon={BubbleChatIcon} strokeWidth={1.5} />
+          <HugeiconsIcon icon={BubbleChatIcon} strokeWidth={2} />
           <span>{chat.title}</span>
         </Link>
       </SidebarMenuButton>
@@ -75,7 +75,7 @@ export function ChatHistoryRow({
             aria-label={`Actions for ${chat.title}`}
             disabled={deleting}
           >
-            <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={1.5} />
+            <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
           </SidebarMenuAction>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="right" align="start">
@@ -85,7 +85,7 @@ export function ChatHistoryRow({
               disabled={deleting}
               onSelect={() => void remove()}
             >
-              <HugeiconsIcon icon={Delete02Icon} strokeWidth={1.5} />
+              <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
               {deleting ? "Deleting…" : "Delete chat"}
             </DropdownMenuItem>
           </DropdownMenuGroup>

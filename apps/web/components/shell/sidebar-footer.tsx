@@ -70,7 +70,7 @@ export function ShellSidebarFooter() {
                 </SidebarGroupContent>
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   className="ml-auto group-data-[collapsible=icon]:hidden"
                 />
               </SidebarMenuButton>
@@ -87,7 +87,7 @@ export function ShellSidebarFooter() {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/research/cohort">
-                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={1.5} />
+                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
                     Browse synthetic cohort
                   </Link>
                 </DropdownMenuItem>
@@ -96,14 +96,14 @@ export function ShellSidebarFooter() {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Workspace</DropdownMenuLabel>
                 <DropdownMenuItem onSelect={toggleTheme}>
-                  <HugeiconsIcon icon={dark ? Sun03Icon : Moon02Icon} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={dark ? Sun03Icon : Moon02Icon} strokeWidth={2} />
                   {dark ? "Light theme" : "Dark theme"}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={resetting || !sessionId || reviews.count === 0}
                   onSelect={() => void reset()}
                 >
-                  <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={2} />
                   {resetting
                     ? "Resetting reviews…"
                     : `Reset review layer${reviews.count > 0 ? ` (${reviews.count})` : ""}`}

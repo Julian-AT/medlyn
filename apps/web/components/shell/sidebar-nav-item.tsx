@@ -44,7 +44,7 @@ export function SidebarNavItem({
           aria-current={active ? "page" : undefined}
           onClick={() => setOpenMobile(false)}
         >
-          <HugeiconsIcon icon={item.icon} strokeWidth={1.5} />
+          <HugeiconsIcon icon={item.icon} strokeWidth={2} />
           <span>{item.title}</span>
         </Link>
       </SidebarMenuButton>

@@ -46,7 +46,7 @@ export function CollapsibleSidebarGroup({
             {label}
             <HugeiconsIcon
               icon={ArrowDown01Icon}
-              strokeWidth={1.5}
+              strokeWidth={2}
               className="ml-auto transition-transform group-data-[state=closed]/section:-rotate-90 motion-reduce:transition-none"
             />
           </CollapsibleTrigger>
