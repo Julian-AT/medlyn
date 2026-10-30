@@ -5,25 +5,17 @@ import {
   Moon02Icon,
   RotateLeft01Icon,
   Sun03Icon,
-  UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDate } from "@medlyn/engine/dates";
-import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useActivePatient } from "@/components/patient/active-patient-provider";
+import { patientAge } from "@/components/patient/patient-options";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarFooter,
   SidebarGroupContent,
@@ -32,19 +24,31 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { PatientSwitcher } from "./patient-switcher";
 import { useWorkspace } from "./workspace-provider";
 
 export function ShellSidebarFooter() {
-  const { patient, patients, selectPatient } = useActivePatient();
+  const { patient } = useActivePatient();
   const { reviews, theme, toggleTheme, sessionId } = useWorkspace();
   const { isMobile } = useSidebar();
+  const [open, setOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
-  const dark = theme === "dark";
+  const age = patientAge(patient.birthDate, patient.asOf);
+  const subtitle = [
+    age === null ? null : `${age} y`,
+    patient.asOf ? `as of ${formatDate(patient.asOf)}` : "As-of date unavailable",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   async function reset() {
     setResetting(true);
     try {
       await reviews.reset();
+      setOpen(false);
+    } catch (error) {
+      console.warn("review_reset_failed", error instanceof Error ? error.name : "Unknown");
+      toast.error("Couldn't reset reviews. Try again.");
     } finally {
       setResetting(false);
     }
@@ -54,16 +58,16 @@ export function ShellSidebarFooter() {
     <SidebarFooter className="mt-auto px-3 pb-3 pt-1 group-data-[collapsible=icon]:px-2">
       <SidebarMenu>
         <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <SidebarMenuButton
                 size="lg"
                 tooltip="Patient and workspace settings"
                 className="h-11 gap-2 rounded-[10px] px-2 text-foreground hover:bg-sidebar-accent data-open:bg-sidebar-accent group-data-[collapsible=icon]:h-8"
-                aria-label="Patient and workspace settings"
+                aria-label={`${patient.displayName}, patient and workspace settings`}
               >
                 <Avatar className="size-6 shrink-0 rounded-md">
-                  <AvatarFallback className="rounded-md bg-gray-alpha-100 text-[10px] font-medium text-foreground">
+                  <AvatarFallback className="rounded-md bg-muted text-[10px] font-medium text-foreground">
                     {patient.displayName
                       .split(/\s+/)
                       .map((part) => part[0])
@@ -73,9 +77,7 @@ export function ShellSidebarFooter() {
                 </Avatar>
                 <SidebarGroupContent className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden [&>span]:block [&>span]:truncate [&>span:first-child]:font-medium [&>span:last-child]:text-xs [&>span:last-child]:text-muted-foreground">
                   <span>{patient.displayName}</span>
-                  <span>
-                    {patient.sex} · as of {formatDate(patient.asOf)}
-                  </span>
+                  <span>{subtitle}</span>
                 </SidebarGroupContent>
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
@@ -83,49 +85,29 @@ export function ShellSidebarFooter() {
                   className="ml-auto group-data-[collapsible=icon]:hidden"
                 />
               </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side={isMobile ? "top" : "right"} align="end" className="min-w-64">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Patient workspace</DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuRadioGroup
-                value={patient.id}
-                onValueChange={selectPatient}
-                className="max-h-72 overflow-y-auto"
+            </PopoverTrigger>
+            <PopoverContent
+              side={isMobile ? "top" : "right"}
+              align="end"
+              className="w-80 gap-1 p-1"
+            >
+              <PatientSwitcher onSelect={() => setOpen(false)} />
+              <Separator />
+              <Button variant="ghost" className="justify-start" onClick={toggleTheme}>
+                <HugeiconsIcon icon={theme === "dark" ? Sun03Icon : Moon02Icon} strokeWidth={2} />
+                {theme === "dark" ? "Light theme" : "Dark theme"}
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start"
+                disabled={resetting || !sessionId || reviews.count === 0}
+                onClick={() => void reset()}
               >
-                {patients.map((entry) => (
-                  <DropdownMenuRadioItem key={entry.id} value={entry.id}>
-                    {entry.displayName}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-              <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link href="/research/cohort">
-                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
-                    Browse synthetic cohort
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Workspace</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={toggleTheme}>
-                  <HugeiconsIcon icon={dark ? Sun03Icon : Moon02Icon} strokeWidth={2} />
-                  {dark ? "Light theme" : "Dark theme"}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={resetting || !sessionId || reviews.count === 0}
-                  onSelect={() => void reset()}
-                >
-                  <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={2} />
-                  {resetting
-                    ? "Resetting reviews…"
-                    : `Reset review layer${reviews.count > 0 ? ` (${reviews.count})` : ""}`}
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={2} />
+                {resetting ? "Resetting reviews…" : "Reset review layer"}
+              </Button>
+            </PopoverContent>
+          </Popover>
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarFooter>
