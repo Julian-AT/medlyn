@@ -3,7 +3,7 @@
 import { ArrowRight02Icon, Mic01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   InputGroup,
@@ -32,16 +32,6 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
     onRun(value, chipId);
   }
   const voice = useSituationVoice(submit);
-  useEffect(() => {
-    function key(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setOpen((value) => !value);
-      }
-    }
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, []);
   return (
     <>
       <Card className="rounded-none bg-transparent py-0 shadow-none ring-0">
