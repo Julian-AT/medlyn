@@ -6,15 +6,19 @@
     },
     {
       "path": "eval/output/results.json",
-      "sha256": "ff7cc3269740ba2a28c77da7c5dd9e80abee4e989e56bef03397ee8a8ece5cf8"
+      "sha256": "61b8f8906ec6e80a0c83504c06946607c4fd9ec1acf8f724d3ce70f3387c4c7c"
     },
     {
       "path": "eval/output/regression.json",
-      "sha256": "c4867595b06cb40720b66b9d814683891f8b41b7658ca2c673abb13ced312ae4"
+      "sha256": "6bf3cf36e2a061e48b5be676a1933ae426bb5f5d169d2d1c67c2231176da45c7"
     },
     {
       "path": "eval/output/playwright.json",
-      "sha256": "0c269d1bbbcebead43e096d268b8c4adb7bb9f3e876465b3c79cca0eb394e97c"
+      "sha256": "2b3a066d4c8c6a24dd904bac2d5774a78d94de74733a300cd87dc98d2edb3f3e"
+    },
+    {
+      "path": "eval/output/heldout.json",
+      "sha256": "c7702f201a92ad2e3eb5c9ff02fc3e60365003776b1c8fb24b403796a5ab5125"
     },
     {
       "path": ".agents/reports/ingest-llm.md",
@@ -26,7 +30,7 @@
     },
     {
       "path": "ml/verifier/results.json",
-      "sha256": "d09293a1faf58094a663645320c27fe9161b31b8bc59d9168fb6931e66bf0b92"
+      "sha256": "8d3aabe075ec545bbf1a3875b127af37a2debf44ece17b3d22d81f0db1f55258"
     },
     {
       "path": "ml/data/sample/manifest.json",
@@ -42,11 +46,10 @@
     }
   ],
   "warnings": [
-    "Held-out results not opened: pass --include-heldout only after the H+7 review.",
     "Ingestion counts use the prior lane summary when JSON is absent; no new ingest was run.",
     "Manuscript measurements require human approval tied to all current source hashes."
   ],
-  "heldout_included": false,
+  "heldout_included": true,
   "status": "automated; manuscript values require human review",
   "publishedMetrics": [
     "RegressionTarget",
@@ -61,6 +64,70 @@
     "RetrievalSmallK",
     "RetrievalLargeK",
     "SequenceLimit",
-    "TrainingMinuteCap"
+    "TrainingMinuteCap",
+    "RegressionPassed",
+    "RegressionTotal",
+    "SuitePassed",
+    "ColdMaxSeconds",
+    "WarmMaxSeconds",
+    "CachedMaxSeconds",
+    "TimingCount",
+    "CacheHits",
+    "TraceChecked",
+    "TraceViolations",
+    "ComposedChecked",
+    "ComposedFailures",
+    "ContradictionsFound",
+    "ClarificationsFound",
+    "FalseAlarms",
+    "Tier1Count",
+    "Tier1Grounding",
+    "Tier2Count",
+    "Tier2Grounding",
+    "Tier3Count",
+    "Tier3Grounding",
+    "DocumentCount",
+    "SegmentCount",
+    "FactCount",
+    "CoverageMatched",
+    "CoverageTotal",
+    "CoveragePercent",
+    "SynthPatients",
+    "SynthDocuments",
+    "SynthFacts",
+    "SynthContradictions",
+    "SynthDistractors",
+    "SynthGaps",
+    "SynthRewrittenPatients",
+    "SynthSamplePatients",
+    "SynthSampleDocuments",
+    "VerifierMacroFone",
+    "VerifierLatencyMs",
+    "RulesVerifierN",
+    "RulesVerifierFscore",
+    "RulesVerifierCoverage",
+    "RulesVerifierLatency",
+    "ProxyVerifierN",
+    "ProxyVerifierFscore",
+    "ProxyVerifierCoverage",
+    "ProxyVerifierLatency",
+    "LocalVerifierN",
+    "LocalVerifierFscore",
+    "LocalVerifierCoverage",
+    "LocalVerifierLatency",
+    "TrainExamples",
+    "ValidationExamples",
+    "TestExamples",
+    "SyntheticChallenges",
+    "SyntheticGenerated",
+    "RetrievalRecall",
+    "LexicalRetrievalN",
+    "LexicalRecallFive",
+    "LexicalRecallTen",
+    "LexicalMrrTen",
+    "HybridRetrievalN",
+    "HybridRecallFive",
+    "HybridRecallTen",
+    "HybridMrrTen"
   ]
 }
