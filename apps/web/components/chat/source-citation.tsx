@@ -8,6 +8,7 @@ import {
   InlineCitationCardBody,
 } from "@/components/ai-elements/inline-citation";
 import { useSourcePassage } from "@/components/chat/hooks/use-source-passage";
+import { SourcePopover } from "@/components/sources/source-popover";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCardTrigger } from "@/components/ui/hover-card";
@@ -28,36 +29,41 @@ export function SourceCitation({ segmentId, index }: { segmentId: string; index:
           if (!value || window.getSelection()?.isCollapsed !== false) setOpen(value);
         }}
       >
-        <HoverCardTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mx-0.5 inline-flex h-4 min-w-4 select-none rounded-full bg-muted px-1 text-[10px]/none font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-            aria-label={`Open source ${index + 1}`}
-            onPointerDown={(event) => {
-              pointer.current = { x: event.clientX, y: event.clientY };
-            }}
-            onPointerCancel={() => {
-              pointer.current = null;
-            }}
-            onClick={(event) => {
-              const activate = canOpenCitation({
-                keyboard: event.detail === 0,
-                hasSelection: window.getSelection()?.isCollapsed === false,
-                start: pointer.current,
-                end: { x: event.clientX, y: event.clientY },
-              });
-              pointer.current = null;
-              if (!activate) return;
-              setOpen(false);
-              window.dispatchEvent(
-                new CustomEvent("medlyn:show-source", { detail: { segmentId } }),
-              );
-            }}
-          >
-            {index + 1}
-          </Button>
-        </HoverCardTrigger>
+        <SourcePopover
+          segmentId={segmentId}
+          trigger={
+            <HoverCardTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mx-0.5 inline-flex h-4 min-w-4 select-none rounded-full bg-muted px-1 text-[10px]/none font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                aria-label={`Open source ${index + 1}`}
+                onPointerDown={(event) => {
+                  pointer.current = { x: event.clientX, y: event.clientY };
+                }}
+                onPointerCancel={() => {
+                  pointer.current = null;
+                }}
+                onClick={(event) => {
+                  const activate = canOpenCitation({
+                    keyboard: event.detail === 0,
+                    hasSelection: window.getSelection()?.isCollapsed === false,
+                    start: pointer.current,
+                    end: { x: event.clientX, y: event.clientY },
+                  });
+                  pointer.current = null;
+                  if (!activate) {
+                    event.preventDefault();
+                    return;
+                  }
+                  setOpen(false);
+                }}
+              >
+                {index + 1}
+              </Button>
+            </HoverCardTrigger>
+          }
+        />
         <InlineCitationCardBody className="w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-border shadow-sm">
           <CardHeader className="gap-1 p-4">
             <CardTitle className="text-sm font-medium">

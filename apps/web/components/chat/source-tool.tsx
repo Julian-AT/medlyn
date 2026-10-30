@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { SourcePopover } from "@/components/sources/source-popover";
 import { Button } from "@/components/ui/button";
 
 function showSource(segmentId: string) {
@@ -25,8 +26,6 @@ export function SourceTool({
     };
   }, [segmentId, autoOpen]);
   return (
-    <Button variant="ghost" onClick={() => showSource(segmentId)}>
-      Open source
-    </Button>
+    <SourcePopover segmentId={segmentId} trigger={<Button variant="ghost">Open source</Button>} />
   );
 }

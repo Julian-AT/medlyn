@@ -14,6 +14,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MessageAction, MessageActions } from "@/components/ai-elements/message";
+import { SourcesListPopover } from "@/components/sources/sources-list-popover";
+import { Button } from "@/components/ui/button";
 import { useMessageFeedback } from "./hooks/use-message-feedback";
 import type { ValidatedSpeech } from "./hooks/use-speech-output";
 
@@ -81,16 +83,14 @@ export function MessageControls({
         </MessageAction>
       )}
       {sources.length > 0 && (
-        <MessageAction
-          tooltip="Open sources"
-          onClick={() =>
-            window.dispatchEvent(
-              new CustomEvent("medlyn:show-source", { detail: { segmentId: sources[0] } }),
-            )
+        <SourcesListPopover
+          sources={sources.map((segmentId) => ({ segmentId }))}
+          trigger={
+            <Button variant="ghost" size="icon-sm" aria-label="Open sources">
+              <HugeiconsIcon icon={File02Icon} size={16} strokeWidth={2} />
+            </Button>
           }
-        >
-          <HugeiconsIcon icon={File02Icon} size={16} strokeWidth={2} />
-        </MessageAction>
+        />
       )}
       <MessageAction
         tooltip="Helpful · saved on this device"
