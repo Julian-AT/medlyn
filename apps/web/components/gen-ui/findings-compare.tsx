@@ -24,7 +24,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
         <Card
           key={finding.id}
           size="sm"
-          className="rounded-xl border-0 bg-background/60 shadow-none ring-0"
+          className="rounded-xl border border-gray-alpha-150 bg-card shadow-none ring-0"
         >
           <CardHeader>
             <CardTitle className="text-sm font-semibold tracking-tight">{finding.title}</CardTitle>
@@ -40,7 +40,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
             {finding.passages.map((passage, index) => (
               <CardContent
                 key={`${passage.segmentId}:${passage.start}`}
-                className="flex flex-col gap-2 rounded-xl bg-muted/40 p-3"
+                className="flex flex-col gap-2 rounded-xl bg-gray-alpha-50 p-3"
               >
                 <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                   <HighlightDifference
