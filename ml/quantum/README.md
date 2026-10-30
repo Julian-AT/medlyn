@@ -1,6 +1,6 @@
 # Quantum research experiment
 
-Research only; not used in the product. This lane evaluates IBM Qiskit on synthetic data.
+Research only; outside the clinical engine. This lane evaluates IBM Qiskit on synthetic data.
 It establishes no clinical advantage, quantum speedup or hardware advantage.
 
 ## Current measurements
@@ -9,13 +9,13 @@ The full **offline control** completed on 400 training and 200 test examples fro
 frozen verifier v2 splits, balanced supported versus not supported. Gemini returned HTTP 429:
 the shared free-tier daily embedding quota was exhausted. Accordingly, the measured control
 uses deterministic 768-dimensional character hashing, **not Gemini embeddings**. Do not
-present these measurements as the planned Gemini experiment. Hardware and same-subset
-LoRA/GPT predictions are pending. No IBM job has been submitted by this lane.
+present these measurements as the planned Gemini experiment. The IBM hardware block completed on `ibm_marrakesh`; same-subset LoRA/GPT
+classifier comparisons remain unmeasured.
 
-`results.json` contains the automated, not human-reviewed results, split hashes, subset row
-hashes, package versions, model scores and patient-bootstrap confidence intervals. Do not
-copy these values into METRICS.md or enable the paper's performance plots before human review.
-The three-class verifier's existing pilot results cannot be used as reference rows here.
+`results.json` contains numeric results, split hashes, subset row hashes, package
+versions and patient-bootstrap intervals. The submission measurement review is agent
+performed, not clinician performed. We report the hardware kernel block separately
+from challenge metrics and the three-class verifier.
 
 ## Reproduce
 
@@ -123,18 +123,19 @@ converted into fabricated measurements. A 16x16 test/test block cannot replace t
 A valid held-out classifier comparison requires a separately authorised larger cross-kernel
 hardware budget.
 
-## Integration
+## Submission results and integration
 
-- Mount `<QuantumCard />` from `apps/app/components/research/quantum-card.tsx` on Research /
-  Evaluation. It reads only the compact aggregate summary and labels feature provenance.
-- After the bibliography, add `\input{appendix-quantum}` in `paper/main.tex` (the orchestrator
-  owns that file). Main already loads `figures/styles.tex`. The appendix defaults to protocol
-  and pending-review text; a human reviewer may define `\MedlynQuantumReviewed` to enable
-  measured plots. Do not define it automatically.
-- Add one root README Research line: “Exploratory IBM Qiskit quantum kernels and QAOA on
-  synthetic examples; offline control measured, Gemini/hardware pending; no product use.”
-- Figure sources use the shared rounded pastel style. `figures/*.dat` under this package
-  contain only aggregate scores/matrices, no claim or passage text.
+The hardware block completed on `ibm_marrakesh`: 136 overlap circuits,
+median transpiled depth 760, execution time 52.9 s, and kernel-block MAE
+0.066 against the exact simulator. Source: [results.json](results.json).
+These are character-hash control measurements. The Gemini feature experiment was
+blocked by quota. No hardware classifier accuracy, clinical advantage or quantum
+advantage is established.
+
+The [paper appendix](../../paper/appendix-quantum.tex) uses only aggregate values
+exported through `paper/scripts/numbers.py`, with the existing agent reviewer label.
+The patient-app research card reads compact aggregate data. Source text, per-claim
+predictions, model weights and credentials are not publication artifacts.
 
 Official references checked during implementation:
 [Gemini 2 task prefixes](https://ai.google.dev/gemini-api/docs/embeddings#task-types-with-embeddings-2),
