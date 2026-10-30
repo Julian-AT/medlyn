@@ -14,7 +14,7 @@
     {
       "path": "METRICS.md",
       "committed": false,
-      "sha256": "a62cb198bf439e13d59549a69ed90b30fe24b72273be3354489922574ea13ca1"
+      "sha256": "5609adbf56cceaedc7d5014504a060eb445bc7395ff092ca3af9706860a9582f"
     },
     {
       "path": "ml/data/sample/manifest.json",
@@ -33,13 +33,13 @@
     },
     {
       "path": "ml/quantum/results.json",
-      "committed": true,
-      "sha256": "49b2f6891a5f587fd38ff78b2aaf34c925be80b7cd1cf4648396c2746f435cfb"
+      "committed": false,
+      "sha256": "3ea1caa9890afb95a307ca4d86d931f69a2623e536c587548316d57d79ff696a"
     },
     {
       "path": "ml/verifier/results.json",
-      "committed": true,
-      "sha256": "d09293a1faf58094a663645320c27fe9161b31b8bc59d9168fb6931e66bf0b92"
+      "committed": false,
+      "sha256": "1f29f906e0f2787e54456de9f3a46bdcb39b09cd2e761fdcf70ee5496806d053"
     }
   ],
   "cohort": {
@@ -9430,141 +9430,213 @@
     "verifier": {
       "sets": [
         {
-          "id": "synthetic_heldout_families",
-          "label": "Synthetic held-out families",
+          "id": "test",
+          "label": "Test",
           "methods": [
             {
               "method": "Rules only",
-              "n": 90,
-              "macroF1": 0.2865761689291101,
-              "low": 0.23027375201288244,
-              "high": 0.33572701807995925,
+              "n": 300,
+              "macroF1": 0.2950865846590509,
+              "low": 0.2630229419703104,
+              "high": 0.3273635433592104,
               "intervalUnit": "patient",
-              "p50Ms": 0.07458349864464253,
-              "p95Ms": 0.21904199820710346,
+              "p50Ms": 0.06758349627489224,
+              "p95Ms": 0.134292000439018,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Local qlora raw",
+              "n": 300,
+              "macroF1": 0.7639856916325553,
+              "low": 0.7133333333333334,
+              "high": 0.8130809531857359,
+              "intervalUnit": "patient",
+              "p50Ms": 629.1321669923491,
+              "p95Ms": 821.6732500004582,
+              "coverage": 1,
+              "ece": 0.12779368162992594
             },
             {
               "method": "Local LoRA verifier",
-              "n": 90,
-              "macroF1": 0.7544642857142857,
-              "low": 0.6695895285296735,
-              "high": 0.8275349390425215,
+              "n": 300,
+              "macroF1": 0.7639856916325553,
+              "low": 0.7133333333333334,
+              "high": 0.8130809531857359,
               "intervalUnit": "patient",
-              "p50Ms": 563.204375001078,
-              "p95Ms": 697.6629589989898,
+              "p50Ms": 629.1321669923491,
+              "p95Ms": 821.6732500004582,
               "coverage": 1,
-              "ece": 0.19146859923123793
+              "ece": 0.08460110246796504
             },
             {
               "method": "GPT judge",
-              "n": 90,
-              "macroF1": 0.8976982097186701,
-              "low": 0.8287795992714025,
-              "high": 0.9552015928322549,
+              "n": 300,
+              "macroF1": 0.8962924402799467,
+              "low": 0.8609971120231039,
+              "high": 0.928849923375744,
               "intervalUnit": "patient",
-              "p50Ms": 1745.8303124985832,
-              "p95Ms": 3636.0077499994077,
+              "p50Ms": 1739.7076455017668,
+              "p95Ms": 3683.07766700309,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Cascade",
+              "n": 300,
+              "macroF1": 0.9561491973005496,
+              "low": 0.9331704005826374,
+              "high": 0.9775363079493943,
+              "intervalUnit": "patient",
+              "p50Ms": 785.209853995184,
+              "p95Ms": 3314.3386669980828,
+              "coverage": 1,
+              "ece": 0.01996430063505363
             }
           ]
         },
         {
-          "id": "heldout_mutation_types",
-          "label": "Held-out mutation types",
+          "id": "rewritten",
+          "label": "Rewritten",
           "methods": [
             {
               "method": "Rules only",
-              "n": 14,
-              "macroF1": 0,
-              "low": 0,
-              "high": 0,
+              "n": 300,
+              "macroF1": 0.29451059492051096,
+              "low": 0.26277693441577016,
+              "high": 0.3275030987467291,
               "intervalUnit": "patient",
-              "p50Ms": 0.07439600085490383,
-              "p95Ms": 0.1625829972908832,
+              "p50Ms": 0.3084165000473149,
+              "p95Ms": 0.9847080073086545,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Local qlora raw",
+              "n": 300,
+              "macroF1": 0.841532313628221,
+              "low": 0.8014025245441795,
+              "high": 0.8810478199718705,
+              "intervalUnit": "patient",
+              "p50Ms": 617.3776039941004,
+              "p95Ms": 789.1102080029668,
+              "coverage": 1,
+              "ece": 0.07546185738393466
             },
             {
               "method": "Local LoRA verifier",
-              "n": 14,
-              "macroF1": 0.17543859649122806,
-              "low": 0.08333333333333333,
-              "high": 0.25925925925925924,
+              "n": 300,
+              "macroF1": 0.841532313628221,
+              "low": 0.8014025245441795,
+              "high": 0.8810478199718705,
               "intervalUnit": "patient",
-              "p50Ms": 568.4319584979676,
-              "p95Ms": 689.4077090037172,
+              "p50Ms": 617.3776039941004,
+              "p95Ms": 789.1102080029668,
               "coverage": 1,
-              "ece": 0.549393919774859
+              "ece": 0.026636698140045458
             },
             {
               "method": "GPT judge",
-              "n": 14,
-              "macroF1": 0.24242424242424243,
-              "low": 0.14285714285714285,
-              "high": 0.2962962962962963,
+              "n": 300,
+              "macroF1": 0.90790189076563,
+              "low": 0.8722790938608275,
+              "high": 0.9382974517550894,
               "intervalUnit": "patient",
-              "p50Ms": 1399.4741250025982,
-              "p95Ms": 2089.2425420024665,
+              "p50Ms": 1755.8682290036813,
+              "p95Ms": 3538.224290998187,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Cascade",
+              "n": 300,
+              "macroF1": 0.93938795095315,
+              "low": 0.9113876259604902,
+              "high": 0.9640578685787778,
+              "intervalUnit": "patient",
+              "p50Ms": 719.4421044987394,
+              "p95Ms": 3365.3601660043932,
+              "coverage": 1,
+              "ece": 0.00901756175303425
             }
           ]
         },
         {
-          "id": "real_patient_weak_labels",
-          "label": "Real patient · weak labels",
+          "id": "real-gold",
+          "label": "Real-gold",
           "methods": [
             {
               "method": "Rules only",
-              "n": 30,
-              "macroF1": 0.2585034013605442,
-              "low": 0.21212121212121213,
-              "high": 0.2962962962962963,
+              "n": 100,
+              "macroF1": 0.30128205128205127,
+              "low": 0.2783882783882784,
+              "high": 0.3191489361702128,
               "intervalUnit": "claim_within_single_patient",
-              "p50Ms": 0.09256200064555742,
-              "p95Ms": 0.698957999702543,
+              "p50Ms": 0.10791699605761096,
+              "p95Ms": 0.23820900241844356,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Local qlora raw",
+              "n": 100,
+              "macroF1": 0.42071759259259256,
+              "low": 0.35206635206635206,
+              "high": 0.4825234441602728,
+              "intervalUnit": "claim_within_single_patient",
+              "p50Ms": 638.9683539964608,
+              "p95Ms": 813.5378750012023,
+              "coverage": 1,
+              "ece": 0.2154626384727385
             },
             {
               "method": "Local LoRA verifier",
-              "n": 30,
-              "macroF1": 0.2222222222222222,
-              "low": 0.16666666666666666,
-              "high": 0.26666666666666666,
+              "n": 100,
+              "macroF1": 0.42071759259259256,
+              "low": 0.35206635206635206,
+              "high": 0.4825234441602728,
               "intervalUnit": "claim_within_single_patient",
-              "p50Ms": 553.0305624961329,
-              "p95Ms": 663.7531660016975,
-              "coverage": 0.9333333333333333,
-              "ece": 0.287799319612905
+              "p50Ms": 638.9683539964608,
+              "p95Ms": 813.5378750012023,
+              "coverage": 1,
+              "ece": 0.14444710214004988
             },
             {
               "method": "GPT judge",
-              "n": 30,
-              "macroF1": 0.3333333333333333,
-              "low": 0.3333333333333333,
-              "high": 0.3333333333333333,
+              "n": 100,
+              "macroF1": 0.6565636155452279,
+              "low": 0.6395835459834643,
+              "high": 0.6666666666666666,
               "intervalUnit": "claim_within_single_patient",
-              "p50Ms": 1775.8306030045787,
-              "p95Ms": 2920.226707996335,
+              "p50Ms": 1672.449500001676,
+              "p95Ms": 2823.8922500022454,
               "coverage": 1,
               "ece": null
+            },
+            {
+              "method": "Cascade",
+              "n": 100,
+              "macroF1": 0.6164642375168691,
+              "low": 0.581143951833607,
+              "high": 0.6466646664666467,
+              "intervalUnit": "claim_within_single_patient",
+              "p50Ms": 1992.3076660052175,
+              "p95Ms": 3496.2795000028564,
+              "coverage": 1,
+              "ece": 0.12253484887649954
             }
           ]
         }
       ],
-      "status": "Pilot v1 predictions reanalysed no retraining",
-      "training": "pending GPU-enabled orchestrator run",
-      "cascade": "unmeasured; no validation policy fitted",
+      "status": "Measured",
+      "training": "",
+      "cascade": "",
       "limitations": [
-        "Synthetic labels are not human gold",
-        "Real labels reuse the engine judge",
-        "Code-check pass is necessary but does not entail support",
-        "Local probabilities are uncalibrated closed-set sequence scores",
-        "Macro F1 uses all three labels even in subsets with absent classes; inspect per-class support"
+        "Rule labels are not human gold",
+        "Real-text set is test-only and never calibration data",
+        "Closed-set temperature scaling is fit on validation only",
+        "Bootstrap uses patient clusters where identifiers are present",
+        "No measured real-regression result is implied"
       ]
     },
     "heldout": "Real blind held-out results remain closed until the orchestrator's H+7 review."

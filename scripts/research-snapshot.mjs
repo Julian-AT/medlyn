@@ -39,8 +39,8 @@ const [full, sample, samplesText, regression, synthetic, verifier, quantum, metr
     source("ml/data/sample/shards/part-0000.jsonl", true),
     json("eval/output/regression.json"),
     json("eval/output/synthetic.json"),
-    json("ml/verifier/results.json", true),
-    json("ml/quantum/results.json", true),
+    json("ml/verifier/results.json"),
+    json("ml/quantum/results.json"),
     source("METRICS.md"),
   ]);
 
