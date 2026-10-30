@@ -34,8 +34,8 @@ export function SidebarNavItem({
         isActive={active}
         tooltip={item.title}
         className={cn(
-          "h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-sidebar-foreground [&_svg]:size-[18px] [&_svg]:text-foreground/70",
-          "data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:[&_svg]:text-sidebar-accent-foreground",
+          "h-9 gap-2.5 rounded-[10px] px-2.5 text-sm/5 font-medium text-muted-foreground hover:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground",
+          "data-active:bg-sidebar-accent data-active:text-foreground data-active:[&_svg]:text-foreground",
           count !== undefined && "pr-12",
         )}
       >
