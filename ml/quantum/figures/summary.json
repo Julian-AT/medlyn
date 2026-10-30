@@ -1,0 +1,45 @@
+{
+  "humanChecked": false,
+  "featureEncoder": "offline-char-hashing-768",
+  "geminiStatus": "blocked_daily_quota_http_429",
+  "models": {
+    "quantum_fidelity": {
+      "accuracy": 0.64,
+      "macroF1": 0.637060187518903,
+      "accuracyCI95": [0.569997311827957, 0.7043230675921557],
+      "macroF1CI95": [0.5680697807196539, 0.7014591303814567],
+      "bootstrap": {
+        "unit": "patient",
+        "replicates": 1000,
+        "limitation": "Conditional on sampled generation families"
+      },
+      "fitPredictSeconds": 0.0027708749985322356
+    },
+    "rbf_svm": {
+      "accuracy": 0.675,
+      "macroF1": 0.6713769306605324,
+      "accuracyCI95": [0.6020418848167539, 0.7333423913043478],
+      "macroF1CI95": [0.598297350494603, 0.7286122659883656],
+      "bootstrap": {
+        "unit": "patient",
+        "replicates": 1000,
+        "limitation": "Conditional on sampled generation families"
+      },
+      "fitPredictSeconds": 0.003367625002283603
+    },
+    "logistic": {
+      "accuracy": 0.585,
+      "macroF1": 0.5837408159683042,
+      "accuracyCI95": [0.5151069518716578, 0.6467667396960154],
+      "macroF1CI95": [0.5102848047027745, 0.6461562314611692],
+      "bootstrap": {
+        "unit": "patient",
+        "replicates": 1000,
+        "limitation": "Conditional on sampled generation families"
+      },
+      "fitPredictSeconds": 0.003236875003494788
+    }
+  },
+  "hardwareStatus": "not_run_no_token_in_lane",
+  "qaoaInstances": 5
+}
