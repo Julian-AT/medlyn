@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 const WINDOW = 120;
 const BINARY = /\.(png|jpe?g|gif|webp|avif|ico|mp4|webm|mov|woff2?|ttf|otf|pdf|lottie|zip|gz)$/i;
@@ -14,14 +14,29 @@ const BLOCKED_PATHS = [
   /^\.env($|\.(?!example$))/,
 ];
 
-const dataPath =
-  process.env.MEDLYN_DATA_PATH ?? "./TRACK-1-clinical-documentation/data/patient-0000-0001";
+const repoRoot = resolve(import.meta.dirname, "..");
+const dataPath = resolve(
+  repoRoot,
+  process.env.MEDLYN_DATA_PATH ?? "./TRACK-1-clinical-documentation/data/patient-0000-0001",
+);
+const args = process.argv.slice(2);
+const workingFiles = args[0] === "--all" || args[0] === "--files";
+if (args.length && !workingFiles) throw new Error("Use --all or --files <paths...>");
 
-const staged = execFileSync("git", ["diff", "--cached", "--name-only", "--diff-filter=ACMR"], {
-  encoding: "utf8",
-})
-  .split("\n")
-  .filter(Boolean);
+const staged =
+  args[0] === "--files"
+    ? args.slice(1)
+    : execFileSync(
+        "git",
+        args[0] === "--all"
+          ? ["ls-files", "--cached", "--others", "--exclude-standard", "-z"]
+          : ["diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"],
+        {
+          encoding: "utf8",
+        },
+      )
+        .split("\0")
+        .filter(Boolean);
 
 const normalise = (s) =>
   s
@@ -53,7 +68,12 @@ if (windows) {
   for (const path of staged) {
     if (!existsSync(path) || BINARY.test(path)) continue;
     const content = normalise(
-      execFileSync("git", ["show", `:${path}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }),
+      workingFiles
+        ? readFileSync(path, "utf8")
+        : execFileSync("git", ["show", `:${path}`], {
+            encoding: "utf8",
+            maxBuffer: 64 * 1024 * 1024,
+          }),
     );
     for (const w of windows) {
       if (content.includes(w)) {
@@ -72,3 +92,6 @@ if (failures.length) {
   console.error(`check-data: refusing to commit challenge data\n${failures.join("\n")}`);
   process.exit(1);
 }
+console.log(
+  `check-data: checked ${staged.length} paths${windows ? " and 120-character passages" : ""}`,
+);
