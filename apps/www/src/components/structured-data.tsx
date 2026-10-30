@@ -1,8 +1,8 @@
-import { appUrl, siteDescription, siteName, siteUrl } from "@/lib/seo";
+import { appUrl, faqQuestions, siteDescription, siteName, siteUrl } from "@/lib/seo";
 
 type FaqEntry = { question: string; answer: string };
 
-export function StructuredData({ questions = [] }: { questions?: readonly FaqEntry[] }) {
+export function StructuredData({ questions = faqQuestions }: { questions?: readonly FaqEntry[] }) {
   const organizationId = new URL("/#organization", siteUrl).href;
   const websiteId = new URL("/#website", siteUrl).href;
   const softwareId = new URL("/#software", siteUrl).href;
