@@ -3,6 +3,7 @@
 import {
   AlertCircleIcon,
   ArrowRight02Icon,
+  CheckmarkCircle02Icon,
   DashedLineCircleIcon,
   ShieldAlertIcon,
 } from "@hugeicons/core-free-icons";
@@ -67,12 +68,12 @@ export function FactCard({
       data-card-id={card.id}
       data-need-id={card.needId}
       className={cn(
-        "h-full rounded-xl border shadow-none ring-0",
+        "h-full rounded-2xl border shadow-none ring-0",
         card.availability === "not_documented" && "border border-dashed ring-0",
       )}
     >
       <CardHeader>
-        <CardTitle>{card.title}</CardTitle>
+        <CardTitle className="font-semibold tracking-tight">{card.title}</CardTitle>
         <CardDescription>{card.why}</CardDescription>
         {card.critical && (
           <CardAction>
@@ -82,10 +83,25 @@ export function FactCard({
             </Badge>
           </CardAction>
         )}
+        {!card.critical && card.availability === "documented" && card.lines.some(showClaim) && (
+          <CardAction>
+            <HugeiconsIcon
+              icon={CheckmarkCircle02Icon}
+              size={18}
+              strokeWidth={1.75}
+              className="text-primary"
+              aria-label="Source-linked facts"
+            />
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-3">
         {card.conflict !== "none" && conflict && (
-          <Badge asChild variant="outline" className="w-fit border-warning/40 text-warning">
+          <Badge
+            asChild
+            variant="outline"
+            className="w-fit border-warning/30 bg-warning/10 text-warning"
+          >
             <button type="button" onClick={() => onFinding(conflict)}>
               {card.conflict === "contradicted" ? "Contradiction" : "Needs clarification"}
               <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
