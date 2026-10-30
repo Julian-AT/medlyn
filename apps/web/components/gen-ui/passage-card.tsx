@@ -37,8 +37,8 @@ export function PassageCard(props: ToolProps<UiToolOutputs["show_passage"]>) {
           key={segment.id}
           className={
             segment.id === output?.segment.id
-              ? "space-y-2 rounded-md border bg-accent p-3"
-              : "space-y-2 px-0 py-0"
+              ? "flex flex-col gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3"
+              : "flex flex-col gap-2 px-0 py-0"
           }
         >
           <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
