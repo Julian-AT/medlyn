@@ -18,8 +18,9 @@ type Props = {
   onSource?: (id: string) => void;
   onSave: (id: string, text: string) => Promise<boolean>;
   busy: boolean;
+  hideSources?: boolean;
 };
-export function LetterSentence({ claim, citations, onSource, onSave, busy }: Props) {
+export function LetterSentence({ claim, citations, onSource, onSave, busy, hideSources }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(claim.text);
   if (!showClaim(claim)) return null;
@@ -74,15 +75,24 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy }: Pro
         )}
       </CardContent>
       <CardFooter className="flex-wrap gap-1 border-0 bg-transparent py-0 print:hidden">
-        {claim.segmentIds.map((id) => (
-          <SourceChip key={id} segmentId={id} index={citations.indexOf(id) + 1} onOpen={onSource} />
-        ))}
+        {!hideSources &&
+          claim.segmentIds.map((id) => (
+            <SourceChip
+              key={id}
+              segmentId={id}
+              index={citations.indexOf(id) + 1}
+              onOpen={onSource}
+            />
+          ))}
         {claim.kind !== "boilerplate" && (
           <Button
             className="rounded-full"
             size="sm"
             variant="ghost"
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setText(claim.text);
+              setEditing(true);
+            }}
           >
             <HugeiconsIcon
               icon={Edit02Icon}
