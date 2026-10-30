@@ -22,7 +22,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
-import { useLetter } from "@/hooks/use-letter";
+import { useLetterDraft } from "./hooks/use-letter-draft";
+import { LetterReferences } from "./letter-references";
 import { LetterSentence } from "./letter-sentence";
 
 export function LetterPanel({
@@ -36,7 +37,7 @@ export function LetterPanel({
   reviewVersion: number;
   onSource: (id: string) => void;
 }) {
-  const draft = useLetter(sessionId, lensKey, reviewVersion);
+  const draft = useLetterDraft(sessionId, lensKey, reviewVersion);
   const { letter, busy, error, stale } = draft;
   const citations = [
     ...new Set(
@@ -52,7 +53,7 @@ export function LetterPanel({
         {letter && (
           <CardAction>
             <Button
-              className="rounded-full"
+              className="h-9 rounded-control"
               variant="outline"
               size="sm"
               disabled={stale}
@@ -81,7 +82,7 @@ export function LetterPanel({
             <AlertDescription>
               Refresh to see affected sentences and proposed edits.
               <Button
-                className="rounded-full"
+                className="h-9 rounded-control"
                 variant="outline"
                 size="sm"
                 onClick={draft.refresh}
@@ -104,7 +105,11 @@ export function LetterPanel({
                 sentence keeps its citations.
               </EmptyDescription>
             </EmptyHeader>
-            <Button className="rounded-full" onClick={draft.generate} disabled={busy || !lensKey}>
+            <Button
+              className="h-9 rounded-control"
+              onClick={draft.generate}
+              disabled={busy || !sessionId}
+            >
               {busy ? "Checking sources & drafting…" : "Generate GP letter"}
             </Button>
           </Empty>
@@ -160,11 +165,7 @@ export function LetterPanel({
             </Alert>
             <Separator />
             <CardDescription>Source references</CardDescription>
-            {citations.map((id, index) => (
-              <CardDescription key={id} className="font-mono text-xs">
-                [{index + 1}] {id}
-              </CardDescription>
-            ))}
+            <LetterReferences citations={citations} asOf={letter.asOf} />
           </>
         )}
       </CardContent>
