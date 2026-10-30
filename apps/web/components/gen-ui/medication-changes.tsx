@@ -12,15 +12,15 @@ export function MedicationChanges({
   changes: UiToolOutputs["show_medications"]["changes"];
 }) {
   return (
-    <CardContent className="flex flex-col gap-4 px-0 pt-4">
-      <CardContent className="flex flex-wrap items-center gap-2 px-0">
+    <CardContent className="flex flex-col gap-4 p-0 pt-4">
+      <CardContent className="flex flex-wrap items-center gap-2 p-0">
         <CardTitle className="text-sm font-semibold">Changes between source lists</CardTitle>
         <Badge variant="secondary">Trend</Badge>
       </CardContent>
       {changes.map((change) => (
         <CardContent
           key={`${change.from.factId}:${change.to.factId}`}
-          className="flex flex-col gap-3 rounded-xl bg-background p-4"
+          className="flex flex-col gap-3 rounded-2xl bg-muted p-4"
         >
           <CardDescription className="font-mono text-xs">
             {displayDates(change.fromDate)} → {displayDates(change.toDate)}
