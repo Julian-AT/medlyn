@@ -32,25 +32,29 @@ def rasterise(source: Path, out: Path, dpi: int = 200) -> dict:
                 groups.setdefault((block, line), []).append({"text": text, "bbox": bbox})
             lines = []
             for words in groups.values():
-                lines.append({
-                    "text": " ".join(word["text"] for word in words),
-                    "bbox": {
-                        "x0": min(word["bbox"]["x0"] for word in words),
-                        "y0": min(word["bbox"]["y0"] for word in words),
-                        "x1": max(word["bbox"]["x1"] for word in words),
-                        "y1": max(word["bbox"]["y1"] for word in words),
-                    },
-                    "words": words,
-                })
-            pages.append({
-                "page": index + 1,
-                "imagePath": str(image_path),
-                "width": image.width,
-                "height": image.height,
-                "dpi": dpi,
-                "source": "embedded" if lines else "scan",
-                "lines": lines,
-            })
+                lines.append(
+                    {
+                        "text": " ".join(word["text"] for word in words),
+                        "bbox": {
+                            "x0": min(word["bbox"]["x0"] for word in words),
+                            "y0": min(word["bbox"]["y0"] for word in words),
+                            "x1": max(word["bbox"]["x1"] for word in words),
+                            "y1": max(word["bbox"]["y1"] for word in words),
+                        },
+                        "words": words,
+                    }
+                )
+            pages.append(
+                {
+                    "page": index + 1,
+                    "imagePath": str(image_path),
+                    "width": image.width,
+                    "height": image.height,
+                    "dpi": dpi,
+                    "source": "embedded" if lines else "scan",
+                    "lines": lines,
+                }
+            )
     if not pages:
         raise ValueError("PDF has no pages")
     result = {"version": 1, "pages": pages}
