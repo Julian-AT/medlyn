@@ -33,13 +33,14 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="print:hidden">
       <ShellSidebarHeader />
-      <SidebarContent className="gap-3 pt-0 pb-3 [&_[data-slot=sidebar-menu]]:gap-1">
+      <SidebarContent className="gap-5 pt-1 pb-3 [&_[data-slot=sidebar-menu]]:gap-1">
         <SidebarGroup className="p-0 px-3 group-data-[collapsible=icon]:px-2">
           <SidebarMenu>
-            <SidebarNavItem item={navigation[0].items[0]} />
+            {navigation[0].items.map((item) => (
+              <SidebarNavItem key={item.href} item={item} count={badges[item.href]} />
+            ))}
           </SidebarMenu>
         </SidebarGroup>
-        <RecentChats />
         {navigation.slice(1).map((group) => (
           <CollapsibleSidebarGroup
             key={group.label}
@@ -59,6 +60,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </CollapsibleSidebarGroup>
         ))}
+        <RecentChats />
       </SidebarContent>
       <ShellSidebarFooter />
       <SidebarRail />

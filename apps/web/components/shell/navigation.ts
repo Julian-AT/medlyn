@@ -18,10 +18,10 @@ import {
   UserIcon,
 } from "@hugeicons/core-free-icons";
 export const navigation = [
-  { label: "Workspace", items: [{ title: "Home", href: "/", icon: Home01Icon }] },
   {
-    label: "Patient record",
+    label: "Workspace",
     items: [
+      { title: "Home", href: "/", icon: Home01Icon },
       { title: "Overview", href: "/patient", icon: UserIcon },
       { title: "Medications", href: "/patient/medications", icon: Medicine01Icon },
       { title: "Diagnoses & history", href: "/patient/diagnoses", icon: HeartCheckIcon },
@@ -52,6 +52,7 @@ export const navigation = [
   },
 ];
 export function routeTitle(pathname: string) {
+  if (pathname === "/chats") return "Chats";
   return (
     navigation.flatMap((group) => group.items).find((item) => item.href === pathname)?.title ??
     "Home"
