@@ -15,7 +15,12 @@ export function LensHeader({
       <CardHeader className="gap-2 px-0">
         <CardDescription className="flex flex-wrap items-center gap-2">
           Clinical lens
-          <Badge variant="outline">
+          <Badge
+            variant="outline"
+            className={
+              !mock && !loading ? "border-primary/20 bg-primary/10 text-primary" : undefined
+            }
+          >
             {mock ? "Demo replay" : loading ? "Checking sources" : "Source-linked"}
           </Badge>
           {screen && (
@@ -24,7 +29,7 @@ export function LensHeader({
             </Badge>
           )}
         </CardDescription>
-        <CardTitle className="text-xl font-medium">
+        <CardTitle className="text-xl font-semibold tracking-tight">
           {screen?.situation.task ?? "Preparing your clinical lens"}
         </CardTitle>
         <CardDescription>
