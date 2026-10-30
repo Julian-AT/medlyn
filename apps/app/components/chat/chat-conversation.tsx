@@ -66,10 +66,7 @@ export function ChatConversation({
                 />
               );
             })}
-            {chat.busy &&
-              !chat.messages.at(-1)?.parts.some((part) => part.type.startsWith("tool-")) && (
-                <ChatActivity message={chat.messages.at(-1)} />
-              )}
+            {chat.busy && <ChatActivity message={chat.messages.at(-1)} />}
           </ConversationContent>
           <ConversationScrollButton aria-label="Scroll to latest message" />
         </Conversation>

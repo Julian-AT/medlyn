@@ -26,7 +26,8 @@ export function ChatActivity({ message }: { message?: UIMessage }) {
             (part.state === "input-streaming" || part.state === "input-available"),
         )
       : undefined;
-  const label = activeTool ? ACTIVITIES[activeTool.type] : undefined;
+  if (!activeTool) return null;
+  const label = ACTIVITIES[activeTool.type];
   return (
     <Card
       role="status"
