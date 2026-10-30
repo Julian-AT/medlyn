@@ -19,10 +19,10 @@ export function FactToolbar({
   onFilter: (filter: FactFilter) => void;
 }) {
   return (
-    <CardContent className="flex flex-wrap items-center gap-3">
-      <InputGroup className="h-9 min-w-48 flex-1 rounded-lg sm:max-w-sm">
+    <CardContent className="flex flex-wrap items-center gap-3 px-0">
+      <InputGroup className="h-10 min-w-48 flex-1 rounded-xl border-0 bg-gray-alpha-100 shadow-none sm:max-w-sm">
         <InputGroupAddon>
-          <HugeiconsIcon icon={Search01Icon} strokeWidth={1.75} aria-hidden="true" />
+          <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
         </InputGroupAddon>
         <InputGroupInput
           value={query}
@@ -37,18 +37,27 @@ export function FactToolbar({
         onValueChange={(value) => {
           if (value === "all" || value === "planned" || value === "negated") onFilter(value);
         }}
-        variant="outline"
+        variant="default"
         size="sm"
         spacing={1}
         aria-label="Filter documented facts"
       >
-        <ToggleGroupItem value="all" className="rounded-lg">
+        <ToggleGroupItem
+          value="all"
+          className="rounded-full px-3 text-muted-foreground data-[state=on]:bg-gray-alpha-100 data-[state=on]:text-foreground"
+        >
           All entries
         </ToggleGroupItem>
-        <ToggleGroupItem value="planned" className="rounded-lg">
+        <ToggleGroupItem
+          value="planned"
+          className="rounded-full px-3 text-muted-foreground data-[state=on]:bg-gray-alpha-100 data-[state=on]:text-foreground"
+        >
           Planned
         </ToggleGroupItem>
-        <ToggleGroupItem value="negated" className="rounded-lg">
+        <ToggleGroupItem
+          value="negated"
+          className="rounded-full px-3 text-muted-foreground data-[state=on]:bg-gray-alpha-100 data-[state=on]:text-foreground"
+        >
           Negated
         </ToggleGroupItem>
       </ToggleGroup>
