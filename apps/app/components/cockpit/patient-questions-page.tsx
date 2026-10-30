@@ -13,11 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FindingComparator } from "./finding-comparator";
 import { usePatientQuestions } from "./hooks/use-patient-questions";
 import { Question } from "./question";
+import { questionStatus } from "./workflow-state";
 
 const groups = [
   { kind: "contradiction", title: "Contradictions" },
   { kind: "needs_clarification", title: "Needs clarification" },
-  { kind: "missing", title: "Documentation gaps" },
+  { kind: "not_documented", title: "Documentation gaps" },
+  { kind: "unavailable", title: "Checks to retry" },
 ] as const;
 
 export function PatientQuestionsPage({ lensKey }: { lensKey?: string }) {
@@ -28,7 +30,7 @@ export function PatientQuestionsPage({ lensKey }: { lensKey?: string }) {
     <PageShell>
       <PageHeading
         title="Open questions"
-        description="Patient-wide contradictions and clarification requests, with checked gaps from your latest situation."
+        description="Compare conflicting sources, investigate unanswered questions, and record your review. Checked gaps come from your latest situation."
       />
       {data.error && (
         <Alert variant="destructive">
@@ -48,7 +50,12 @@ export function PatientQuestionsPage({ lensKey }: { lensKey?: string }) {
         </CardContent>
       ) : (
         groups.map(({ kind, title }) => {
-          const questions = data.questions.filter((item) => item.kind === kind);
+          const questions = data.questions.filter((item) => {
+            const card = data.screen?.sections
+              .flatMap((section) => section.cards)
+              .find((card) => card.id === item.cardId);
+            return questionStatus(item, card) === kind;
+          });
           return (
             <Card
               key={kind}
@@ -82,15 +89,17 @@ export function PatientQuestionsPage({ lensKey }: { lensKey?: string }) {
                   <Card className="col-span-full rounded-2xl p-4 shadow-none ring-1 ring-border">
                     <CardContent className="flex flex-wrap items-center justify-between gap-3 p-0">
                       <CardDescription>
-                        {kind === "missing"
+                        {kind === "not_documented"
                           ? data.hasLens
                             ? "No documentation gaps in the latest situation."
                             : "Run a situation to check gaps."
-                          : data.error
-                            ? "Couldn't check patient findings."
-                            : "No open items in this group."}
+                          : kind === "unavailable"
+                            ? "No incomplete checks. If a check fails, retry its situation."
+                            : data.error
+                              ? "Couldn't check patient findings."
+                              : "No open items in this group."}
                       </CardDescription>
-                      {kind === "missing" && !data.hasLens && (
+                      {kind === "not_documented" && !data.hasLens && (
                         <Button asChild variant="outline" size="sm">
                           <Link href="/situations">Run a situation</Link>
                         </Button>

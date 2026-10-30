@@ -8,7 +8,6 @@ import type {
   OpenQuestion,
 } from "@medlyn/engine/contracts";
 import { SourceChips } from "@/components/sources/source-chips";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +20,8 @@ import {
 import { GapCoverage } from "./gap-coverage";
 import { investigationContext } from "./investigation-context";
 import { ReviewControls, type ReviewHandler, reviewLabel } from "./review-controls";
+import { questionStatus } from "./workflow-state";
+import { WorkflowStatus } from "./workflow-status";
 export function Question({
   question,
   finding,
@@ -44,19 +45,13 @@ export function Question({
       className="min-w-0 rounded-2xl border border-gray-alpha-150 p-4 shadow-none ring-0"
     >
       <CardHeader className="p-0">
-        <Badge
-          variant="outline"
-          className={question.kind === "missing" ? "w-fit" : "w-fit border-warning/40 text-warning"}
-        >
-          {
-            {
-              contradiction: "Contradiction",
-              needs_clarification: "Needs clarification",
-              missing: "Documentation gap",
-            }[question.kind]
-          }
-        </Badge>
+        <WorkflowStatus status={questionStatus(question, card)} />
         <CardTitle>{question.title}</CardTitle>
+        {card?.availability === "unavailable" && (
+          <CardDescription>
+            The check did not finish. Retry this situation before drawing a conclusion.
+          </CardDescription>
+        )}
         {question.review && (
           <CardDescription>
             {reviewLabel(question.review.action)}
