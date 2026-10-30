@@ -8,8 +8,6 @@ const repoRoot = path.resolve(import.meta.dirname, "..");
 const secretNames = new Set([
   "DATABASE_URL",
   "OPENAI_API_KEY",
-  "DEMO_PASSWORD",
-  "DEMO_SESSION_SECRET",
   "GEMINI_API_KEY",
   "FISH_AUDIO_API_KEY",
   "FISH_AUDIO_VOICE_ID",
@@ -29,8 +27,6 @@ export function projectEnvironment(project, source) {
     OPENAI_API_KEY: source.OPENAI_API_KEY_PROD || "",
     MODEL_FAST: source.MODEL_FAST_PROD || source.MODEL_FAST || "",
     MODEL_REASONING: source.MODEL_REASONING_PROD || source.MODEL_REASONING || "",
-    DEMO_PASSWORD: source.DEMO_PASSWORD || "",
-    DEMO_SESSION_SECRET: source.DEMO_SESSION_SECRET || "",
     MEDLYN_MOCK: "0",
     MEDLYN_VERIFIER: "gpt",
     MEDLYN_LLM_CONCURRENCY: source.MEDLYN_LLM_CONCURRENCY || "8",
@@ -47,9 +43,6 @@ export function environmentProblems(project, environment) {
   const problems = Object.entries(environment)
     .filter(([, value]) => !value)
     .map(([name]) => `${name} is missing`);
-  if (project === "app" && environment.DEMO_SESSION_SECRET.length < 32) {
-    problems.push("DEMO_SESSION_SECRET must contain at least 32 characters");
-  }
   for (const name of ["NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_APP_URL", "DATABASE_URL"]) {
     if (!environment[name]) continue;
     try {

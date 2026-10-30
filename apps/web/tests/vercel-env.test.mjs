@@ -3,7 +3,7 @@ import {
   environmentProblems,
   maskedEnvironment,
   projectEnvironment,
-} from "../../../../scripts/vercel-env.mjs";
+} from "../../../scripts/vercel-env.mjs";
 
 const source = {
   OPENAI_API_KEY: "local-secret",
@@ -12,8 +12,6 @@ const source = {
   MODEL_FAST: "configured-fast-role",
   MODEL_REASONING: "configured-reasoning-role",
   DATABASE_URL: "postgresql://user:secret@db.eu-central-1.neon.tech/db",
-  DEMO_PASSWORD: "demo-secret",
-  DEMO_SESSION_SECRET: "signing-secret-with-at-least-32-characters",
   MEDLYN_DATA_PATH: "local-only",
   MEDLYN_VERIFIER: "local",
 };
@@ -46,12 +44,7 @@ describe("Vercel environment plans", () => {
   });
   it("masks every credential, including the database URL", () => {
     const output = maskedEnvironment(projectEnvironment("app", source)).join("\n");
-    for (const value of [
-      source.OPENAI_API_KEY_PROD,
-      source.DATABASE_URL,
-      source.DEMO_PASSWORD,
-      source.DEMO_SESSION_SECRET,
-    ]) {
+    for (const value of [source.OPENAI_API_KEY_PROD, source.DATABASE_URL]) {
       expect(output).not.toContain(value);
     }
     expect(output).toContain("OPENAI_API_KEY=[masked]");
