@@ -32,7 +32,7 @@ export function PatientSummary(props: ToolProps<UiToolOutputs["show_patient_summ
           ))}
       </CardContent>
       {output?.criticalFacts.length ? (
-        <CardContent className="space-y-3 border-t px-0 pt-3">
+        <CardContent className="flex flex-col gap-3 border-t px-0 pt-3">
           <CardTitle className="text-xs">Critical facts</CardTitle>
           {output.criticalFacts.map((item) => (
             <ClaimLine key={item.factId} {...item} />

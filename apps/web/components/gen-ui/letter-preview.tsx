@@ -22,12 +22,12 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
       {output?.sections
         .filter((section) => section.claims.length > 0)
         .map((section) => (
-          <CardContent key={section.id} className="space-y-2 px-0">
+          <CardContent key={section.id} className="flex flex-col gap-2 px-0">
             <CardTitle className="text-xs font-medium">{section.title}</CardTitle>
             {section.claims
               .filter((claim) => ["supported", "exempt"].includes(claim.validation.support))
               .map((claim) => (
-                <CardContent key={claim.id} className="space-y-1 px-0">
+                <CardContent key={claim.id} className="flex flex-col gap-1 px-0">
                   <CardDescription className="whitespace-pre-wrap text-sm text-foreground">
                     {claim.text}
                   </CardDescription>
@@ -44,7 +44,7 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
           </CardContent>
         ))}
       {output?.annotations.length ? (
-        <CardContent className="space-y-2 border-t px-0 pt-3">
+        <CardContent className="flex flex-col gap-2 border-t px-0 pt-3">
           <CardTitle className="text-xs">Clinician notes — not from the source documents</CardTitle>
           {output.annotations.map((note) => (
             <CardDescription key={note.id} className="whitespace-pre-wrap text-xs">

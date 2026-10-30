@@ -8,7 +8,7 @@ import { SourceChip } from "./source-chip";
 export function ClaimLine({ line, quote }: { line: ClaimLineType; quote?: string }) {
   if (line.validation.support !== "supported" && line.validation.support !== "exempt") return null;
   return (
-    <CardContent className="space-y-1.5 px-0 py-0">
+    <CardContent data-claim-id={line.id} className="flex flex-col gap-1.5 px-0 py-0">
       <CardDescription className="whitespace-pre-wrap text-sm text-foreground tabular-nums">
         {line.text}
       </CardDescription>
