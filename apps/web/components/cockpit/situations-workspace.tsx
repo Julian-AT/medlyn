@@ -4,6 +4,7 @@ import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { PageHeading } from "@/components/categories/page-heading";
 import { PageShell } from "@/components/categories/page-shell";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { useWorkspace } from "@/components/shell/workspace-provider";
 import { Card } from "@/components/ui/card";
 import { useLens } from "@/hooks/use-lens";
@@ -12,6 +13,7 @@ import { LensCanvas } from "./lens-canvas";
 import { LensHeader } from "./lens-header";
 import { SituationInput } from "./situation-input";
 export function SituationsWorkspace({ chip, text }: { chip?: string; text?: string }) {
+  const { patient } = useActivePatient();
   const lens = useLens();
   const { setScreen, reviews } = useWorkspace();
   const { screen } = reviews;
@@ -28,11 +30,11 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
     const firstRequest = requested.current === "";
     requested.current = key;
     const profile = CHIPS.find((item) => item.id === chip);
-    const session = sessionStorage.getItem("medlyn-session") ?? undefined;
+    const session = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? undefined;
     if (text?.trim()) void lens.run(text, undefined, false, session);
     else if (profile && (!firstRequest || profile.id !== CHIPS[0].id))
       void lens.run(profile.text, profile.id, false, session);
-  }, [chip, text, lens.run]);
+  }, [chip, text, lens.run, patient.id]);
   function openSource(id: string) {
     setSegmentId(id);
     setFindingId(null);

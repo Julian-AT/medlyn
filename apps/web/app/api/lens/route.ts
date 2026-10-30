@@ -1,6 +1,9 @@
-import { LensRequest, type LensEvent } from "@medlyn/engine/contracts";
-import { corpusDocument } from "@/lib/evidence-server";
+import { type LensEvent, LensRequest } from "@medlyn/engine/contracts";
 import { mockLensStream } from "@medlyn/engine/lens/mock";
+import { PATIENT_ID } from "@medlyn/engine/store";
+import { corpusDocument } from "@/lib/evidence-server";
+import { patientEvidence, titleOutput } from "@/lib/patient-evidence";
+import { patientIdFromRequest } from "../../../lib/active-patient.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,18 +22,26 @@ export async function POST(request: Request) {
     typeof body === "object" && body !== null && "chipId" in body && typeof body.chipId === "string"
       ? body.chipId
       : undefined;
+  const patientId = patientIdFromRequest(request);
   const encoder = new TextEncoder();
   let cancelled = false;
   let iterator: AsyncIterator<LensEvent> | undefined;
   let mock = process.env.MEDLYN_MOCK === "1";
   let stream: AsyncIterable<LensEvent>;
   try {
+    if (mock && patientId !== PATIENT_ID)
+      return Response.json(
+        { error: "Live evidence is required for this patient." },
+        { status: 503 },
+      );
     if (mock) stream = demoStream();
     else
       stream = (await import("@medlyn/engine/lens/stream")).streamLens({
         ...parsed.data,
         chipId,
+        patientId,
       });
+    stream = titledStream(stream, patientId);
     iterator = stream[Symbol.asyncIterator]();
     const first = await iterator.next();
     if (first.done || first.value.type === "error")
@@ -80,6 +91,11 @@ export async function POST(request: Request) {
       "Lens engine unavailable; replaying labelled mock",
       error instanceof Error ? error.message : "Unknown error",
     );
+    if (patientId !== PATIENT_ID)
+      return Response.json(
+        { error: "Evidence unavailable for the selected patient." },
+        { status: 503 },
+      );
     mock = true;
     const fallback = demoStream();
     return new Response(
@@ -133,5 +149,20 @@ async function* demoStream(): AsyncGenerator<LensEvent> {
       );
       yield event;
     }
+  }
+}
+
+async function* titledStream(
+  stream: AsyncIterable<LensEvent>,
+  patientId: string,
+): AsyncGenerator<LensEvent> {
+  let evidence: ReturnType<typeof patientEvidence> | undefined;
+  for await (const event of stream) {
+    if (event.type === "situation" && process.env.MEDLYN_MOCK !== "1") {
+      evidence = patientEvidence(patientId, event.window);
+      yield event;
+      continue;
+    }
+    yield evidence && event.type === "section" ? await titleOutput(event, await evidence) : event;
   }
 }

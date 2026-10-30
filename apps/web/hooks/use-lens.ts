@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { LensEvent } from "@medlyn/engine/contracts";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { emptyLens, NdjsonBuffer, reduceLens } from "@/lib/lens-state";
 
 export function useLens() {
+  const { patient } = useActivePatient();
   const [state, dispatch] = useReducer(reduceLens, emptyLens);
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,7 @@ export function useLens() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             text,
+            patientId: patient.id,
             chipId,
             sessionId: session ?? sessionId,
             noCache,
@@ -72,20 +75,19 @@ export function useLens() {
         if (number === sequence.current) setLoading(false);
       }
     },
-    [sessionId],
+    [sessionId, patient.id],
   );
 
+  const initialRun = useRef(run);
   useEffect(() => {
-    const id = sessionStorage.getItem("medlyn-session") ?? crypto.randomUUID();
-    sessionStorage.setItem("medlyn-session", id);
+    const id = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? crypto.randomUUID();
+    sessionStorage.setItem(`medlyn-session:${patient.id}`, id);
     setSessionId(id);
-    void run(CHIPS[0].text, CHIPS[0].id, false, id);
+    void initialRun.current(CHIPS[0].text, CHIPS[0].id, false, id);
     return () => {
       abort.current?.abort();
     };
-    // The initial request belongs to this browser tab, independently of subsequent renders.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [patient.id]);
 
   return {
     state,
