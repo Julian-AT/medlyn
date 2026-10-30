@@ -4,14 +4,19 @@ import { CategoryEmpty } from "@/components/categories/category-empty";
 import { DocumentsTable } from "@/components/categories/documents-table";
 import { PageHeading } from "@/components/categories/page-heading";
 import { PageShell } from "@/components/categories/page-shell";
+import { activePatientId } from "@/lib/patient-server";
 export const metadata: Metadata = { title: "Documents · Medlyn" };
 
 export const dynamic = "force-dynamic";
 export default async function Page() {
   let documents = null;
   try {
-    const window = await evidenceWindow();
-    const [docs, segments] = await Promise.all([loadDocuments(window), loadSegments(window)]);
+    const patientId = await activePatientId();
+    const window = await evidenceWindow(undefined, patientId);
+    const [docs, segments] = await Promise.all([
+      loadDocuments(window, patientId),
+      loadSegments(window),
+    ]);
     documents = docs.map(({ normText, ...doc }) => ({
       ...doc,
       segmentId: segments.find((segment) => segment.documentId === doc.id)?.id ?? null,

@@ -1,10 +1,11 @@
 import type { EvidenceWindow } from "@medlyn/engine/contracts";
 import { loadFindings } from "@medlyn/engine/store";
 import { FindingsCompare } from "@/components/gen-ui/findings-compare";
+import { activePatientId } from "@/lib/patient-server";
 import { SharedDataView } from "./shared-data-view";
 export async function ImagingFindings({ window }: { window: EvidenceWindow }) {
   try {
-    const findings = await loadFindings(window);
+    const findings = await loadFindings(window, await activePatientId());
     if (!findings.length) return null;
     return (
       <SharedDataView>

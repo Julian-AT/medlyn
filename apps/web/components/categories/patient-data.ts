@@ -1,21 +1,18 @@
 import "server-only";
 import { isShowable, validateClaims } from "@medlyn/engine/claims/validate";
-import { renderLine } from "@medlyn/engine/lens/templates";
-import {
-  evidenceWindow,
-  loadDocuments,
-  loadFacts,
-  loadSegments,
-  PATIENT_ID,
-} from "@medlyn/engine/store";
+import { renderLine, withDocumentTitles } from "@medlyn/engine/lens/templates";
+import { evidenceWindow, loadDocuments, loadFacts, loadSegments } from "@medlyn/engine/store";
 import { cache } from "react";
-export const patientData = cache(async (patientId = PATIENT_ID, asOf?: string) => {
+import { activePatientId } from "@/lib/patient-server";
+export const patientData = cache(async (requestedPatientId?: string, asOf?: string) => {
+  const patientId = requestedPatientId ?? (await activePatientId());
   const window = await evidenceWindow(asOf, patientId);
-  const [documents, facts, segments] = await Promise.all([
+  const [documents, rawFacts, segments] = await Promise.all([
     loadDocuments(window, patientId),
     loadFacts(window, undefined, patientId),
     loadSegments(window, patientId),
   ]);
+  const facts = withDocumentTitles(rawFacts, documents);
   const ctx = { patientId, window, facts, segments };
   const claims = await validateClaims(
     facts.map((fact) => renderLine(fact, ctx)),
@@ -23,6 +20,7 @@ export const patientData = cache(async (patientId = PATIENT_ID, asOf?: string) =
   );
   const supported = new Map(claims.filter(isShowable).map((claim) => [claim.factIds[0], claim]));
   return {
+    patientId,
     window,
     documents: documents.map(({ normText, ...document }) => document),
     facts: facts.filter((fact) => supported.has(fact.id)),
