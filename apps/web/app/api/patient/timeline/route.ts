@@ -1,15 +1,17 @@
 import { isShowable, validateClaims } from "@medlyn/engine/claims/validate";
-import { renderLine } from "@medlyn/engine/lens/templates";
-import { loadFacts, loadSegments } from "@medlyn/engine/store";
+import { renderLine, withDocumentTitles } from "@medlyn/engine/lens/templates";
+import { loadDocuments, loadFacts, loadSegments } from "@medlyn/engine/store";
 import { patientError, patientHeaders, patientRequest } from "../request.ts";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const { patientId, window, kinds } = await patientRequest(request);
-    const [facts, segments] = await Promise.all([
+    const [rawFacts, segments, documents] = await Promise.all([
       loadFacts(window, kinds, patientId),
       loadSegments(window, patientId),
+      loadDocuments(window, patientId),
     ]);
+    const facts = withDocumentTitles(rawFacts, documents);
     const ctx = { patientId, window, facts, segments };
     const claims = await validateClaims(
       facts.map((fact) => renderLine(fact, ctx)),

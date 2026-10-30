@@ -1,7 +1,8 @@
-import { evidenceWindow, PATIENT_ID } from "@medlyn/engine/store";
+import { evidenceWindow } from "@medlyn/engine/store";
+import { patientIdFromRequest } from "../../../lib/active-patient.ts";
 import { PatientRequestError, patientQuery } from "./request-values.ts";
 export async function patientRequest(request: Request) {
-  const query = patientQuery(new URL(request.url).searchParams, PATIENT_ID);
+  const query = patientQuery(new URL(request.url).searchParams, patientIdFromRequest(request));
   return {
     patientId: query.patientId,
     window: await evidenceWindow(query.asOf, query.patientId),
