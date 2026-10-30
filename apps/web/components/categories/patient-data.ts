@@ -22,6 +22,7 @@ export const patientData = cache(async (requestedPatientId?: string, asOf?: stri
   return {
     patientId,
     window,
+    segments,
     documents: documents.map(({ normText, ...document }) => document),
     facts: facts.filter((fact) => supported.has(fact.id)),
     rows: facts.flatMap((fact) => {
