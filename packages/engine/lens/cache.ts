@@ -42,6 +42,9 @@ export function requestCacheKey(request: CacheRequest): string {
 /** One row read with a current-revision guard in the same database statement. */
 export async function getRequestCache(request: CacheRequest): Promise<LensScreen | null> {
   const patientId = request.patientId ?? PATIENT_ID;
+  const requestKeys = [requestCacheKey(request)];
+  // Warmed default-date screens also serve an explicitly identical evidence window.
+  if (request.asOf) requestKeys.push(requestCacheKey({ ...request, asOf: undefined }));
   const db = getDb();
   const latest = db
     .select({ id: corpusRevisions.id })
@@ -56,9 +59,16 @@ export async function getRequestCache(request: CacheRequest): Promise<LensScreen
       and(
         eq(lensCache.patientId, patientId),
         or(
-          eq(sql<string>`${lensCache.timings}->>'requestKey'`, requestCacheKey(request)),
-          sql`${lensCache.timings}->'requestKeys' @> ${JSON.stringify([requestCacheKey(request)])}::jsonb`,
+          ...requestKeys.map((key) =>
+            or(
+              eq(sql<string>`${lensCache.timings}->>'requestKey'`, key),
+              sql`${lensCache.timings}->'requestKeys' @> ${JSON.stringify([key])}::jsonb`,
+            ),
+          ),
         ),
+        request.asOf
+          ? eq(sql<string>`${lensCache.screen}->'window'->>'asOf'`, request.asOf)
+          : undefined,
         eq(sql<string>`${lensCache.screen}->'window'->>'corpusRevision'`, latest),
       ),
     )
