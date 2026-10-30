@@ -4,18 +4,24 @@
   "packageManager": "pnpm@10.18.0",
   "type": "module",
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "husky",
     "smoke": "pnpm --filter @medlyn/engine smoke",
     "db:push": "pnpm --filter @medlyn/engine db:push",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "ingest": "pnpm --filter @medlyn/engine ingest",
     "lens": "pnpm --filter @medlyn/engine lens",
-    "dev": "pnpm --filter @medlyn/web dev",
+    "dev": "turbo dev --filter=@medlyn/web --filter=@medlyn/www",
     "eval": "pnpm --filter @medlyn/eval eval",
-    "warm": "pnpm --filter @medlyn/engine warm"
+    "warm": "pnpm --filter @medlyn/engine warm",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "biome format --write .",
+    "check": "biome check ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.4",
+    "husky": "^9.1.7",
     "turbo": "^2.5.0",
     "typescript": "^5.9.0"
   }
