@@ -2,15 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  createSpeechSession,
-  type SpeechBrowser,
-} from "@/components/chat/hooks/use-speech-session";
+import { createSpeechSession } from "@/components/chat/hooks/use-speech-session";
 import {
   initialSpeechState,
   speechErrorMessage,
   speechLanguage,
 } from "@/components/chat/hooks/use-speech-state";
+import { speechConstructor } from "@/components/chat/hooks/use-speech-support";
 
 type VoiceOptions = {
   onInterim?: (text: string) => void;
@@ -31,9 +29,12 @@ export function useSituationVoice(
   const stop = useCallback(() => session.current?.stop(), []);
   const cancel = useCallback(() => session.current?.cancel(), []);
   const start = useCallback(() => {
-    const browser = window as unknown as SpeechBrowser;
-    const Constructor = browser.SpeechRecognition ?? browser.webkitSpeechRecognition;
-    if (!Constructor || session.current) return;
+    if (session.current) return;
+    const Constructor = speechConstructor(window);
+    if (!Constructor) {
+      if (!window.isSecureContext) toast.error(speechErrorMessage("insecure-context"));
+      return;
+    }
     callback.current.options.onStart?.();
     const current = createSpeechSession(
       Constructor,
@@ -52,8 +53,7 @@ export function useSituationVoice(
     current.start();
   }, []);
   useEffect(() => {
-    const browser = window as unknown as SpeechBrowser;
-    setSupported(Boolean(browser.SpeechRecognition ?? browser.webkitSpeechRecognition));
+    setSupported(Boolean(speechConstructor(window)));
     function visibility() {
       if (document.hidden) stop();
     }
