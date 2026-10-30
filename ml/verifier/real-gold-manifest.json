@@ -1,0 +1,816 @@
+{
+  "status": "rule_labelled_human_review_pending",
+  "n": 100,
+  "labels": {
+    "contradicted": 50,
+    "supported": 50
+  },
+  "mutations": {
+    "side_flip": 12,
+    "none": 50,
+    "assertion_flip": 19,
+    "number_change": 19
+  },
+  "references": [
+    {
+      "id": "real-b2e69c1c1d419f5f",
+      "factId": "f-f3cb594ed961053a",
+      "documentId": "12340018",
+      "segmentId": "12340018-s41",
+      "start": 1425,
+      "end": 1454
+    },
+    {
+      "id": "real-7500e5bf9bfdf927",
+      "factId": "f-bfc6b1e8adadecb7",
+      "documentId": "12340012",
+      "segmentId": "12340012-s88",
+      "start": 4310,
+      "end": 4323
+    },
+    {
+      "id": "real-0834cd4efd5bccd5",
+      "factId": "f-b0aaa300ed377d6d",
+      "documentId": "12340018",
+      "segmentId": "12340018-s59",
+      "start": 2736,
+      "end": 2773
+    },
+    {
+      "id": "real-9dbb596f63e5d3ca",
+      "factId": "f-efa45d4cafa30e55",
+      "documentId": "12340018",
+      "segmentId": "12340018-s47",
+      "start": 2074,
+      "end": 2118
+    },
+    {
+      "id": "real-113a1f067e6a0855",
+      "factId": "f-dadde97e43b6501c",
+      "documentId": "12340009",
+      "segmentId": "12340009-s16",
+      "start": 460,
+      "end": 495
+    },
+    {
+      "id": "real-8b29078b6814d657",
+      "factId": "f-128339ac5ae3e9ce",
+      "documentId": "12340012",
+      "segmentId": "12340012-s54",
+      "start": 2143,
+      "end": 2214
+    },
+    {
+      "id": "real-03d9bf7c6c668d64",
+      "factId": "f-dacd3eb2c32791f8",
+      "documentId": "12340012",
+      "segmentId": "12340012-s7",
+      "start": 130,
+      "end": 177
+    },
+    {
+      "id": "real-b323604b0d2d0c72",
+      "factId": "f-e12adf521960b248",
+      "documentId": "12340014",
+      "segmentId": "12340014-s12",
+      "start": 417,
+      "end": 449
+    },
+    {
+      "id": "real-8272cccde9678708",
+      "factId": "f-dacd3eb2c32791f8",
+      "documentId": "12340012",
+      "segmentId": "12340012-s7",
+      "start": 130,
+      "end": 177
+    },
+    {
+      "id": "real-29682c1e95974599",
+      "factId": "f-64883c6210aef6ba",
+      "documentId": "12340016",
+      "segmentId": "12340016-s4",
+      "start": 87,
+      "end": 102
+    },
+    {
+      "id": "real-9f776404c15bd796",
+      "factId": "f-2619c7ac19bfd1ce",
+      "documentId": "12340014",
+      "segmentId": "12340014-s14",
+      "start": 475,
+      "end": 490
+    },
+    {
+      "id": "real-94b20d07bb664bff",
+      "factId": "f-022247bacb75560e",
+      "documentId": "12340012",
+      "segmentId": "12340012-s103",
+      "start": 5524,
+      "end": 5548
+    },
+    {
+      "id": "real-29f15537e3fa0997",
+      "factId": "f-997af28e709a7097",
+      "documentId": "12340012",
+      "segmentId": "12340012-s64",
+      "start": 2758,
+      "end": 2777
+    },
+    {
+      "id": "real-6cf0bdf357d4ff1d",
+      "factId": "f-dd9963ec6474047c",
+      "documentId": "12340012",
+      "segmentId": "12340012-s58",
+      "start": 2462,
+      "end": 2537
+    },
+    {
+      "id": "real-8dc133851a9e7b06",
+      "factId": "f-aa6f7e4582e7501c",
+      "documentId": "12340012",
+      "segmentId": "12340012-s26",
+      "start": 878,
+      "end": 958
+    },
+    {
+      "id": "real-07bdc306d9007255",
+      "factId": "f-998f1db8e0fd4b73",
+      "documentId": "12340012",
+      "segmentId": "12340012-s105",
+      "start": 5596,
+      "end": 5707
+    },
+    {
+      "id": "real-b3fc942402e1140a",
+      "factId": "f-3cf8fc8f2918a031",
+      "documentId": "12340011",
+      "segmentId": "12340011-s9",
+      "start": 308,
+      "end": 332
+    },
+    {
+      "id": "real-86264ece41289b5d",
+      "factId": "f-2f33fc43e4541767",
+      "documentId": "12340012",
+      "segmentId": "12340012-s89",
+      "start": 4349,
+      "end": 4384
+    },
+    {
+      "id": "real-f0f4bb31755fe4b0",
+      "factId": "f-9ba5642804b94768",
+      "documentId": "12340012",
+      "segmentId": "12340012-s66",
+      "start": 2873,
+      "end": 2921
+    },
+    {
+      "id": "real-9ea6e163d2298aff",
+      "factId": "f-20260bdee8c357e8",
+      "documentId": "12340018",
+      "segmentId": "12340018-s26",
+      "start": 950,
+      "end": 959
+    },
+    {
+      "id": "real-ff65b452ce4e4484",
+      "factId": "f-d0453eee8a30fb05",
+      "documentId": "12340014",
+      "segmentId": "12340014-s30",
+      "start": 756,
+      "end": 888
+    },
+    {
+      "id": "real-d5c27f42a803b946",
+      "factId": "f-54a90b5b25e4311b",
+      "documentId": "12340018",
+      "segmentId": "12340018-s25",
+      "start": 935,
+      "end": 949
+    },
+    {
+      "id": "real-77b582efeed180c8",
+      "factId": "f-510f7d887a725b50",
+      "documentId": "12340012",
+      "segmentId": "12340012-s67",
+      "start": 3024,
+      "end": 3086
+    },
+    {
+      "id": "real-e241998ce3ee5043",
+      "factId": "f-01824d21ffb5a46b",
+      "documentId": "12340018",
+      "segmentId": "12340018-s41",
+      "start": 1425,
+      "end": 1526
+    },
+    {
+      "id": "real-39213106e4af1a2b",
+      "factId": "f-ec8af36cb660e5ed",
+      "documentId": "12340012",
+      "segmentId": "12340012-s15",
+      "start": 371,
+      "end": 403
+    },
+    {
+      "id": "real-3494e2562a04b48d",
+      "factId": "f-174e7b94c2d64117",
+      "documentId": "12340012",
+      "segmentId": "12340012-s36",
+      "start": 1711,
+      "end": 1725
+    },
+    {
+      "id": "real-48d61573dd3732ff",
+      "factId": "f-5008ecead0828ce6",
+      "documentId": "12340012",
+      "segmentId": "12340012-s75",
+      "start": 3527,
+      "end": 3624
+    },
+    {
+      "id": "real-3733b2b3c930e993",
+      "factId": "f-9f2e65a3c2be11a7",
+      "documentId": "12340012",
+      "segmentId": "12340012-s67",
+      "start": 2959,
+      "end": 2969
+    },
+    {
+      "id": "real-1512b520711b53fc",
+      "factId": "f-ed08fddff326bb0b",
+      "documentId": "12340012",
+      "segmentId": "12340012-s105",
+      "start": 5596,
+      "end": 5707
+    },
+    {
+      "id": "real-29cfb37ef58f3c33",
+      "factId": "f-cf394b02c9edf746",
+      "documentId": "12340011",
+      "segmentId": "12340011-s9",
+      "start": 184,
+      "end": 232
+    },
+    {
+      "id": "real-031999daa7553d2e",
+      "factId": "f-2271da702cafcb97",
+      "documentId": "12340012",
+      "segmentId": "12340012-s28",
+      "start": 1261,
+      "end": 1350
+    },
+    {
+      "id": "real-0b7f0e95440d1f90",
+      "factId": "f-a9eb227b36c61b00",
+      "documentId": "12340018",
+      "segmentId": "12340018-s10",
+      "start": 312,
+      "end": 339
+    },
+    {
+      "id": "real-ba0617df1dd38b3a",
+      "factId": "f-382c36f068832827",
+      "documentId": "12340012",
+      "segmentId": "12340012-s107",
+      "start": 5940,
+      "end": 6016
+    },
+    {
+      "id": "real-a782545d3200dfce",
+      "factId": "f-9d12c984ef06055f",
+      "documentId": "12340012",
+      "segmentId": "12340012-s54",
+      "start": 2216,
+      "end": 2256
+    },
+    {
+      "id": "real-191bb604c02d8879",
+      "factId": "f-4c55f4f57ab9a9af",
+      "documentId": "12340012",
+      "segmentId": "12340012-s92",
+      "start": 4562,
+      "end": 4586
+    },
+    {
+      "id": "real-cd60ed14923af903",
+      "factId": "f-c9b554ce6b317604",
+      "documentId": "12340012",
+      "segmentId": "12340012-s111",
+      "start": 6329,
+      "end": 6535
+    },
+    {
+      "id": "real-4d0d404f682218e0",
+      "factId": "f-af4b398363cfacf0",
+      "documentId": "12340016",
+      "segmentId": "12340016-s10",
+      "start": 213,
+      "end": 275
+    },
+    {
+      "id": "real-2f6078fb26a4bb43",
+      "factId": "f-175f4a09a3132b7b",
+      "documentId": "12340014",
+      "segmentId": "12340014-s32",
+      "start": 1016,
+      "end": 1054
+    },
+    {
+      "id": "real-ce4d5905f8cccf08",
+      "factId": "f-39daa8da951f3ff0",
+      "documentId": "12340016",
+      "segmentId": "12340016-s22",
+      "start": 841,
+      "end": 942
+    },
+    {
+      "id": "real-99b4069cd61d3bca",
+      "factId": "f-6369abcbce374b3c",
+      "documentId": "12340012",
+      "segmentId": "12340012-s89",
+      "start": 4333,
+      "end": 4348
+    },
+    {
+      "id": "real-73acdc866ab6b164",
+      "factId": "f-d9392115a5ed8307",
+      "documentId": "12340016",
+      "segmentId": "12340016-s19",
+      "start": 685,
+      "end": 764
+    },
+    {
+      "id": "real-d6594bd964d0cf7d",
+      "factId": "f-cc02f69a1e752a3b",
+      "documentId": "12340012",
+      "segmentId": "12340012-s42",
+      "start": 1808,
+      "end": 1817
+    },
+    {
+      "id": "real-a8fa285a63918e3e",
+      "factId": "f-dea4d401e44d9c6a",
+      "documentId": "12340009",
+      "segmentId": "12340009-s16",
+      "start": 435,
+      "end": 442
+    },
+    {
+      "id": "real-8d43f6e8bdb5900a",
+      "factId": "f-faac65cad54f6479",
+      "documentId": "12340012",
+      "segmentId": "12340012-s33",
+      "start": 1615,
+      "end": 1640
+    },
+    {
+      "id": "real-8e05bc360b2d5ece",
+      "factId": "f-478c0f927c9aa39a",
+      "documentId": "12340011",
+      "segmentId": "12340011-s14",
+      "start": 483,
+      "end": 516
+    },
+    {
+      "id": "real-9cffaefab87fdacf",
+      "factId": "f-16f254b02b13a231",
+      "documentId": "12340012",
+      "segmentId": "12340012-s101",
+      "start": 5362,
+      "end": 5451
+    },
+    {
+      "id": "real-5d2c02cb9d72dd56",
+      "factId": "f-8c93a78b7cb92829",
+      "documentId": "12340014",
+      "segmentId": "12340014-s21",
+      "start": 635,
+      "end": 648
+    },
+    {
+      "id": "real-a1ffe7cb2b805987",
+      "factId": "f-864240fbf6b7498d",
+      "documentId": "12340012",
+      "segmentId": "12340012-s109",
+      "start": 6197,
+      "end": 6261
+    },
+    {
+      "id": "real-92dc0f95b151e655",
+      "factId": "f-04f447bb7579499c",
+      "documentId": "12340014",
+      "segmentId": "12340014-s24",
+      "start": 672,
+      "end": 696
+    },
+    {
+      "id": "real-fd0b90a777d8e6fc",
+      "factId": "f-ad3fe484993ec319",
+      "documentId": "12340011",
+      "segmentId": "12340011-s9",
+      "start": 359,
+      "end": 369
+    },
+    {
+      "id": "real-a4d739ea92cf09c5",
+      "factId": "f-a3487bebbfa0c3a0",
+      "documentId": "12340012",
+      "segmentId": "12340012-s71",
+      "start": 3329,
+      "end": 3400
+    },
+    {
+      "id": "real-486ca29ceadb9a00",
+      "factId": "f-64619bf273ff407d",
+      "documentId": "12340009",
+      "segmentId": "12340009-s17",
+      "start": 496,
+      "end": 521
+    },
+    {
+      "id": "real-e889fee9d22bd4fb",
+      "factId": "f-f5251a5a54ed5c15",
+      "documentId": "12340018",
+      "segmentId": "12340018-s36",
+      "start": 1226,
+      "end": 1291
+    },
+    {
+      "id": "real-5ce53d21bbbfdf19",
+      "factId": "f-c578284bb7b5369d",
+      "documentId": "12340012",
+      "segmentId": "12340012-s115",
+      "start": 7036,
+      "end": 7144
+    },
+    {
+      "id": "real-7e4e6f15b1c37e5f",
+      "factId": "f-1d14dbdc015cdcf4",
+      "documentId": "12340018",
+      "segmentId": "12340018-s46",
+      "start": 1941,
+      "end": 2073
+    },
+    {
+      "id": "real-a7e2403ec9bcfbd5",
+      "factId": "f-2e9377301605ed3e",
+      "documentId": "12340012",
+      "segmentId": "12340012-s92",
+      "start": 4438,
+      "end": 4519
+    },
+    {
+      "id": "real-ad7affc7c77c3875",
+      "factId": "f-51bc265f9f46fae5",
+      "documentId": "12340012",
+      "segmentId": "12340012-s60",
+      "start": 2571,
+      "end": 2649
+    },
+    {
+      "id": "real-d2829b43aa49aec3",
+      "factId": "f-bbb6abcf6bfbdb1e",
+      "documentId": "12340012",
+      "segmentId": "12340012-s65",
+      "start": 2830,
+      "end": 2836
+    },
+    {
+      "id": "real-4af193117666d021",
+      "factId": "f-3bb09021133fb3d5",
+      "documentId": "12340012",
+      "segmentId": "12340012-s92",
+      "start": 4438,
+      "end": 4486
+    },
+    {
+      "id": "real-6db5d8518eaad18d",
+      "factId": "f-ee679b0e98e9c7d5",
+      "documentId": "12340018",
+      "segmentId": "12340018-s45",
+      "start": 1842,
+      "end": 1940
+    },
+    {
+      "id": "real-aac225af3287cfca",
+      "factId": "f-c811502cca37a512",
+      "documentId": "12340018",
+      "segmentId": "12340018-s9",
+      "start": 207,
+      "end": 226
+    },
+    {
+      "id": "real-1a974e41b179d2a8",
+      "factId": "f-a6022bc0f8365b4d",
+      "documentId": "12340012",
+      "segmentId": "12340012-s82",
+      "start": 4050,
+      "end": 4145
+    },
+    {
+      "id": "real-a123503af0e6d522",
+      "factId": "f-91a0bdce44c43584",
+      "documentId": "12340016",
+      "segmentId": "12340016-s23",
+      "start": 984,
+      "end": 1011
+    },
+    {
+      "id": "real-ce93ebf3e84966d4",
+      "factId": "f-a9ae06a321262d12",
+      "documentId": "12340014",
+      "segmentId": "12340014-s17",
+      "start": 575,
+      "end": 595
+    },
+    {
+      "id": "real-29d3c24babad640f",
+      "factId": "f-87f4f2495f3bf3b3",
+      "documentId": "12340012",
+      "segmentId": "12340012-s73",
+      "start": 3460,
+      "end": 3488
+    },
+    {
+      "id": "real-5526018f2aa5fa2f",
+      "factId": "f-3a0f08605c44ba5d",
+      "documentId": "12340012",
+      "segmentId": "12340012-s68",
+      "start": 3087,
+      "end": 3142
+    },
+    {
+      "id": "real-16305b060e1e0b17",
+      "factId": "f-263f3000348ceb94",
+      "documentId": "12340014",
+      "segmentId": "12340014-s22",
+      "start": 649,
+      "end": 663
+    },
+    {
+      "id": "real-65db16238a1bc2b5",
+      "factId": "f-23ce353b798c6959",
+      "documentId": "12340014",
+      "segmentId": "12340014-s11",
+      "start": 374,
+      "end": 416
+    },
+    {
+      "id": "real-62de0da0bd519077",
+      "factId": "f-473e41e555f81f4d",
+      "documentId": "12340012",
+      "segmentId": "12340012-s110",
+      "start": 6263,
+      "end": 6328
+    },
+    {
+      "id": "real-2a0e7b46d509233d",
+      "factId": "f-64a91c79903a131a",
+      "documentId": "12340012",
+      "segmentId": "12340012-s78",
+      "start": 3874,
+      "end": 3949
+    },
+    {
+      "id": "real-9b8725ccbc951a6b",
+      "factId": "f-334d73f1ea8816d2",
+      "documentId": "12340018",
+      "segmentId": "12340018-s54",
+      "start": 2571,
+      "end": 2604
+    },
+    {
+      "id": "real-ee42a64120e920ac",
+      "factId": "f-af4b398363cfacf0",
+      "documentId": "12340016",
+      "segmentId": "12340016-s10",
+      "start": 213,
+      "end": 275
+    },
+    {
+      "id": "real-e9569558795b97e6",
+      "factId": "f-3018198c1482c329",
+      "documentId": "12340012",
+      "segmentId": "12340012-s97",
+      "start": 4885,
+      "end": 4899
+    },
+    {
+      "id": "real-554c91a25d27ab82",
+      "factId": "f-c9ea23ae0e69c889",
+      "documentId": "12340012",
+      "segmentId": "12340012-s35",
+      "start": 1697,
+      "end": 1710
+    },
+    {
+      "id": "real-1b71458ba9aeeb9d",
+      "factId": "f-e6213cf72209d6f5",
+      "documentId": "12340012",
+      "segmentId": "12340012-s122",
+      "start": 7619,
+      "end": 7652
+    },
+    {
+      "id": "real-763031e8db1d08a4",
+      "factId": "f-25c97951a2a57d29",
+      "documentId": "12340012",
+      "segmentId": "12340012-s66",
+      "start": 2910,
+      "end": 2919
+    },
+    {
+      "id": "real-f913e23cd7b1c81e",
+      "factId": "f-b060435bbac13499",
+      "documentId": "12340012",
+      "segmentId": "12340012-s116",
+      "start": 7147,
+      "end": 7273
+    },
+    {
+      "id": "real-e40f965efc13d282",
+      "factId": "f-aa6f7e4582e7501c",
+      "documentId": "12340012",
+      "segmentId": "12340012-s26",
+      "start": 878,
+      "end": 958
+    },
+    {
+      "id": "real-576f962847cce4a0",
+      "factId": "f-83d230784dc63995",
+      "documentId": "12340012",
+      "segmentId": "12340012-s49",
+      "start": 1926,
+      "end": 1997
+    },
+    {
+      "id": "real-f4e1f185e07b3acd",
+      "factId": "f-2d7b7daff820324a",
+      "documentId": "12340012",
+      "segmentId": "12340012-s80",
+      "start": 3969,
+      "end": 4033
+    },
+    {
+      "id": "real-6a6c84e9f1a0984f",
+      "factId": "f-2a9ca03bf766c395",
+      "documentId": "12340012",
+      "segmentId": "12340012-s63",
+      "start": 2736,
+      "end": 2747
+    },
+    {
+      "id": "real-f781ff5c68e5ec41",
+      "factId": "f-045b7d7ddf1f7361",
+      "documentId": "12340012",
+      "segmentId": "12340012-s97",
+      "start": 4838,
+      "end": 4899
+    },
+    {
+      "id": "real-7f78db4e1b91785e",
+      "factId": "f-b7428034ddb16020",
+      "documentId": "12340011",
+      "segmentId": "12340011-s14",
+      "start": 459,
+      "end": 583
+    },
+    {
+      "id": "real-08df5df07639e89f",
+      "factId": "f-00ec79758efa40ab",
+      "documentId": "12340012",
+      "segmentId": "12340012-s63",
+      "start": 2726,
+      "end": 2734
+    },
+    {
+      "id": "real-2e3ab1b51bad3272",
+      "factId": "f-bdc742a4b9d6b358",
+      "documentId": "12340012",
+      "segmentId": "12340012-s96",
+      "start": 4713,
+      "end": 4837
+    },
+    {
+      "id": "real-01dbf89943b57ac0",
+      "factId": "f-e1ec1ab4ed48dd47",
+      "documentId": "12340012",
+      "segmentId": "12340012-s7",
+      "start": 130,
+      "end": 177
+    },
+    {
+      "id": "real-4ab410ef9a591a1d",
+      "factId": "f-045b7d7ddf1f7361",
+      "documentId": "12340012",
+      "segmentId": "12340012-s97",
+      "start": 4838,
+      "end": 4899
+    },
+    {
+      "id": "real-52d2d3a02cfdf0a5",
+      "factId": "f-f0126dc1b8ca9b06",
+      "documentId": "12340012",
+      "segmentId": "12340012-s41",
+      "start": 1792,
+      "end": 1796
+    },
+    {
+      "id": "real-063e4fb93c4aae0c",
+      "factId": "f-3b110637a833aca7",
+      "documentId": "12340012",
+      "segmentId": "12340012-s9",
+      "start": 194,
+      "end": 219
+    },
+    {
+      "id": "real-0d3a4684b8bc5c40",
+      "factId": "f-769f2c0b56f75df9",
+      "documentId": "12340011",
+      "segmentId": "12340011-s15",
+      "start": 584,
+      "end": 645
+    },
+    {
+      "id": "real-b0d6f49b92c40c9f",
+      "factId": "f-e6f5c69462ea8e7d",
+      "documentId": "12340014",
+      "segmentId": "12340014-s31",
+      "start": 889,
+      "end": 942
+    },
+    {
+      "id": "real-8fa5110143b2673e",
+      "factId": "f-6c46523a25968ff9",
+      "documentId": "12340012",
+      "segmentId": "12340012-s37",
+      "start": 1726,
+      "end": 1735
+    },
+    {
+      "id": "real-48079ba2c7a60198",
+      "factId": "f-88293677580d94b8",
+      "documentId": "12340011",
+      "segmentId": "12340011-s9",
+      "start": 267,
+      "end": 306
+    },
+    {
+      "id": "real-6abef690f76906bf",
+      "factId": "f-7cd800836a8b4643",
+      "documentId": "12340008",
+      "segmentId": "12340008-s20",
+      "start": 872,
+      "end": 936
+    },
+    {
+      "id": "real-530fecbfcb42628e",
+      "factId": "f-2d6fa9a83c3547e0",
+      "documentId": "12340018",
+      "segmentId": "12340018-s34",
+      "start": 1128,
+      "end": 1206
+    },
+    {
+      "id": "real-6a7a5e6243542ccc",
+      "factId": "f-bfe58587ee32d686",
+      "documentId": "12340011",
+      "segmentId": "12340011-s9",
+      "start": 334,
+      "end": 370
+    },
+    {
+      "id": "real-14ebb989e00dff12",
+      "factId": "f-0ef264d85eea08a0",
+      "documentId": "12340012",
+      "segmentId": "12340012-s99",
+      "start": 5187,
+      "end": 5217
+    },
+    {
+      "id": "real-387f5b2ee3f25d7a",
+      "factId": "f-f3cb594ed961053a",
+      "documentId": "12340018",
+      "segmentId": "12340018-s41",
+      "start": 1425,
+      "end": 1454
+    },
+    {
+      "id": "real-a2ba66431d540fa6",
+      "factId": "f-2a244e5005539287",
+      "documentId": "12340018",
+      "segmentId": "12340018-s34",
+      "start": 1128,
+      "end": 1206
+    },
+    {
+      "id": "real-9fec33fb4e486a29",
+      "factId": "f-57e41a43a4ea9981",
+      "documentId": "12340012",
+      "segmentId": "12340012-s27",
+      "start": 1141,
+      "end": 1260
+    }
+  ]
+}
