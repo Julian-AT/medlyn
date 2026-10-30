@@ -9,12 +9,11 @@ import {
   type Situation,
 } from "../contracts.ts";
 import {
-  documentCount,
+  assertWindowCurrent,
   evidenceWindow,
-  loadDocuments,
-  loadFacts,
+  loadEvidence,
   loadFindings,
-  loadSegments,
+  PATIENT_ID,
 } from "../store.ts";
 import { type AbsenceOptions, checkDocumented, containsSynonym } from "./absence.ts";
 import { batchCandidateSearch, batchDocumentSearch } from "./absence-search.ts";
@@ -30,6 +29,7 @@ import {
 import { type RenderContext, type RenderedCard, renderCard } from "./render.ts";
 import { openQuestions, patientView, screenEvents, screenFromEvents } from "./screen.ts";
 import { emptySelection, selectSection } from "./select.ts";
+import { type LensTrace, lensTrace } from "./timing.ts";
 
 type CompletedSection = {
   section: Section;
@@ -49,31 +49,40 @@ export async function* asCompleted<T>(jobs: Promise<T>[]): AsyncGenerator<T> {
 }
 
 export async function* streamLens(
-  req: LensRequest & { chipId?: string },
+  req: LensRequest & { chipId?: string; patientId?: string },
 ): AsyncGenerator<LensEvent> {
   const started = performance.now();
+  const trace = lensTrace(started);
   try {
     RequestSchema.parse(req);
-    const initialWindow = await evidenceWindow(req.asOf);
-    const situation = await parseSituation(req.text, req.asOf, req.chipId, initialWindow.asOf);
+    const patientId = req.patientId ?? PATIENT_ID;
+    if (!patientId.trim()) throw new Error("Patient id must not be empty");
+    const initialWindow = await trace("window", () => evidenceWindow(req.asOf, patientId));
+    const situation = await trace("parse", () =>
+      parseSituation(req.text, req.asOf, req.chipId, initialWindow.asOf),
+    );
     const window =
-      situation.asOf === initialWindow.asOf ? initialWindow : await evidenceWindow(situation.asOf);
-    const sourcesJob = Promise.all([loadFacts(window), loadSegments(window)]);
-    const findingsJob = loadFindings(window);
-    const absenceSourcesJob = Promise.all([loadDocuments(window), documentCount()]);
-    const background = Promise.allSettled([sourcesJob, findingsJob, absenceSourcesJob]);
-    const planned = await plan(situation);
+      situation.asOf === initialWindow.asOf
+        ? initialWindow
+        : await trace("window_cutoff", () => evidenceWindow(situation.asOf, patientId));
+    const sourcesJob = trace("evidence", () => loadEvidence(window, patientId));
+    const findingsJob = trace("findings", () => loadFindings(window, patientId, sourcesJob));
+    const background = Promise.allSettled([sourcesJob, findingsJob]);
+    const planned = await trace("plan", () => plan(situation));
     situation.tier = planned.tier;
-    const [facts, segments] = await sourcesJob;
-    const lensKey = lensCacheKey(situation, window, facts, segments);
+    const { facts, segments, documents, total } = await sourcesJob;
+    const lensKey = lensCacheKey(situation, window, facts, segments, patientId);
     if (!req.noCache) {
-      const cached = await getCache(lensKey).catch((error: unknown) => {
-        console.warn("lens_cache_read_failed", {
-          reason: error instanceof Error ? error.name : "Error",
-        });
-        return null;
-      });
+      const cached = await trace("cache_read", () => getCache(lensKey, patientId)).catch(
+        (error: unknown) => {
+          console.warn("lens_cache_read_failed", {
+            reason: error instanceof Error ? error.name : "Error",
+          });
+          return null;
+        },
+      );
       if (cached) {
+        await trace("revision_guard", () => assertWindowCurrent(window, patientId));
         const elapsed = performance.now() - started;
         cached.timings = {
           planMs: elapsed,
@@ -89,31 +98,39 @@ export async function* streamLens(
     const first: LensEvent = {
       type: "situation",
       lensKey,
-      patient: patientView(segments),
+      patient: patientView(segments, patientId),
       situation,
       window,
       sectionTitles: planned.sections.map(({ id, title }) => ({ id, title })),
     };
     const events: LensEvent[] = [first];
     yield first;
-    const ctx: RenderContext = { window, facts, segments, findings: [] };
+    const ctx: RenderContext = {
+      patientId,
+      window,
+      facts,
+      segments,
+      findings: [],
+      validatedLines: new Map(),
+    };
     const search = batchDocumentSearch();
-    const candidateSearch = batchCandidateSearch(window);
-    const absenceSources = absenceSourcesJob.then(
-      ([documents, total]): AbsenceOptions => ({
-        documents,
-        total,
-        segments,
-        search,
-        candidateSearch,
-      }),
-    );
+    const candidateSearch = batchCandidateSearch(window, undefined, patientId);
+    const absenceSources: AbsenceOptions = {
+      patientId,
+      documents,
+      total,
+      segments,
+      search,
+      candidateSearch,
+    };
     const absenceChecks = new Map<string, Promise<AbsenceResult>>();
     const check = (need: PlannedSection["needs"][number]) => {
       const existing = absenceChecks.get(need.id);
       if (existing) return existing;
-      const result = absenceSources.then((sources) =>
-        checkDocumented(absenceConcept(need), need.synonyms, window, sources),
+      const result = trace(
+        "absence",
+        () => checkDocumented(absenceConcept(need), need.synonyms, window, absenceSources),
+        need.id,
       );
       absenceChecks.set(need.id, result);
       return result;
@@ -139,7 +156,7 @@ export async function* streamLens(
     // Start larger selections first so the final queued sections are the cheaper ones.
     const jobs = [...prepared]
       .sort((a, b) => work.get(b.id)! - work.get(a.id)!)
-      .map((section) => completeSection(section, situation, ctx, check, findingsJob));
+      .map((section) => completeSection(section, situation, ctx, check, findingsJob, trace));
     const finished: CompletedSection[] = [];
     let firstSectionMs: number | undefined;
     for await (const result of asCompleted(jobs)) {
@@ -173,6 +190,7 @@ export async function* streamLens(
     events.push(findingsEvent);
     yield findingsEvent;
     await background;
+    await trace("revision_guard", () => assertWindowCurrent(window, patientId));
     const timings = {
       planMs,
       ...(firstSectionMs === undefined ? {} : { firstSectionMs }),
@@ -181,11 +199,13 @@ export async function* streamLens(
     };
     const done: LensEvent = { type: "done", timings };
     if (!req.noCache) {
-      await putCache(screenFromEvents([...events, done])).catch((error: unknown) => {
-        console.warn("lens_cache_write_failed", {
-          reason: error instanceof Error ? error.name : "Error",
-        });
-      });
+      await trace("cache_write", () => putCache(screenFromEvents([...events, done]))).catch(
+        (error: unknown) => {
+          console.warn("lens_cache_write_failed", {
+            reason: error instanceof Error ? error.name : "Error",
+          });
+        },
+      );
       timings.totalMs = performance.now() - started;
     }
     yield EventSchema.parse(done);
@@ -203,6 +223,7 @@ async function completeSection(
   ctx: RenderContext,
   check: (need: PlannedSection["needs"][number]) => Promise<AbsenceResult>,
   findings: Promise<RenderContext["findings"]>,
+  trace: LensTrace,
 ): Promise<CompletedSection> {
   for (const need of section.needs) {
     const candidates = completionCandidates(need, ctx.facts);
@@ -220,7 +241,11 @@ async function completeSection(
   // Give coalesced absence searches a slot before queuing all section selections.
   await new Promise<void>((resolve) => setImmediate(resolve));
   let failed = false;
-  const selections = await selectSection(section, situation, ctx.facts).catch((error: unknown) => {
+  const selections = await trace(
+    "select",
+    () => selectSection(section, situation, ctx.facts),
+    section.id,
+  ).catch((error: unknown) => {
     failed = true;
     console.warn("lens_selection_failed", {
       sectionId: section.id,
@@ -229,40 +254,49 @@ async function completeSection(
     return section.needs.map(emptySelection);
   });
   const renderCtx = { ...ctx, findings: await findings };
-  const rendered = await Promise.all(
-    section.needs.map(async (need) => {
-      let selection = selections.find((entry) => entry.needId === need.id) ?? emptySelection(need);
-      const candidates = completionCandidates(need, ctx.facts);
-      const candidateIds = new Set(
-        ("afterDocumentDate" in need ? candidates : ctx.facts).map((fact) => fact.id),
-      );
-      selection = { ...selection, factIds: selection.factIds.filter((id) => candidateIds.has(id)) };
-      if (selection.headline?.factIds.some((id) => !selection.factIds.includes(id)))
-        selection.headline = null;
-      let absence: AbsenceResult | undefined;
-      if (!selection.factIds.length && !failed) {
-        try {
-          absence = await check(need);
-          if (absence.status === "documented") {
-            const hits = new Set(absence.segmentIds);
-            const retry = await selectSection(
-              { ...section, needs: [need] },
-              situation,
-              candidates,
-              ctx.segments.filter((segment) => hits.has(segment.id)),
-            );
-            selection = retry[0] ?? selection;
+  const rendered = await trace(
+    "render",
+    () =>
+      Promise.all(
+        section.needs.map(async (need) => {
+          let selection =
+            selections.find((entry) => entry.needId === need.id) ?? emptySelection(need);
+          const candidates = completionCandidates(need, ctx.facts);
+          const candidateIds = new Set(
+            ("afterDocumentDate" in need ? candidates : ctx.facts).map((fact) => fact.id),
+          );
+          selection = {
+            ...selection,
+            factIds: selection.factIds.filter((id) => candidateIds.has(id)),
+          };
+          if (selection.headline?.factIds.some((id) => !selection.factIds.includes(id)))
+            selection.headline = null;
+          let absence: AbsenceResult | undefined;
+          if (!selection.factIds.length && !failed) {
+            try {
+              absence = await check(need);
+              if (absence.status === "documented") {
+                const hits = new Set(absence.segmentIds);
+                const retry = await selectSection(
+                  { ...section, needs: [need] },
+                  situation,
+                  candidates,
+                  ctx.segments.filter((segment) => hits.has(segment.id)),
+                );
+                selection = retry[0] ?? selection;
+              }
+            } catch (error) {
+              console.warn("lens_need_unavailable", {
+                needId: need.id,
+                reason: error instanceof Error ? error.name : "Error",
+              });
+              return renderCard(need, emptySelection(need), renderCtx, undefined, true);
+            }
           }
-        } catch (error) {
-          console.warn("lens_need_unavailable", {
-            needId: need.id,
-            reason: error instanceof Error ? error.name : "Error",
-          });
-          return renderCard(need, emptySelection(need), renderCtx, undefined, true);
-        }
-      }
-      return renderCard(need, selection, renderCtx, absence, failed);
-    }),
+          return renderCard(need, selection, renderCtx, absence, failed);
+        }),
+      ),
+    section.id,
   );
   return {
     section: { id: section.id, title: section.title, cards: rendered.map(({ card }) => card) },
