@@ -57,7 +57,10 @@ export function EvidencePanel({ segmentId, finding, screen, onSource, onReview }
           </EmptyDescription>
         </EmptyHeader>
         {screen && (
-          <Card size="sm" className="w-full max-w-xs">
+          <Card
+            size="sm"
+            className="w-full max-w-xs rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0"
+          >
             <CardHeader>
               <CardDescription>Evidence window</CardDescription>
               <CardTitle className="font-mono">{formatDate(screen.window.asOf)}</CardTitle>
@@ -75,7 +78,7 @@ export function EvidencePanel({ segmentId, finding, screen, onSource, onReview }
   const segments =
     document?.segments ?? (passage ? [...passage.before, passage.segment, ...passage.after] : []);
   return (
-    <Card className="bg-transparent ring-0">
+    <Card className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
         <CardDescription>Source document</CardDescription>
         <CardTitle>{metadata?.titleEn ?? "Loading evidence…"}</CardTitle>
@@ -105,7 +108,7 @@ export function EvidencePanel({ segmentId, finding, screen, onSource, onReview }
           <Alert>
             <AlertDescription>
               {error}
-              <Button variant="outline" size="sm" onClick={retry}>
+              <Button className="rounded-full" variant="outline" size="sm" onClick={retry}>
                 Retry source
               </Button>
             </AlertDescription>
@@ -117,9 +120,9 @@ export function EvidencePanel({ segmentId, finding, screen, onSource, onReview }
             key={segment.id}
             size="sm"
             className={cn(
-              "ring-0",
+              "rounded-xl shadow-none ring-0",
               segment.id === passage?.segment.id
-                ? "bg-primary/10 ring-1 ring-primary/40"
+                ? "bg-gray-alpha-100 ring-1 ring-gray-alpha-200"
                 : "bg-transparent",
             )}
           >

@@ -38,20 +38,20 @@ export function EvidenceWorkspace({
       className="min-w-0 gap-4 rounded-none bg-transparent py-0 shadow-none ring-0 xl:sticky xl:top-6 xl:self-start"
       aria-label="Evidence and investigation"
     >
-      <Card className="gap-0 py-0">
+      <Card className="gap-0 rounded-2xl border border-gray-alpha-150 bg-card py-0 shadow-xs ring-0">
         <Tabs value={tab} onValueChange={onTab}>
           <CardHeader className="p-3 print:hidden">
-            <TabsList className="w-full">
-              <TabsTrigger value="evidence">
+            <TabsList className="w-full rounded-full bg-gray-alpha-100">
+              <TabsTrigger className="rounded-full" value="evidence">
                 <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
                 Evidence
               </TabsTrigger>
-              <TabsTrigger value="questions">
+              <TabsTrigger className="rounded-full" value="questions">
                 <HugeiconsIcon icon={Task01Icon} strokeWidth={2} aria-hidden="true" />
                 Open questions
                 <Badge variant="secondary">{screen?.openQuestions.length ?? 0}</Badge>
               </TabsTrigger>
-              <TabsTrigger value="letter">
+              <TabsTrigger className="rounded-full" value="letter">
                 <HugeiconsIcon icon={NoteEditIcon} strokeWidth={2} aria-hidden="true" />
                 Letter
               </TabsTrigger>
