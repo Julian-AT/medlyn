@@ -7,6 +7,7 @@ import { CardContent, CardDescription } from "@/components/ui/card";
 import { groupEvidence } from "@/lib/group-evidence";
 import { ClaimLine } from "./claim-line";
 import { displayDates } from "./display-dates";
+import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 export function Timeline(props: ToolProps<UiToolOutputs["show_timeline"]>) {
@@ -31,18 +32,17 @@ export function Timeline(props: ToolProps<UiToolOutputs["show_timeline"]>) {
       }
     >
       {output?.events.length === 0 ? (
-        <CardDescription>No events to display in this view.</CardDescription>
+        <ToolEmpty
+          title="No events to display"
+          description="Try a different event type or open a situation. This view does not establish absence."
+        />
       ) : null}
       {groups.map(({ item: event, sources }) => (
         <CardContent
           key={event.factId}
-          className="relative flex flex-col gap-3 border-l border-primary/25 py-2 pl-5 pr-0"
+          className="flex min-h-10 flex-col gap-3 border-b border-border p-0 pb-4"
         >
-          <Badge
-            aria-hidden="true"
-            className="absolute -left-1 top-3 size-2 rounded-full border-0 bg-primary p-0"
-          />
-          <CardContent className="flex flex-wrap items-center gap-2 px-0">
+          <CardContent className="flex flex-wrap items-center gap-2 p-0">
             <CardDescription className="font-mono text-xs font-medium tabular-nums">
               {displayDates(event.date)}
             </CardDescription>
