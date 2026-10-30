@@ -35,14 +35,14 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
   return (
     <>
       <Card className="rounded-none bg-transparent py-0 shadow-none ring-0">
-        <CardContent className="flex flex-col gap-4 px-0">
+        <CardContent className="flex flex-col gap-3 px-0">
           <form
             onSubmit={(event) => {
               event.preventDefault();
               submit(text);
             }}
           >
-            <InputGroup className="h-12 rounded-xl border-0 bg-gray-alpha-100 shadow-none">
+            <InputGroup className="h-10 rounded-xl bg-gray-alpha-50 shadow-none">
               <InputGroupAddon>
                 <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
               </InputGroupAddon>
@@ -116,7 +116,7 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
               <ToggleGroupItem
                 key={chip.id}
                 value={chip.id}
-                className="h-8 rounded-full bg-gray-alpha-100 px-3 text-xs font-medium text-muted-foreground data-[state=on]:bg-foreground data-[state=on]:text-background"
+                className="h-8 shrink-0 whitespace-nowrap rounded-control px-3 text-sm font-medium text-muted-foreground data-[state=on]:bg-secondary data-[state=on]:text-foreground"
               >
                 {chip.label}
               </ToggleGroupItem>
