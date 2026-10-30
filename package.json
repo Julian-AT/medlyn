@@ -8,7 +8,12 @@
     "smoke": "pnpm --filter @medlyn/engine smoke",
     "db:push": "pnpm --filter @medlyn/engine db:push",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "ingest": "pnpm --filter @medlyn/engine ingest",
+    "lens": "pnpm --filter @medlyn/engine lens",
+    "dev": "pnpm --filter @medlyn/web dev",
+    "eval": "pnpm --filter @medlyn/eval eval",
+    "warm": "pnpm --filter @medlyn/engine warm"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

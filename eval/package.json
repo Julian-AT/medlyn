@@ -1,0 +1,19 @@
+{
+  "name": "@medlyn/eval",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval": "node --env-file=../.env --experimental-strip-types --no-warnings run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@medlyn/engine": "workspace:*",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.0.0",
+    "promptfoo": "^0.125.1",
+    "typescript": "^5.9.0"
+  }
+}

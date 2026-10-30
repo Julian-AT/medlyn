@@ -5,13 +5,21 @@
   "exports": {
     "./contracts": "./contracts.ts",
     "./db/schema": "./db/schema.ts",
-    "./lens/mock": "./lens/mock.ts"
+    "./lens/mock": "./lens/mock.ts",
+    "./lens/stream": "./lens/stream.ts",
+    "./evidence/passage": "./evidence/passage.ts",
+    "./dates": "./dates.ts",
+    "./store": "./store.ts",
+    "./llm/client": "./llm/client.ts"
   },
   "scripts": {
     "smoke": "node --env-file=../../.env --experimental-strip-types llm/smoke.ts",
+    "ingest": "node --env-file=../../.env --experimental-strip-types --no-warnings ingest/run.ts",
+    "lens": "node --env-file=../../.env --experimental-strip-types --no-warnings lens/cli.ts",
     "db:push": "drizzle-kit push",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "warm": "node --env-file=../../.env --experimental-strip-types --no-warnings lens/warm.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

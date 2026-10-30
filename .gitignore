@@ -19,3 +19,5 @@ coverage/
 eval/output/
 eval/playwright/test-results/
 eval/playwright/report/
+
+.agents/
