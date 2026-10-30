@@ -35,14 +35,16 @@ export function ChatComposer({
 }) {
   const { patient } = useActivePatient();
   const [text, setText] = useState("");
-  const [language, setLanguage] = useState("en-GB");
+  const [language, setLanguage] = useState("en-US");
   const dictationBase = useRef("");
+  const latestText = useRef(text);
+  latestText.current = text;
   const transcript = (value: string) =>
     setText(appendDictation(dictationBase.current, value).slice(0, 6000));
   const voice = useSituationVoice(transcript, {
     onInterim: transcript,
     onStart: () => {
-      dictationBase.current = text;
+      dictationBase.current = latestText.current;
     },
     language,
     keyboard: false,
@@ -74,7 +76,7 @@ export function ChatComposer({
       <PromptInputTextarea
         aria-label={`Ask about ${patient.displayName}`}
         placeholder={
-          voice.listening ? "Listening…" : `Ask about ${patient.displayName.split(" ")[0]}’s care…`
+          voice.listening ? "Dictating…" : `Ask about ${patient.displayName.split(" ")[0]}’s care…`
         }
         className="max-h-40 min-h-12 px-4 py-3 text-base/6 md:text-sm/6"
         rows={1}
@@ -91,14 +93,14 @@ export function ChatComposer({
           <>
             {voice.listening && (
               <Badge variant="secondary" role="status" aria-live="polite">
-                Listening…
+                {voice.phase === "starting"
+                  ? "Starting…"
+                  : voice.phase === "stopping"
+                    ? "Finishing…"
+                    : "Listening…"}
               </Badge>
             )}
-            <Select
-              value={language.startsWith("de") ? "de-AT" : "en-GB"}
-              disabled={busy || voice.listening}
-              onValueChange={setLanguage}
-            >
+            <Select value={language} disabled={busy || voice.listening} onValueChange={setLanguage}>
               <SelectTrigger
                 aria-label="Dictation language"
                 size="sm"
@@ -107,8 +109,8 @@ export function ChatComposer({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en-GB">EN</SelectItem>
-                <SelectItem value="de-AT">DE</SelectItem>
+                <SelectItem value="en-US">EN</SelectItem>
+                <SelectItem value="de-DE">DE</SelectItem>
               </SelectContent>
             </Select>
             <Tooltip>
