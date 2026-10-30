@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { PatientOption } from "@/lib/active-patient";
+import { uniquePatients } from "./patient-options";
 
 type ActivePatient = {
   patient: PatientOption;
@@ -24,7 +25,27 @@ export function ActivePatientProvider({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const [loadedPatients, setLoadedPatients] = useState<PatientOption[] | null>(null);
+  const options = uniquePatients([...(loadedPatients ?? patients), patient]);
+  const activePatient = options.find((entry) => entry.id === patient.id) ?? patient;
   const [facts, setFacts] = useState(new Map<string, Fact>());
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/patient/list", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Patient names unavailable");
+        const body: { patients: PatientOption[] } = await response.json();
+        if (!controller.signal.aborted) setLoadedPatients(uniquePatients(body.patients));
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          console.warn(
+            "patient_names_unavailable",
+            error instanceof Error ? error.name : "Unknown",
+          );
+      });
+    return () => controller.abort();
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     void fetch(`/api/patient/facts?patientId=${patient.id}`, { signal: controller.signal })
@@ -44,7 +65,7 @@ export function ActivePatientProvider({
     return () => controller.abort();
   }, [patient.id]);
   async function selectPatient(id: string) {
-    const next = patients.find((entry) => entry.id === id);
+    const next = options.find((entry) => entry.id === id);
     if (!next || id === patient.id) return;
     try {
       const response = await fetch("/api/patient/select", {
@@ -60,7 +81,9 @@ export function ActivePatientProvider({
     }
   }
   return (
-    <PatientContext.Provider value={{ patient, patients, selectPatient, facts }}>
+    <PatientContext.Provider
+      value={{ patient: activePatient, patients: options, selectPatient, facts }}
+    >
       {children}
     </PatientContext.Provider>
   );
