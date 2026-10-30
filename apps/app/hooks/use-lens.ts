@@ -2,22 +2,22 @@
 
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { useActivePatient } from "@/components/patient/active-patient-provider";
+import { useWorkspace } from "@/components/shell/workspace-provider";
 import { emptyLens, readLensStream, reduceLens } from "@/lib/lens-state";
 
 type InitialSituation = { text?: string; chipId?: string };
 
 export function useLens(initial: InitialSituation = {}) {
-  const { patient } = useActivePatient();
   const [state, dispatch] = useReducer(reduceLens, emptyLens);
-  const [sessionId, setSessionId] = useState("");
+  const { sessionId } = useWorkspace();
   const [loading, setLoading] = useState(true);
   const [mock, setMock] = useState(false);
   const [activeChip, setActiveChip] = useState<string | null>(null);
   const [recent, setRecent] = useState<string[]>([]);
   const abort = useRef<AbortController | null>(null);
   const sequence = useRef(0);
-  const session = useRef("");
+  const session = useRef(sessionId);
+  session.current = sessionId;
   const last = useRef({ text: CHIPS[0].text, chipId: CHIPS[0].id as string | undefined });
 
   const run = useCallback(async (text: string, chipId?: string, noCache = false) => {
@@ -71,10 +71,7 @@ export function useLens(initial: InitialSituation = {}) {
   }, []);
 
   useEffect(() => {
-    const id = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? crypto.randomUUID();
-    sessionStorage.setItem(`medlyn-session:${patient.id}`, id);
-    session.current = id;
-    setSessionId(id);
+    if (!sessionId) return;
     const chip = CHIPS.find((item) => item.id === initial.chipId) ?? CHIPS[0];
     if (initial.text?.trim()) void run(initial.text);
     else void run(chip.text, chip.id);
@@ -82,7 +79,7 @@ export function useLens(initial: InitialSituation = {}) {
       sequence.current++;
       abort.current?.abort();
     };
-  }, [patient.id, initial.chipId, initial.text, run]);
+  }, [sessionId, initial.chipId, initial.text, run]);
 
   return {
     state,
