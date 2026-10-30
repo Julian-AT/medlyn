@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { displayDates } from "./display-dates";
 import { SourceChip } from "./source-chip";
+import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
@@ -21,23 +22,35 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
       title="GP follow-up letter"
       description={output ? `Draft · as of ${displayDates(output.asOf)}` : undefined}
     >
+      {output &&
+      !output.sections.some((section) =>
+        section.claims.some((claim) => ["supported", "exempt"].includes(claim.validation.support)),
+      ) ? (
+        <ToolEmpty
+          title="No validated letter text to display"
+          description="Review the source evidence, then ask Medlyn to draft the letter again."
+        />
+      ) : null}
       {(props.expanded
         ? output?.sections
         : output?.sections.filter((section) => section.claims.length > 0).slice(0, 2)
       )
         ?.filter((section) => section.claims.length > 0)
         .map((section) => (
-          <CardContent key={section.id} className="flex flex-col gap-2 px-0">
+          <CardContent key={section.id} className="flex flex-col gap-2 p-0">
             <CardTitle className="text-xs font-medium">{section.title}</CardTitle>
             {(props.expanded ? section.claims : section.claims.slice(0, 1))
               .filter((claim) => ["supported", "exempt"].includes(claim.validation.support))
               .map((claim) => (
-                <CardContent key={claim.id} className="flex flex-col gap-1 px-0">
+                <CardContent key={claim.id} className="flex flex-col gap-1 p-0">
                   <CardDescription className="whitespace-pre-wrap text-sm text-foreground">
                     {displayDates(claim.text)}
                   </CardDescription>
                   {claim.flag ? (
-                    <Badge variant="outline">
+                    <Badge
+                      variant="outline"
+                      className="border-warning/30 bg-warning/10 text-xs text-warning"
+                    >
                       Needs review · {claim.flag.reason.replaceAll("_", " ")}
                     </Badge>
                   ) : null}
@@ -49,7 +62,7 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
           </CardContent>
         ))}
       {props.expanded && output?.annotations.length ? (
-        <CardContent className="flex flex-col gap-2 px-0 pt-3">
+        <CardContent className="flex flex-col gap-2 p-0 pt-3">
           <CardTitle className="text-xs">Clinician notes — not from the source documents</CardTitle>
           {output.annotations.map((note) => (
             <CardDescription key={note.id} className="whitespace-pre-wrap text-xs">
@@ -59,7 +72,7 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
         </CardContent>
       ) : null}
       {props.expanded && (
-        <Button asChild variant="outline" size="sm" className="rounded-full shadow-none">
+        <Button asChild variant="outline" size="sm" className="rounded-control shadow-none">
           <a href={`/letter?${query}`}>Open GP letter</a>
         </Button>
       )}
