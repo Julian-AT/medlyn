@@ -26,9 +26,9 @@ export function SourceChip({
           <HoverCardTrigger asChild>
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="h-7 max-w-full gap-1.5 rounded-lg px-2 text-xs font-medium text-primary shadow-none"
+              className="h-6 max-w-full gap-1 rounded-md px-1 text-[11px] font-normal text-muted-foreground shadow-none hover:text-foreground"
               aria-label={`Open source ${segmentId}`}
               onClick={() => showSource(segmentId)}
             >
