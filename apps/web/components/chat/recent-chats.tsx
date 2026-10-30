@@ -6,12 +6,8 @@ import Link from "next/link";
 import { InvestigationBridge } from "@/components/chat/investigation-bridge";
 import { ChatHistoryRow } from "@/components/shell/chat-history-row";
 import { useChatHistory } from "@/components/shell/hooks/use-chat-history";
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuSkeleton,
-} from "@/components/ui/sidebar";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VISIBLE_CHATS = 5;
 
@@ -36,7 +32,7 @@ export function RecentChats() {
           </Link>
         </SidebarGroupLabel>
         <SidebarMenu>
-          {status === "loading" && <SidebarMenuSkeleton />}
+          {status === "loading" && <Skeleton className="h-8 w-full rounded-[10px]" />}
           {chats.slice(0, VISIBLE_CHATS).map((chat) => (
             <ChatHistoryRow key={chat.id} chat={chat} onDelete={remove} />
           ))}
