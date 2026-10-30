@@ -18,7 +18,9 @@ export function LensHeader({
           <Badge
             variant="outline"
             className={
-              !mock && !loading ? "border-primary/20 bg-primary/10 text-primary" : undefined
+              !mock && !loading
+                ? "border-gray-alpha-150 bg-gray-alpha-100 text-foreground"
+                : undefined
             }
           >
             {mock ? "Demo replay" : loading ? "Checking sources" : "Source-linked"}

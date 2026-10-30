@@ -56,7 +56,7 @@ export function LensCanvas({
           <AlertTitle>Lens interrupted</AlertTitle>
           <AlertDescription>
             {state.error}
-            <Button size="sm" variant="outline" onClick={onRetry}>
+            <Button className="rounded-full" size="sm" variant="outline" onClick={onRetry}>
               Retry lens
             </Button>
           </AlertDescription>
@@ -65,7 +65,10 @@ export function LensCanvas({
       <LayoutGroup id="clinical-lens">
         {critical.length > 0 && (
           <>
-            <Alert variant="destructive">
+            <Alert
+              variant="destructive"
+              className="rounded-2xl border-0 bg-destructive/5 px-5 py-4 dark:bg-destructive/10"
+            >
               <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={2} aria-hidden="true" />
               <AlertTitle>Critical for this task</AlertTitle>
               <AlertDescription>
@@ -80,7 +83,7 @@ export function LensCanvas({
           </>
         )}
         {!screen && (
-          <Card>
+          <Card className="rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0">
             <CardHeader>
               <CardTitle>Preparing your clinical lens</CardTitle>
             </CardHeader>
@@ -98,10 +101,10 @@ export function LensCanvas({
           return (
             <Card
               key={section.id}
-              className="gap-3 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0"
+              className="gap-4 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0"
             >
               <CardHeader className="flex flex-row items-center justify-between px-0">
-                <CardTitle>{section.title}</CardTitle>
+                <CardTitle className="text-sm font-semibold">{section.title}</CardTitle>
                 {pending && <Badge variant="outline">Checking sources</Badge>}
               </CardHeader>
               <CardContent
@@ -115,7 +118,11 @@ export function LensCanvas({
                 {pending &&
                   !visible.length &&
                   [0, 1].map((key) => (
-                    <Card size="sm" key={key}>
+                    <Card
+                      size="sm"
+                      key={key}
+                      className="rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0"
+                    >
                       <CardHeader>
                         <Skeleton className="h-4 w-2/3" />
                       </CardHeader>
