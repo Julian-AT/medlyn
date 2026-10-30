@@ -3,6 +3,7 @@
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription } from "@/components/ui/card";
+import { displayDates } from "./display-dates";
 import { SourceChip } from "./source-chip";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
@@ -30,7 +31,7 @@ export function GapCard(props: Props) {
         {unavailable
           ? "Couldn't check"
           : output?.status === "not_documented"
-            ? `Not documented as of ${output.searched.asOf} · searched ${eligible} of ${eligible} eligible documents`
+            ? `Not documented as of ${displayDates(output.searched.asOf)} · searched ${eligible} of ${eligible} eligible documents`
             : "Documented in the source passages"}
       </CardDescription>
       <CardContent className="flex flex-wrap gap-1.5 px-0">
