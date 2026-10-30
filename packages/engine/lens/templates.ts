@@ -3,6 +3,7 @@ import { VALIDATOR_VERSION } from "../claims/version.ts";
 import {
   type Claim,
   type ClaimLine,
+  type Document,
   type EvidenceWindow,
   type Fact,
   MedicationAttrs,
@@ -27,9 +28,21 @@ export function medicationSchedule(
     .join("-");
 }
 
+/** Adds source metadata to request-local copies so rendering and validation agree. */
+export function withDocumentTitles(
+  facts: Fact[],
+  documents: Pick<Document, "id" | "titleEn">[],
+): Fact[] {
+  const titles = new Map(documents.map((document) => [document.id, document.titleEn]));
+  return facts.map((fact) => {
+    const title = titles.get(fact.documentId)?.trim();
+    return title ? { ...fact, attrs: { ...fact.attrs, sourceTitle: title } } : fact;
+  });
+}
+
 export function factLineText(fact: Fact): string {
   let text = fact.labelEn;
-  let source = stringAttr(fact, "sourceLabel") ?? stringAttr(fact, "sourceTitle") ?? "Document";
+  let source = stringAttr(fact, "sourceTitle") ?? stringAttr(fact, "sourceLabel") ?? "Document";
   const date = formatDate(fact.docDate, "day");
   if (fact.kind === "medication") {
     const parsed = MedicationAttrs.safeParse(fact.attrs);
