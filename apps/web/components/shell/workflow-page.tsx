@@ -37,7 +37,7 @@ export function WorkflowPage({ view }: { view: "questions" | "letter" | "reviews
   const [findingId, setFindingId] = useState<string | null>(null);
   const finding = reviews.screen?.findings.find((item) => item.id === findingId);
   return (
-    <Card className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-6xl px-4 py-6 shadow-none ring-0 md:px-8">
+    <Card className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-[1100px] px-4 py-6 shadow-none ring-0 md:px-8 md:py-8">
       <CardContent className="flex flex-col gap-8 px-0">
         <PageHeading
           title={
