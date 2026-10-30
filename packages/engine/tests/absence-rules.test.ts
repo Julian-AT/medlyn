@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkDocumented, containsSynonym } from "../lens/absence.ts";
+import { checkDocumented, containsSynonym, locatedAbsenceHits } from "../lens/absence.ts";
 import type { Document, EvidenceWindow, Segment } from "../contracts.ts";
 
 const window: EvidenceWindow = { asOf: "2020-01-02", eligibleDocumentIds: ["a"], corpusRevision: "r1" };
@@ -60,5 +60,11 @@ describe("absence checks", () => {
   it("has an overall deadline including the full text pass", async () => {
     const result = await checkDocumented("absent", [], window, { ...sources, timeoutMs: 10, search: () => new Promise(() => undefined) });
     expect(result.status).toBe("unavailable");
+  });
+  it("requires positive full-text matches to quote their located source", () => {
+    expect(locatedAbsenceHits([{ segmentId: segment.id, quote: "Marker alpha" }], [segment])).toEqual([segment.id]);
+    expect(() => locatedAbsenceHits([{ segmentId: segment.id, quote: "invented" }], [segment])).toThrow("unlocated");
+    expect(() => locatedAbsenceHits([{ segmentId: "missing", quote: "Marker" }], [segment])).toThrow("unlocated");
+    expect(() => locatedAbsenceHits([{ segmentId: segment.id, quote: " " }], [segment])).toThrow("unlocated");
   });
 });

@@ -128,7 +128,8 @@ async function completeSection(
   for (const need of section.needs) {
     const candidates = completionCandidates(need, ctx.facts);
     const quantitativeLab = need.kinds.includes("lab") && need.requiredFields?.includes("value");
-    if (!candidates.length || (quantitativeLab && !candidates.some((fact) => containsSynonym(`${fact.labelEn} ${fact.quote}`, need.synonyms)))) {
+    const specificCheck = quantitativeLab || "afterDocumentDate" in need || need.id.endsWith("_exam");
+    if (!candidates.length || (specificCheck && !candidates.some((fact) => containsSynonym(`${fact.labelEn} ${fact.quote}`, need.synonyms)))) {
       void check(need).catch(() => undefined);
     }
   }

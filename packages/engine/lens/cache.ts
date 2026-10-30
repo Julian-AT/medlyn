@@ -6,7 +6,7 @@ import { cacheKey } from "../claims/identity.ts";
 import { VALIDATOR_VERSION } from "../claims/validate.ts";
 import { PATIENT_ID } from "../store.ts";
 
-export const ENGINE_VERSION = "lens-pipeline-5";
+export const ENGINE_VERSION = "lens-pipeline-9";
 
 export function lensCacheKey(situation: Situation, window: EvidenceWindow, facts: Fact[], segments: Segment[]): string {
   return cacheKey({

@@ -79,6 +79,7 @@ describe("lens planning and selection", () => {
     const planned = await plan(emergency.situation);
     const contrast = planned.sections.find((section) => section.needs.some((need) => need.id === "contrast_risks"));
     expect(contrast?.needs.map((need) => need.id)).toContain("kidney_function");
+    expect(contrast?.needs.find((need) => need.id === "contrast_risks")?.requiredFields).toContain("prior_contrast_avoidance");
   });
   it("plans the scheduled procedure separately from a tumour-board meeting date", async () => {
     const surgery = CHIPS.find((chip) => chip.profileId === "surgery_tumour_board")!;
@@ -88,7 +89,8 @@ describe("lens planning and selection", () => {
   });
   it("checks for a later HbA1c separately from rendering the latest extracted value", () => {
     const section = { id: "hba1c", title: "HbA1c", needs: [{ ...need, id: "hba1c" }] };
-    const [later] = followupNeeds(section, [{ ...fact, kind: "lab", labelEn: "HbA1c", temporalStatus: "stated" }]);
+    const measured = { ...fact, kind: "lab" as const, labelEn: "HbA1c", assertion: "present" as const, temporalStatus: "stated" as const };
+    const [later] = followupNeeds(section, [measured, { ...measured, id: "later-plan", docDate: "2021-01-01", temporalStatus: "planned" }]);
     expect(later.id).toBe("completion_later_hba1c");
     expect(later.afterDocumentDate).toBe(fact.docDate);
     expect(absenceConcept(later)).toContain("Later HbA1c measurement");

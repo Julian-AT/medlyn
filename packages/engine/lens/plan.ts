@@ -71,7 +71,11 @@ function requireNeed(id: string): Need {
   const need = NEEDS[id];
   if (!need) throw new Error(`Planner returned unknown need: ${id}`);
   if (id === "lipids") return { ...need, title: "Blood lipid measurements" };
-  if (id === "contrast_risks") return { ...need, kinds: [...new Set([...need.kinds, "imaging" as const, "procedure" as const])] };
+  if (id === "contrast_risks") return {
+    ...need,
+    kinds: [...new Set([...need.kinds, "imaging" as const, "procedure" as const])],
+    requiredFields: [...(need.requiredFields ?? []), "prior_contrast_avoidance"],
+  };
   return need;
 }
 
@@ -85,7 +89,8 @@ const FOLLOWUPS = [
 export function followupNeeds(section: PlannedSection, facts: Fact[]): CompletionNeed[] {
   const laterLabs: CompletionNeed[] = [];
   if (section.needs.some((need) => need.id === "hba1c")) {
-    const latest = facts.filter((fact) => ["lab", "measurement"].includes(fact.kind)
+    const latest = facts.filter((fact) => ["lab", "measurement"].includes(fact.kind) && fact.assertion === "present"
+      && !["planned", "recommended"].includes(fact.temporalStatus)
       && containsSynonym(`${fact.labelEn} ${fact.quote}`, ["HbA1c", "glycated haemoglobin", "glycated hemoglobin"]))
       .sort((a, b) => b.docDate.localeCompare(a.docDate))[0];
     if (latest) laterLabs.push({
