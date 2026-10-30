@@ -3,7 +3,8 @@
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
-import { ClaimLine } from "./claim-line";
+import { ClaimList } from "./claim-list";
+import { displayDates } from "./display-dates";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 export function PatientSummary(props: ToolProps<UiToolOutputs["show_patient_summary"]>) {
@@ -12,11 +13,9 @@ export function PatientSummary(props: ToolProps<UiToolOutputs["show_patient_summ
     <ToolFrame
       {...props}
       title="Patient summary"
-      description={output ? `As of ${output.asOf}` : undefined}
+      description={output ? `As of ${displayDates(output.asOf)}` : undefined}
     >
-      {output?.demographics.map((item) => (
-        <ClaimLine key={item.factId} {...item} />
-      ))}
+      <ClaimList items={output?.demographics ?? []} />
       {output ? (
         <CardDescription className="text-xs tabular-nums">
           {output.documentCount} eligible documents
@@ -32,11 +31,9 @@ export function PatientSummary(props: ToolProps<UiToolOutputs["show_patient_summ
           ))}
       </CardContent>
       {output?.criticalFacts.length ? (
-        <CardContent className="flex flex-col gap-3 border-t px-0 pt-3">
+        <CardContent className="flex flex-col gap-3 px-0 pt-3">
           <CardTitle className="text-xs">Critical facts</CardTitle>
-          {output.criticalFacts.map((item) => (
-            <ClaimLine key={item.factId} {...item} />
-          ))}
+          <ClaimList items={output.criticalFacts} />
         </CardContent>
       ) : null}
     </ToolFrame>
