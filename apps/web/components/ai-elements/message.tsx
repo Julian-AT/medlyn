@@ -13,6 +13,7 @@ import { createContext, memo, useContext, useEffect, useState } from "react";
 import { Streamdown } from "streamdown";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +22,11 @@ export type MessageProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const Message = ({ className, from, ...props }: MessageProps) => (
-  <div
+  <Card
+    data-role={from}
     className={cn(
-      "group flex w-full max-w-[95%] flex-col gap-2",
-      from === "user" ? "is-user ml-auto justify-end" : "is-assistant",
+      "group/message flex w-full min-w-0 flex-col gap-2 overflow-visible rounded-none bg-transparent p-0 shadow-none ring-0",
+      from === "user" ? "ml-auto max-w-[90%] items-end sm:max-w-[85%]" : "items-start",
       className,
     )}
     {...props}
@@ -34,17 +36,16 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
 export type MessageContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const MessageContent = ({ children, className, ...props }: MessageContentProps) => (
-  <div
+  <CardContent
     className={cn(
-      "is-user:dark flex w-fit max-w-full min-w-0 flex-col gap-2 overflow-hidden text-sm",
-      "group-[.is-user]:ml-auto group-[.is-user]:rounded-lg group-[.is-user]:bg-secondary group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
-      "group-[.is-assistant]:text-foreground",
+      "flex w-full min-w-0 flex-col gap-3 px-0 text-sm/relaxed text-foreground",
+      "group-data-[role=user]/message:w-fit group-data-[role=user]/message:rounded-2xl group-data-[role=user]/message:bg-muted group-data-[role=user]/message:px-4 group-data-[role=user]/message:py-3",
       className,
     )}
     {...props}
   >
     {children}
-  </div>
+  </CardContent>
 );
 
 export type MessageActionsProps = ComponentProps<"div">;
@@ -294,6 +295,7 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
     <div className={cn("group relative size-24 overflow-hidden rounded-lg", className)} {...props}>
       {isImage ? (
         <>
+          {/* biome-ignore lint/performance/noImgElement: Browser blob previews cannot use the image optimizer. */}
           <img
             alt={filename || "attachment"}
             className="size-full object-cover"
