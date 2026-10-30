@@ -21,7 +21,18 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
     id,
     messages: initialMessages,
     generateId: () => crypto.randomUUID(),
-    transport: new DefaultChatTransport({ api: "/api/chat", body: { patientId: patient.id } }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: { patientId: patient.id },
+      fetch: (input, init) =>
+        fetch(input, {
+          ...init,
+          signal: AbortSignal.any([
+            ...(init?.signal ? [init.signal] : []),
+            AbortSignal.timeout(50_000),
+          ]),
+        }),
+    }),
     onFinish: ({ message, messages, isAbort, isError, isDisconnect }) => {
       investigationCompleted.current = !isAbort && !isError && !isDisconnect;
       chatStore().save(patient.id, id, messages);
