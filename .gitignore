@@ -55,8 +55,4 @@ __pycache__/
 .ruff_cache/
 .husky/_
 
-*ElevenLabs.html
-*_files/
-image.png
-current.png
-eleven.png
+.design-references/
