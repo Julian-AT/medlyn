@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { z } from "zod";
 
 export type ModelRole = "reasoning" | "fast";
@@ -5,16 +6,25 @@ export type Message = { role: "system" | "user" | "assistant"; content: string }
 
 const ROLE_ENV = { reasoning: "MODEL_REASONING", fast: "MODEL_FAST" } as const;
 let active = 0;
-const waiting: (() => void)[] = [];
+const waiting: { resolve: () => void; lens: boolean; limit: number }[] = [];
+const priority = new AsyncLocalStorage<boolean>();
+
+export function withLensPriority<T>(run: () => T): T {
+  return priority.run(true, run);
+}
 
 function concurrency(): number {
-  const value = Number(process.env.MEDLYN_LLM_CONCURRENCY ?? 8);
-  return Number.isSafeInteger(value) && value > 0 ? value : 8;
+  const fallback = priority.getStore() ? 16 : 8;
+  const value = Number(process.env.MEDLYN_LLM_CONCURRENCY ?? fallback);
+  return Number.isSafeInteger(value) && value > 0 ? value : fallback;
 }
 
 async function withRequestSlot<T>(run: () => Promise<T>): Promise<T> {
   await new Promise<void>((resolve) => {
-    waiting.push(resolve);
+    const entry = { resolve, lens: priority.getStore() === true, limit: concurrency() };
+    const background = entry.lens ? waiting.findIndex((job) => !job.lens) : -1;
+    if (background < 0) waiting.push(entry);
+    else waiting.splice(background, 0, entry);
     drain();
   });
   try {
@@ -26,9 +36,11 @@ async function withRequestSlot<T>(run: () => Promise<T>): Promise<T> {
 }
 
 function drain(): void {
-  while (active < concurrency() && waiting.length) {
+  while (waiting.length && active < waiting[0].limit) {
+    const next = waiting.shift();
+    if (!next) return;
     active++;
-    waiting.shift()!();
+    next.resolve();
   }
 }
 
@@ -103,5 +115,7 @@ export async function structured<T extends z.ZodType>(
       lastError = error;
     }
   }
-  throw new Error(`LLM ${name}: invalid structured output`, { cause: lastError });
+  throw new StructuredOutputError(`LLM ${name}: invalid structured output`, { cause: lastError });
 }
+
+export class StructuredOutputError extends Error {}
