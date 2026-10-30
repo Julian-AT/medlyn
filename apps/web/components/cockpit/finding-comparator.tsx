@@ -2,7 +2,7 @@
 
 import type { Finding } from "@medlyn/engine/contracts";
 import { HighlightDifference } from "@/components/gen-ui/highlight-difference";
-import { DocumentReaderDialog } from "@/components/sources/document-reader-dialog";
+import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,13 +26,13 @@ export function FindingComparator({
     <Card className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
         <Badge variant="outline" className="w-fit border-warning/40 text-warning">
-          {finding.type.replaceAll("_", " ")}
+          {finding.type === "contradiction" ? "Contradiction" : "Needs clarification"}
         </Badge>
         <CardTitle>{finding.title}</CardTitle>
         <CardDescription>{finding.explanation}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
-        {finding.passages.map((passage) => (
+        {finding.passages.map((passage, index) => (
           <Card
             key={`${passage.segmentId}:${passage.start}:${passage.end}`}
             size="sm"
@@ -40,7 +40,7 @@ export function FindingComparator({
           >
             <CardHeader>
               <CardDescription className="break-all font-mono text-xs">
-                {passage.documentId}@{passage.start}–{passage.end}
+                Passage {index + 1}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
@@ -56,7 +56,9 @@ export function FindingComparator({
               <CardDescription className="text-sm">{passage.claimEn}</CardDescription>
             </CardContent>
             <CardFooter>
-              <DocumentReaderDialog documentId={passage.documentId} highlight={passage.segmentId} />
+              <SourceChips
+                sources={[{ documentId: passage.documentId, segmentId: passage.segmentId }]}
+              />
             </CardFooter>
           </Card>
         ))}

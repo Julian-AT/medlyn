@@ -2,6 +2,7 @@
 import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Finding, OpenQuestion } from "@medlyn/engine/contracts";
+import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,13 +28,22 @@ export function Question({
   onReview: ReviewHandler;
 }) {
   return (
-    <Card size="sm" className="rounded-xl border border-gray-alpha-150 shadow-xs ring-0">
-      <CardHeader>
+    <Card
+      size="sm"
+      className="min-w-0 rounded-2xl border border-gray-alpha-150 p-4 shadow-none ring-0"
+    >
+      <CardHeader className="p-0">
         <Badge
           variant="outline"
           className={question.kind === "missing" ? "w-fit" : "w-fit border-warning/40 text-warning"}
         >
-          {question.kind.replaceAll("_", " ")}
+          {
+            {
+              contradiction: "Contradiction",
+              needs_clarification: "Needs clarification",
+              missing: "Documentation gap",
+            }[question.kind]
+          }
         </Badge>
         <CardTitle>{question.title}</CardTitle>
         {question.review && (
@@ -43,9 +53,9 @@ export function Question({
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
+      <CardContent className="flex flex-wrap gap-2 p-0">
         <Button
-          className="rounded-full"
+          className="h-8 rounded-control"
           size="sm"
           variant="secondary"
           onClick={() =>
@@ -66,7 +76,7 @@ export function Question({
         </Button>
         {finding && (
           <Button
-            className="rounded-full"
+            className="h-8 rounded-control"
             variant="outline"
             size="sm"
             onClick={() => onCompare(finding.id)}
@@ -75,7 +85,17 @@ export function Question({
           </Button>
         )}
       </CardContent>
-      <CardFooter className="justify-end py-1">
+      {finding && (
+        <CardContent className="p-0">
+          <SourceChips
+            sources={finding.passages.map((passage) => ({
+              segmentId: passage.segmentId,
+              documentId: passage.documentId,
+            }))}
+          />
+        </CardContent>
+      )}
+      <CardFooter className="justify-end p-0">
         <ReviewControls
           targetType={finding ? "finding" : "open_question"}
           targetId={finding?.id ?? question.id}
