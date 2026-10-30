@@ -21,7 +21,7 @@ export function CategoryEmpty({ unavailable = false }: { unavailable?: boolean }
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="outline" asChild>
+        <Button className="rounded-full" variant="outline" asChild>
           <Link href="/situations">Open Situations</Link>
         </Button>
       </EmptyContent>

@@ -1,6 +1,7 @@
 import { formatDate } from "@medlyn/engine/dates";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import type { CategoryAccentKey } from "./category-accent";
 import { categories } from "./category-config";
 import { CategoryEmpty } from "./category-empty";
 import { LabTrends, MedicationView } from "./clinical-views";
@@ -33,10 +34,11 @@ export async function CategoryPage({ category }: { category: string }) {
   return (
     <PageShell>
       <PageHeading
+        category={category as CategoryAccentKey}
         title={config.title}
         description={config.description}
         action={
-          <Button asChild>
+          <Button className="rounded-full" asChild>
             <Link href="/situations">Open a situation</Link>
           </Button>
         }
