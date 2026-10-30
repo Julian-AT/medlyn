@@ -40,7 +40,7 @@ export function CollapsibleSidebarGroup({
       >
         <SidebarGroupLabel
           asChild
-          className="h-7 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground group-data-[collapsible=icon]:hidden"
+          className="mb-1.5 h-5 rounded-[10px] px-1.5 text-sm/5 font-medium text-sidebar-foreground hover:text-foreground group-data-[collapsible=icon]:hidden"
         >
           <CollapsibleTrigger className="group/section gap-2">
             {label}
