@@ -189,16 +189,19 @@ describe("generative UI evidence rules", () => {
     ).toBe(true);
   });
 
-  it("keeps blood pressure components separate", () => {
+  it("pairs systolic and diastolic readings into one blood pressure point", () => {
     const bp = fact({ labelEn: "Blood pressure", attrs: { value: "128/76", unit: "mmHg" } });
     expect(
-      labUiPoints([bp], [line(bp)], "blood_pressure").map(({ series, value }) => ({
-        series,
-        value,
-      })),
+      labUiPoints([bp], [line(bp)], "blood_pressure").map(
+        ({ series, value, diastolic, displayValue }) => ({
+          series,
+          value,
+          diastolic,
+          displayValue,
+        }),
+      ),
     ).toEqual([
-      { series: "systolic", value: 128 },
-      { series: "diastolic", value: 76 },
+      { series: "blood_pressure", value: 128, diastolic: 76, displayValue: "128/76 mmHg" },
     ]);
   });
 
