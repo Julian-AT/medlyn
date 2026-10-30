@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEvidence } from "@/hooks/use-evidence";
 
 const actions = {
   accept: "Confirmed",
@@ -31,12 +32,26 @@ const targets = {
 };
 export function ReviewsPage() {
   const { reviews } = useWorkspace();
+  const evidence = useEvidence();
   const entries = activeReviews(reviews.entries);
+  const cards = evidence?.sections.flatMap((section) => section.cards) ?? [];
+  function targetLabel(entry: (typeof entries)[number]) {
+    if (entry.targetType === "card") return cards.find((card) => card.id === entry.targetId)?.title;
+    if (entry.targetType === "finding")
+      return evidence?.findings.find((finding) => finding.id === entry.targetId)?.title;
+    if (entry.targetType === "open_question")
+      return evidence?.openQuestions.find((question) => question.id === entry.targetId)?.title;
+    if (entry.targetType === "fact")
+      return cards
+        .flatMap((card) => card.lines)
+        .find((line) => line.factIds.includes(entry.targetId))?.text;
+    return undefined;
+  }
   return (
     <PageShell>
       <PageHeading
         title="Reviews"
-        description="Your session’s append-only review ledger. Reset the overlay to return to machine output."
+        description="Your review decisions for this session. Reset reviews to restore the original source-linked results."
         action={
           <Button variant="outline" disabled={!entries.length} onClick={reviews.reset}>
             Reset review layer
@@ -63,10 +78,15 @@ export function ReviewsPage() {
             {entries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell className="whitespace-normal">
-                  {targets[entry.targetType]} · {entry.targetId}
+                  {targets[entry.targetType]}
+                  {targetLabel(entry) && ` · ${targetLabel(entry)}`}
                 </TableCell>
                 <TableCell className="whitespace-normal">
-                  <Badge variant="outline">{actions[entry.action]}</Badge>
+                  <Badge variant="outline">
+                    {entry.action === "correct" && entry.supportResult !== "supported"
+                      ? "Clinician note"
+                      : actions[entry.action]}
+                  </Badge>
                 </TableCell>
                 <TableCell className="whitespace-normal">
                   {entry.reasonText ?? entry.reason?.replaceAll("_", " ") ?? "—"}
@@ -84,7 +104,7 @@ export function ReviewsPage() {
           <EmptyHeader>
             <EmptyTitle>No reviews in this session</EmptyTitle>
             <EmptyDescription>
-              Accept, dismiss or leave an item open from Open questions or a clinical situation.
+              Accept, correct, dismiss or leave an item open from Open questions or Situations.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>

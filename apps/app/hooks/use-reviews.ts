@@ -50,14 +50,14 @@ export function useReviews(raw: Screen | null, sessionId: string) {
       if (!response.ok) throw new Error(body.error ?? "Fact identity unavailable.");
       targetHash = body.contentHash;
     } else {
-      if (!raw) throw new Error("Open a lens before reviewing.");
+      if (!raw) throw new Error("Open a situation before reviewing.");
       const target =
         targetType === "card"
           ? raw.sections.flatMap((section) => section.cards).find((item) => item.id === targetId)
           : targetType === "finding"
             ? raw.findings.find((item) => item.id === targetId)
             : raw.openQuestions.find((item) => item.id === targetId);
-      if (!target) throw new Error("This item has changed. Review the refreshed lens.");
+      if (!target) throw new Error("This item has changed. Review the refreshed situation.");
       targetHash = reviewTargetHash(target);
     }
     await saveReview({
@@ -74,7 +74,7 @@ export function useReviews(raw: Screen | null, sessionId: string) {
     if (!sessionId || request.sessionId !== sessionId)
       throw new Error("The review session changed. Reload this item.");
     if (activeSession.current !== sessionId)
-      throw new Error("The patient changed. Review the selected patient's lens.");
+      throw new Error("The patient changed. Review the selected patient's situation.");
     const response = await fetch("/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
