@@ -18,7 +18,7 @@ export function lymphNodeCandidates(input: FindingInput): Candidate[] {
       "The pathology summary records N0 in the TNM classification.") : [];
   });
   return [candidate("lymph_nodes", "Axillary lymph nodes need clarification", "Palpation described enlarged right axillary nodes; later ultrasound described no enlarged axillary nodes without stating a side, and pathology records N0. Different dates and examinations prevent a qualifying contradiction.", [...positive, ...negative, ...staging], {
-    type: "needs_clarification", hypothesisText: "Different examination methods, dates or sides may explain the descriptions; this remains an open finding.",
+    deterministic: true, type: "needs_clarification", hypothesisText: null,
   })];
 }
 
@@ -36,7 +36,7 @@ export function caseIdCandidates(input: FindingInput): Candidate[] {
       output.push(candidate("case_id", "Case identifiers need clarification", "The pathology report and the letter that repeats its biopsy summary carry different case identifiers. The sources do not establish that these identifiers have the same scope.", [
         ...locate(input, pathology, id.index!, id.index! + id[0].length, `The pathology report carries case identifier ${id[1]}.`),
         ...locate(input, letter, other.index!, other.index! + other[0].length, `The discharge letter carries case identifier ${other[1]}.`),
-      ], { type: "needs_clarification", severity: "low", hypothesisText: "The identifiers may belong to different administrative scopes; no shared scope is established." }));
+      ], { deterministic: true, type: "needs_clarification", severity: "low", hypothesisText: null }));
     }
   }
   return output;

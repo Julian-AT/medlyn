@@ -31,6 +31,22 @@ function strings(value: unknown): string[] {
   return [];
 }
 
+function scheduleChecks(value: unknown, passage: string): boolean {
+  if (!value || typeof value !== "object") return true;
+  if (Array.isArray(value)) return value.every((item) => scheduleChecks(item, passage));
+  return Object.entries(value).every(([key, field]) => {
+    if (key !== "schedule" || field === null) return scheduleChecks(field, passage);
+    if (!Array.isArray(field) || field.length !== 4) return false;
+    const columns = field.map((column) => typeof column === "string" ? canonical(column) : "");
+    if (columns.some((column) => !/^(?:\d+(?:\.\d+|\/\d+)?|st)$/.test(column))) return false;
+    const escaped = columns.map((column) => column.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    // Units may separate table cells, but no extra numeric cell may be skipped.
+    const separator = "(?:\\s*(?:st|tabl\\.?|tabletten?|dosen?)?\\s*[-–|;]\\s*|\\s+(?:(?:st|tabl\\.?|tabletten?|dosen?)\\s+)?)";
+    const pattern = new RegExp(`(?<![\\p{L}\\p{N}./])${escaped.join(separator)}(?![\\p{L}\\p{N}./])`, "u");
+    return pattern.test(canonical(passage));
+  });
+}
+
 /** Canonical numbers, dates, doses and sides, including nested attributes. */
 export function checkedTokens(fields: Record<string, unknown>): string[] {
   return [...new Set(strings(fields).flatMap((value) => canonical(value).match(CHECKED) ?? []))];
@@ -100,6 +116,7 @@ export function locate(quote: string, segment: Segment, fields: Record<string, u
     match = index >= 0 ? "normalised" : "fuzzy";
   }
   const actual = segment.text.slice(start, end);
+  if (!scheduleChecks(fields, actual)) return { ok: false, reason: "Ordered schedule absent from passage" };
   const tokens = new Set(checkedTokens({ passage: actual }));
   for (const token of [...tokens]) {
     const number = token.match(/^\d+(?:\.\d+)?(?=mcg|mg|kg|ml|mmhg|mm|cm|iu|ie|g|l|%)/)?.[0];

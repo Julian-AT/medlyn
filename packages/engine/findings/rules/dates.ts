@@ -18,10 +18,10 @@ export function restatedDateCandidates(input: FindingInput): Candidate[] {
     const b = dateKey(restated.text);
     if (!a || !b || a === b) return [];
     const headerStart = header.start + header.text.indexOf(headerDischarge);
-    return [candidate("restated_date", "Discharge date restated inconsistently", "The header and narrative state different dates for the same discharge. The malformed year is almost certainly a typographical error.", [
-      ...locate(input, document, headerStart, header.end, `The discharge header states ${a}.`),
+    return [candidate("restated_date", "Discharge date restated inconsistently", "The header and narrative state different dates for the same discharge.", [
+      ...locate(input, document, headerStart, header.end, `The discharge header states ${headerDischarge.match(DATE)![0]}.`),
       ...locate(input, document, restated.start, restated.end, `The narrative states discharge home on ${b}.`, /nach Hause entlassen/i),
-    ], { deterministic: true, severity: "low", hypothesisText: "The malformed year may be a typographical error; the source has not been corrected." })];
+    ], { deterministic: true, severity: "low" })];
   });
 }
 
@@ -43,7 +43,7 @@ export function admissionCandidates(input: FindingInput): Candidate[] {
         .flatMap((l) => locate(input, d, l.start, l.end, `Admission was scheduled for ${headerDate}.`, /terminisiert/i))),
     ];
     return [candidate("admission_date", "Admission dates need clarification", "The admission header and planned admission use one date, while the ward narrative uses another. The documents do not establish whether these describe hospital and ward admission separately.", passages, {
-      type: "needs_clarification", hypothesisText: "Hospital admission and ward admission may have occurred on different dates; this is not established.",
+      deterministic: true, type: "needs_clarification", hypothesisText: null,
     })];
   });
 }
@@ -75,7 +75,7 @@ export function biopsyDateCandidates(input: FindingInput): Candidate[] {
         ...locate(input, letter, repeated.start + repeated.text.indexOf(summary.text.trim()),
           repeated.start + repeated.text.indexOf(summary.text.trim()) + summary.text.trim().length,
           "The letter repeats the pathology summary and TNM for the same core biopsy."),
-      ]));
+      ], { deterministic: true }));
     }
   }
   return output;

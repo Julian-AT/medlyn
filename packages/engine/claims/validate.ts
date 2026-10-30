@@ -9,6 +9,8 @@ import { formatDate } from "../dates.ts";
 import { cacheKey, normaliseClaimText } from "./identity.ts";
 import { codeCheck, hasNegation } from "./code-check.ts";
 import { VALIDATOR_VERSION } from "./version.ts";
+import { findingPassagesLocated, findingText, findingTexts } from "../findings/text.ts";
+import type { FindingInput, FindingRecord } from "../findings/types.ts";
 export { VALIDATOR_VERSION } from "./version.ts";
 
 export type ValidationContext = {
@@ -18,6 +20,7 @@ export type ValidationContext = {
   segments: Segment[];
   absenceResult?: AbsenceResult;
   absenceResults?: AbsenceResult[];
+  finding?: { record: FindingRecord; input: FindingInput };
 };
 export type ValidatedClaim<T extends Claim = Claim> = T & { validation: Claim["validation"] & { details: Record<string, unknown> } };
 type Verdict = { support: Support; negationFlag: boolean; details: Record<string, unknown> };
@@ -73,6 +76,22 @@ function absenceVerdict(claim: Claim, ctx: ValidationContext): Verdict {
 }
 
 function templateVerdict(claim: Claim, ctx: ValidationContext, facts: Fact[]): Verdict {
+  if (ctx.finding) {
+    const { record, input } = ctx.finding;
+    const expectedIds = [...new Set(record.passages.map((passage) => passage.segmentId))].sort();
+    const sameSources = JSON.stringify([...claim.segmentIds].sort()) === JSON.stringify(expectedIds);
+    const located = findingPassagesLocated(record, input) && record.passages.every((passage) => {
+      const segment = ctx.segments.find((item) => item.id === passage.segmentId);
+      return segment?.documentId === passage.documentId && passage.start >= segment.start &&
+        passage.end <= segment.end &&
+        segment.text.slice(passage.start - segment.start, passage.end - segment.start) === passage.quote;
+    });
+    if (!sameSources || !located || claim.factIds.length ||
+      !findingTexts(findingText(record, input)).includes(claim.text)) {
+      return fail("Finding text does not match a located rule template", claim.text);
+    }
+    return { support: "supported", negationFlag: hasNegation(claim.text), details: { template: "finding-1" } };
+  }
   if (!facts.length) return fail("Template has no facts", claim.text);
   const normal = normaliseClaimText(claim.text);
   const exact = facts.length === 1 && normaliseClaimText(factLineText(facts[0])) === normal;
@@ -138,6 +157,7 @@ async function evaluate(claim: Claim, ctx: ValidationContext, key: string): Prom
   if (cited.error) return fail(cited.error, claim.text);
   if (claim.kind === "template") {
     const verdict = templateVerdict(claim, ctx, cited.facts);
+    if (ctx.finding) return verdict;
     if (verdict.support !== "supported") return verdict;
     const cached = await readCached(key, ctx.patientId);
     if (cached?.support === "supported") return cached;
@@ -156,7 +176,7 @@ async function evaluate(claim: Claim, ctx: ValidationContext, key: string): Prom
 export async function validateClaim<T extends Claim>(claim: T, ctx: ValidationContext): Promise<ValidatedClaim<T>> {
   const key = identity(claim, ctx);
   // Authorship and absence provenance are evaluated per call, independently of shared text identity.
-  const dedupe = claim.kind === "composed" || claim.kind === "template";
+  const dedupe = !ctx.finding && (claim.kind === "composed" || claim.kind === "template");
   const pendingKey = `${claim.kind}:${key}`;
   let task = dedupe ? pending.get(pendingKey) : undefined;
   if (!task) {
@@ -173,6 +193,39 @@ export async function validateClaim<T extends Claim>(claim: T, ctx: ValidationCo
 
 export async function validateClaims<T extends Claim>(claims: T[], ctx: ValidationContext): Promise<ValidatedClaim<T>[]> {
   return Promise.all(claims.map((claim) => validateClaim(claim, ctx)));
+}
+
+/** Finding strings retain the frozen screen shape after crossing the shared Claim boundary. */
+export async function validateFindingText(
+  record: FindingRecord, input: FindingInput, window?: EvidenceWindow,
+): Promise<FindingRecord> {
+  if (record.type === "dismissed_candidate") return record;
+  const rendered = findingText(record, input);
+  const documents = input.documents;
+  const segmentIds = [...new Set(record.passages.map((passage) => passage.segmentId))];
+  const ctx: ValidationContext = {
+    patientId: documents[0]?.doc.patientId ?? "",
+    window: window ?? {
+      asOf: documents.map((document) => document.doc.docDate).sort().at(-1) ?? "0000-01-01",
+      corpusRevision: documents[0]?.doc.revisionId ?? "",
+      eligibleDocumentIds: documents.map((document) => document.doc.id),
+    },
+    facts: input.facts,
+    segments: documents.flatMap((document) => document.segments),
+    finding: { record, input },
+  };
+  if (documents.some((document) => document.doc.patientId !== ctx.patientId ||
+    document.doc.revisionId !== ctx.window.corpusRevision ||
+    !ctx.window.eligibleDocumentIds.includes(document.doc.id))) {
+    return { ...rendered, type: "dismissed_candidate", explanation: "Finding evidence is inconsistent." };
+  }
+  const claims = findingTexts(rendered).map((text, index): Claim => ({
+    id: `${record.id}-text-${index}`, kind: "template", text, factIds: [], segmentIds,
+    author: "machine", validation: { key: "", support: "unsupported" },
+  }));
+  const checked = await validateClaims(claims, ctx);
+  if (checked.every(isShowable)) return rendered;
+  return { ...rendered, type: "dismissed_candidate", explanation: "Finding text could not be validated." };
 }
 
 export async function validateAbsence<T extends Claim>(claim: T, result: AbsenceResult, ctx: ValidationContext): Promise<ValidatedClaim<T>> {

@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { computeFindings, sameCandidate } from "../findings/index.ts";
 import type { CorpusInputDocument, FindingRecord } from "../findings/types.ts";
 import { loadCorpus } from "../ingest/corpus.ts";
+import { locate } from "../ingest/locate.ts";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 if (!process.env.MEDLYN_DATA_PATH && existsSync(path.join(repoRoot, ".env"))) process.loadEnvFile(path.join(repoRoot, ".env"));
@@ -54,6 +55,7 @@ describe.skipIf(!available)("findings runtime regression", () => {
         expect(passage.end).toBeLessThanOrEqual(segment.end);
         expect(document.normText.slice(passage.start, passage.end)).toBe(passage.quote);
         expect(passage.claimEn.length).toBeGreaterThan(0);
+        expect(locate(passage.quote, segment, { claim: passage.claimEn }).ok).toBe(true);
       }
     }
   });

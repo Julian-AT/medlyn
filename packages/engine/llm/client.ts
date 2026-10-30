@@ -4,6 +4,33 @@ export type ModelRole = "reasoning" | "fast";
 export type Message = { role: "system" | "user" | "assistant"; content: string };
 
 const ROLE_ENV = { reasoning: "MODEL_REASONING", fast: "MODEL_FAST" } as const;
+let active = 0;
+const waiting: (() => void)[] = [];
+
+function concurrency(): number {
+  const value = Number(process.env.MEDLYN_LLM_CONCURRENCY ?? 8);
+  return Number.isSafeInteger(value) && value > 0 ? value : 8;
+}
+
+async function withRequestSlot<T>(run: () => Promise<T>): Promise<T> {
+  await new Promise<void>((resolve) => {
+    waiting.push(resolve);
+    drain();
+  });
+  try {
+    return await run();
+  } finally {
+    active--;
+    drain();
+  }
+}
+
+function drain(): void {
+  while (active < concurrency() && waiting.length) {
+    active++;
+    waiting.shift()!();
+  }
+}
 
 export function modelFor(role: ModelRole): string {
   const model = process.env[ROLE_ENV[role]];
@@ -12,18 +39,21 @@ export function modelFor(role: ModelRole): string {
 }
 
 async function complete(model: string, messages: Message[], body: object, timeoutMs: number) {
-  const res = await fetch(`${process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1"}/chat/completions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ model, messages, ...body }),
-    signal: AbortSignal.timeout(timeoutMs),
+  return withRequestSlot(async () => {
+    const url = `${process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1"}/chat/completions`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model, messages, ...body }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const json = await res.json();
+    return json.choices[0].message.content as string;
   });
-  if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
-  const json = await res.json();
-  return json.choices[0].message.content as string;
 }
 
 /**

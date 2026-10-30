@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { structured } from "../llm/client.ts";
 import { record } from "./passages.ts";
+import { CLARIFICATION_FALLBACK, FINDING_FALLBACK } from "./text.ts";
 import type { Candidate, FindingInput, FindingRecord } from "./types.ts";
 
 const Verdict = z.object({
@@ -41,8 +42,10 @@ export async function adjudicate(candidate: Candidate, input: FindingInput): Pro
       : verdict.taxonomy === "qualifying_contradiction" && verdict.sameEventEstablished ? "contradiction"
         : verdict.taxonomy === "needs_clarification" ? "needs_clarification" : "dismissed_candidate";
     return record({ ...candidate, type,
-      explanation: type === "dismissed_candidate" ? verdict.rationale : candidate.explanation,
-      hypothesisText: candidate.hypothesisText ?? verdict.hypothesisText });
+      explanation: type === "dismissed_candidate" ? verdict.rationale
+        : type === candidate.type ? candidate.explanation
+          : type === "contradiction" ? FINDING_FALLBACK : CLARIFICATION_FALLBACK,
+      hypothesisText: null });
   } catch (error) {
     console.warn(JSON.stringify({ event: "findings.adjudication_failed", category: candidate.category,
       error: error instanceof Error ? error.message : String(error) }));

@@ -3,10 +3,8 @@ import type { Db } from "../db/client.ts";
 import { findingPassages, findings } from "../db/schema.ts";
 import { adjudicate } from "./adjudicate.ts";
 import { findingId, record } from "./passages.ts";
-import { bmiCandidates } from "./rules/bmi.ts";
-import { caseIdCandidates, lymphNodeCandidates } from "./rules/clarification.ts";
-import { admissionCandidates, biopsyDateCandidates, restatedDateCandidates } from "./rules/dates.ts";
-import { sideCandidates } from "./rules/side.ts";
+import { ruleCandidates } from "./rules/index.ts";
+import { validateFindingText } from "../claims/validate.ts";
 import { concurrentMap, sweep } from "./sweep.ts";
 import type { Candidate, FindingInput, FindingRecord } from "./types.ts";
 
@@ -20,17 +18,16 @@ export function sameCandidate(a: Candidate, b: Candidate): boolean {
 
 /** Compute at ingestion from the supplied corpus; consumers apply the shared evidence window. */
 export async function computeFindings(input: FindingInput, opts: { llm?: boolean } = {}): Promise<FindingRecord[]> {
-  const candidates = [
-    ...sideCandidates(input), ...bmiCandidates(input), ...biopsyDateCandidates(input),
-    ...restatedDateCandidates(input), ...admissionCandidates(input),
-    ...lymphNodeCandidates(input), ...caseIdCandidates(input),
-  ].filter((c) => c.passages.length >= 2);
-  if (opts.llm === false) return candidates.map(record);
+  const candidates = ruleCandidates(input);
+  if (opts.llm === false) return Promise.all(candidates.map((candidate) => validateFindingText(record({
+    ...candidate, type: candidate.deterministic ? candidate.type : "dismissed_candidate",
+  }), input)));
   const extra = await sweep(input);
   for (const candidate of extra) {
     if (!candidates.some((existing) => sameCandidate(existing, candidate))) candidates.push(candidate);
   }
-  const records = await concurrentMap(candidates, (c) => adjudicate(c, input));
+  const records = await concurrentMap(candidates, async (candidate) =>
+    validateFindingText(await adjudicate(candidate, input), input));
   return [...new Map(records.map((r) => [r.id, r])).values()];
 }
 
