@@ -3,7 +3,15 @@ import { formatDate } from "@medlyn/engine/dates";
 import { useState } from "react";
 import { SourceChip } from "@/components/cockpit/source-chip";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import {
   Table,
   TableBody,
@@ -14,6 +22,8 @@ import {
 } from "@/components/ui/table";
 import { CategoryEmpty } from "./category-empty";
 import { EvidenceSheet } from "./evidence-sheet";
+import { type FactFilter, filterRows } from "./fact-filters.ts";
+import { FactToolbar } from "./fact-toolbar.tsx";
 import type { PatientRow } from "./patient-data";
 export function FactTable({
   rows,
@@ -25,17 +35,26 @@ export function FactTable({
   description?: string;
 }) {
   const [source, setSource] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<FactFilter>("all");
+  const visible = filterRows(rows, query, filter);
   if (!rows.length) return <CategoryEmpty />;
   return (
     <>
-      <Card className="gap-4 rounded-xl border py-5 shadow-none ring-0">
+      <Card className="gap-5 rounded-2xl border py-5 shadow-none ring-0">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="font-semibold tracking-tight">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
+          <CardAction>
+            <Badge variant="secondary" className="font-mono">
+              {rows.length} entries
+            </Badge>
+          </CardAction>
         </CardHeader>
-        <CardContent>
+        <FactToolbar query={query} filter={filter} onQuery={setQuery} onFilter={setFilter} />
+        <CardContent className="[&>[data-slot=table-container]]:max-h-[36rem]">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
                 <TableHead>Documented fact</TableHead>
                 <TableHead>Date</TableHead>
@@ -43,7 +62,7 @@ export function FactTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map(({ fact, claim }) => (
+              {visible.map(({ fact, claim }) => (
                 <TableRow key={claim.id} data-claim-id={claim.id}>
                   <TableCell className="max-w-xl whitespace-normal py-4">
                     <CardDescription className="text-foreground">{claim.text}</CardDescription>
@@ -70,6 +89,14 @@ export function FactTable({
               ))}
             </TableBody>
           </Table>
+          {!visible.length && (
+            <Empty className="min-h-48">
+              <EmptyHeader>
+                <EmptyTitle>No matching entries</EmptyTitle>
+                <EmptyDescription>Try another search or choose All entries.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
         </CardContent>
       </Card>
       <EvidenceSheet segmentId={source} onClose={() => setSource(null)} />
