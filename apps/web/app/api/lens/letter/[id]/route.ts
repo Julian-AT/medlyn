@@ -1,8 +1,14 @@
 import { loadLetter } from "@medlyn/engine/letter/storage";
+import { DEFAULT_PATIENT_ID, patientIdFromRequest } from "../../../../../lib/active-patient.ts";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (patientIdFromRequest(request) !== DEFAULT_PATIENT_ID)
+    return Response.json(
+      { error: "This action is unavailable for synthetic patients." },
+      { status: 409 },
+    );
   const { id } = await params;
   const sessionId = new URL(request.url).searchParams.get("sessionId");
   if (!sessionId?.trim())
