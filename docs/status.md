@@ -3,8 +3,7 @@
 Snapshot: 30 October 2026. This page consolidates lane reports and inspected
 artefacts; it does not certify a deployment or replace human-reviewed metrics.
 The [agent guide](../AGENTS.md) contains rules and [decisions](decisions.md) records
-approved changes. App paths below use the final `apps/app` / `@medlyn/app` names;
-the integration sweep owns the rename from `apps/web` / `@medlyn/web`.
+approved changes. The patient app uses `apps/app` / `@medlyn/app`.
 
 ## Clock and checkpoints
 
@@ -86,7 +85,7 @@ figures below retain their original denominators and are not clinician-reviewed.
 
 Retrieval numbers come from the eval-scale pilot; the later multi-patient synthetic
 run recorded retrieval errors under Gemini quota exhaustion. Preserve both run
-identities. Verifier values come from the newer `ml/verifier/RESULTS.md` and
+identities. Verifier values come from the newer `ml/verifier/results.md` and
 `results.json`: they supersede the older verifier handoff's Metal blocker. The
 local method remains below GPT and is not promoted to the production claim gate.
 Real-patient weak-label verifier results are a separate test, never training data.
@@ -130,7 +129,7 @@ synthetic acceptance gate remains open.
 
 ## Integration and submission work
 
-1. Complete the `apps/web` → `apps/app` rename in paths, package name, root dev
+1. Complete the `apps/app` → `apps/app` rename in paths, package name, root dev
    filters, imports, lockfile and tests; verify both apps with final names.
 2. Bump lens engine cache identity for the absence-fallback change and warm again.
    The handoff warmed existing `lens-pipeline-16` keys; cache changes are outside
@@ -164,7 +163,7 @@ Lane reports are internal, ignored integration evidence under `.agents/reports/`
 `regression.md`, `absence-fallback.md`, `multi-patient.md`, `ingest-llm.md`,
 `findings.md`, `fix-committed.md`, `search.md`, `eval-scale.md`, `synth.md`,
 `multimodal.md`, `chat.md`, `gen-ui.md`, `brand.md`, `paper.md` and `tooling.md`.
-Newer [verifier results](../ml/verifier/RESULTS.md) supersede its older handoff.
+Newer [verifier results](../ml/verifier/results.md) supersede its older handoff.
 [Paper provenance](../paper/README.md) explains how aggregates are selected.
 
 The complete paper input bundle can still reflect an older 9/15 run while the

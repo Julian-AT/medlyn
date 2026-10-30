@@ -11,7 +11,7 @@ uv run python -m synth.rewrite --data data/synth-v1 --n 300 --workers 3
 uv run python -m pytest tests/test_synth*.py -q
 ```
 
-From the repository root, `node --experimental-strip-types ml/synth/check_engine.mjs
+From the repository root, `node --experimental-strip-types ml/synth/check-engine.mjs
 ml/data/synth-v1` checks every fact against the engine's actual normalisation and segment boundaries,
 and runs the engine's `locate` on every hundredth patient. Set the final argument to `1` to run
 `locate` for all patients. The same command with `ml/data/sample 1` covers the entire sample.

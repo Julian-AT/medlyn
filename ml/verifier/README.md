@@ -1,6 +1,6 @@
 # Local verifier research
 
-[RUNBOOK.md](RUNBOOK.md) contains the exact ordered commands. Use the installed environment:
+[runbook.md](runbook.md) contains the exact ordered commands. Use the installed environment:
 `UV_CACHE_DIR=/private/tmp/medlyn-uv-cache uv run --no-sync ...`, from `ml/`.
 
 The v2 builder adds explicit number swaps, bilingual side flips, negation scope, temporal shifts
@@ -34,5 +34,5 @@ window and full cache identity. See the runbook's concrete integration steps. Th
 unchanged until the orchestrator integrates and verifies the regression.
 
 The legacy pilot CLI remains available with `evaluate --version 1`. Never retry or retune a test
-set to select a model. [DATASET.md](DATASET.md), [MODEL_CARD.md](MODEL_CARD.md) and
-[RESULTS.md](RESULTS.md) distinguish actual artifacts from unrun targets.
+set to select a model. [dataset.md](dataset.md), [model-card.md](model-card.md) and
+[results.md](results.md) distinguish actual artifacts from unrun targets.

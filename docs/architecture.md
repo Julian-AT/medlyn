@@ -19,9 +19,8 @@ clinical validation. See [status](status.md) for measured coverage and open gate
 | Engine agent/review/letter | Investigation tools, validated chat history, review overlay and GP draft                                     |
 | Evaluation/research        | Separate real, synthetic, retrieval and verifier reports; generated paper aggregates                         |
 
-Paths use the final `apps/app` / `@medlyn/app` names. The integration sweep renames
-the earlier `apps/web` / `@medlyn/web` tree. [Decisions](decisions.md) records this
-and the migration from the assistant-ui dock to AI SDK v7 with AI Elements.
+The patient app lives in `apps/app`, with workspace name `@medlyn/app`.
+[Decisions](decisions.md) records the layout and the migration from the assistant-ui dock to AI SDK v7 with AI Elements.
 
 ```mermaid
 flowchart TD

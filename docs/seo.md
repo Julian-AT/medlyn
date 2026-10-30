@@ -77,12 +77,12 @@ before deployment.
 ## Patient app
 
 The root layout already exports `robots: { index: false, follow: false }`. The new
-`apps/web/app/robots.ts` disallows all crawlers. Each of the 18 pages under `(app)`
+`apps/app/app/robots.ts` disallows all crawlers. Each of the 18 pages under `(app)`
 gets a static, descriptive browser title such as `Medications · Medlyn`; titles
 contain no patient data. The app has no public sitemap.
 
 The requested `X-Robots-Tag: noindex, nofollow` response header is **pending ownership
-confirmation** for `apps/web/next.config.ts`. Add it with a `headers()` entry matching
+confirmation** for `apps/app/next.config.ts`. Add it with a `headers()` entry matching
 `/:path*`, covering pages, API routes, exports and static assets. Keep the existing
 Next config intact. A concrete integration patch is included in the lane handoff.
 
@@ -99,8 +99,8 @@ Run with installed dependencies (no install required):
 ```sh
 pnpm --filter @medlyn/www exec tsc --noEmit
 pnpm --filter @medlyn/www exec next build
-pnpm --filter @medlyn/web exec tsc --noEmit
-pnpm --filter @medlyn/web exec next build
+pnpm --filter @medlyn/app exec tsc --noEmit
+pnpm --filter @medlyn/app exec next build
 ```
 
 The www build should list `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest`,

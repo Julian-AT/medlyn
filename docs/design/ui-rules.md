@@ -25,7 +25,7 @@ headings with an accessible full title. Controls in a group use the same height.
 
 ## Sources
 
-Use `components/sources/SourcePopover` through `SourceChips` or a source button.
+Use `components/sources/source-popover.tsx` through `SourceChips` or a source button.
 The trigger reads “Source” or names its document/date. One trigger opens the exact
 passage and its translation; use the popup's action to open the full document.
 Do not add a competing hover preview, modal or source viewer. Existing chart

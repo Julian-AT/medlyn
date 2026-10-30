@@ -164,7 +164,7 @@ switcher; its avatar is neutral. No gradient exception is needed.
 
 ## Scope and checks
 
-The implementation lives in `apps/web/app/globals.css` and the owned category,
+The implementation lives in `apps/app/app/globals.css` and the owned category,
 cockpit, generative UI and shell components. Context7 was unavailable; the saved
 reference CSS, installed Next.js CSS guide, Tailwind theme and native shadcn source
 were inspected instead. Fresh commands, results and cross-lane requests are in

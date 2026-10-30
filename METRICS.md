@@ -56,7 +56,7 @@ Pointers only; no pooled score or clinician-gold claim:
   `eval/output/synthetic.json`.
 - Retrieval: [search documentation](packages/engine/search/README.md) and artefacts
   referenced by [paper provenance](paper/README.md).
-- Verifier: [comparison results](ml/verifier/RESULTS.md); separate synthetic and
+- Verifier: [comparison results](ml/verifier/results.md); separate synthetic and
   real-patient test labels; no production promotion decision made here.
 - Quantum: [research limitations and provenance](ml/quantum/README.md); separate
   exploratory research, not clinical correctness evidence.

@@ -10,14 +10,14 @@ Retrieval calls `packages/engine/search/eval.ts`'s `evaluateRetrieval(cases, mod
 
 Controls:
 
-| Environment variable | Default | Purpose |
-| --- | --- | --- |
-| `EVAL_SYNTH_PATIENTS` | 50 | Maximum labelled patients |
-| `EVAL_SYNTH_DATA` | sample, then synth-v1 | Alternative dataset directory, relative to repo root |
-| `EVAL_SYNTH_WAIT_SECONDS` | 30 | Poll Neon every five seconds until synthetic patients appear |
-| `EVAL_SYNTH_LIMIT` | all ingested challenges | Limit live screens for a smoke run; other challenges remain skipped |
-| `EVAL_CONCURRENCY` | 3 | Concurrent synthetic screens, capped at three |
-| `EVAL_SYNTH_JUDGE` | enabled | Set `0` for deterministic scoring only |
+| Environment variable      | Default                 | Purpose                                                             |
+| ------------------------- | ----------------------- | ------------------------------------------------------------------- |
+| `EVAL_SYNTH_PATIENTS`     | 50                      | Maximum labelled patients                                           |
+| `EVAL_SYNTH_DATA`         | sample, then synth-v1   | Alternative dataset directory, relative to repo root                |
+| `EVAL_SYNTH_WAIT_SECONDS` | 30                      | Poll Neon every five seconds until synthetic patients appear        |
+| `EVAL_SYNTH_LIMIT`        | all ingested challenges | Limit live screens for a smoke run; other challenges remain skipped |
+| `EVAL_CONCURRENCY`        | 3                       | Concurrent synthetic screens, capped at three                       |
+| `EVAL_SYNTH_JUDGE`        | enabled                 | Set `0` for deterministic scoring only                              |
 
 The command writes `eval/output/synthetic.json`, including per-question methods, per-screen errors, attempted and skipped counts, cold latency, contradictions net, retrieval and verifier results. The summary reports tier, question type and mutation groups. It exits nonzero when there are no live measurements, fewer than 150 generated challenges, a discovery error, or any attempted screen fails. Skipped un-ingested patients do not masquerade as failed clinical answers.
 

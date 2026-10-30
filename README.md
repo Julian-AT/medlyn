@@ -18,14 +18,14 @@ agreement and synthetic evaluation coverage still miss acceptance targets. See
 | Public landing page | `apps/www` · `@medlyn/www` | [localhost:3001](http://localhost:3001) | `https://example.com`     |
 | Patient app         | `apps/app` · `@medlyn/app` | [localhost:3000](http://localhost:3000) | `https://app.example.com` |
 
-Names above describe the final layout. The integration sweep renames the earlier
-`apps/web` / `@medlyn/web` package; until that lands, its scoped commands use the
-old name. Example domains are placeholders, not deployed demos.
+The patient workspace is `apps/app` / `@medlyn/app`. Example domains are
+placeholders, not deployed demos.
 
 The public site preserves the supplied design. The patient app uses a neutral
 ElevenLabs-inspired shadcn shell with chat home/history, patient category pages,
-Situations, source inspection, reviews and letters. Research destinations remain
-publication slots where verified reports have not yet been integrated.
+Situations, source inspection, reviews and letters. Research pages serve a committed snapshot of aggregate reports and the fresh
+synthetic sample. Regenerate it with `node scripts/research-snapshot.mjs` before
+deployment; see [deployment instructions](docs/deploy.md).
 
 ## How it works
 
