@@ -48,7 +48,7 @@ export function ShellSidebarFooter() {
   }
 
   return (
-    <SidebarFooter className="mt-auto border-t border-sidebar-border p-2">
+    <SidebarFooter className="mt-auto px-3 pb-3 pt-1 group-data-[collapsible=icon]:px-2">
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
@@ -56,11 +56,11 @@ export function ShellSidebarFooter() {
               <SidebarMenuButton
                 size="lg"
                 tooltip="Patient and workspace settings"
-                className="h-16 rounded-[10px] px-2 data-open:bg-sidebar-accent group-data-[collapsible=icon]:h-8"
+                className="h-14 gap-2 rounded-[10px] border border-sidebar-border bg-card px-2 text-foreground data-open:bg-sidebar-accent group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent"
                 aria-label="Patient and workspace settings"
               >
                 <Avatar className="size-8 shrink-0 rounded-[10px]">
-                  <AvatarFallback className="rounded-[10px] bg-primary/10 font-medium text-primary">
+                  <AvatarFallback className="rounded-[10px] bg-secondary font-medium text-foreground">
                     AM
                   </AvatarFallback>
                 </Avatar>
@@ -70,7 +70,7 @@ export function ShellSidebarFooter() {
                 </SidebarGroupContent>
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
-                  strokeWidth={1.75}
+                  strokeWidth={1.5}
                   className="ml-auto group-data-[collapsible=icon]:hidden"
                 />
               </SidebarMenuButton>
@@ -87,7 +87,7 @@ export function ShellSidebarFooter() {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/research/cohort">
-                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={1.75} />
+                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={1.5} />
                     Browse synthetic cohort
                   </Link>
                 </DropdownMenuItem>
@@ -96,14 +96,14 @@ export function ShellSidebarFooter() {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Workspace</DropdownMenuLabel>
                 <DropdownMenuItem onSelect={toggleTheme}>
-                  <HugeiconsIcon icon={dark ? Sun03Icon : Moon02Icon} strokeWidth={1.75} />
+                  <HugeiconsIcon icon={dark ? Sun03Icon : Moon02Icon} strokeWidth={1.5} />
                   {dark ? "Light theme" : "Dark theme"}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={resetting || !sessionId || reviews.count === 0}
                   onSelect={() => void reset()}
                 >
-                  <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={1.75} />
+                  <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={1.5} />
                   {resetting
                     ? "Resetting reviews…"
                     : `Reset review layer${reviews.count > 0 ? ` (${reviews.count})` : ""}`}
