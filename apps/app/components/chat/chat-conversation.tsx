@@ -15,6 +15,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { ChatActivity } from "./chat-activity";
 import { ChatComposer } from "./chat-composer";
 import { ChatMessage } from "./chat-message";
+import { ChatStorageNotice } from "./chat-storage-notice";
 import { useChatConversation } from "./hooks/use-chat-conversation";
 import { useInvestigationQueue } from "./hooks/use-investigation-queue";
 
@@ -74,6 +75,7 @@ export function ChatConversation({
           <ConversationScrollButton aria-label="Scroll to latest message" />
         </Conversation>
         <CardContent className="z-10 mx-auto w-full max-w-3xl shrink-0 space-y-3 bg-background px-5 pt-3 sm:px-8">
+          <ChatStorageNotice />
           {chat.error && (
             <Alert variant="destructive" role="alert">
               <AlertDescription>
