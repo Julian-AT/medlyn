@@ -51,6 +51,14 @@ class ManuscriptTest(unittest.TestCase):
         self.assertIn(r"\input{generated/numbers.tex}", source)
         self.assertNotIn(r"\begin{tabular}", source)
 
+    def test_submission_has_no_placeholders_or_direct_empirical_coordinates(self):
+        paths = [ROOT / "main.tex", ROOT / "appendix-quantum.tex", ROOT / "generated/numbers.tex"]
+        for path in paths:
+            self.assertNotRegex(path.read_text(), r"(?i)pending|TBD|TODO|not yet|—|---")
+        appendix = (ROOT / "appendix-quantum.tex").read_text()
+        self.assertIn(r"\QuantumCircuits", appendix)
+        self.assertIn(r"\input{appendix-quantum}", (ROOT / "main.tex").read_text())
+
 
 if __name__ == "__main__":
     unittest.main()

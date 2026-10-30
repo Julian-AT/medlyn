@@ -32,7 +32,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*", type=Path)
     args = parser.parse_args()
-    paths = args.paths or [ROOT / "main.tex", *sorted((ROOT / "figures").glob("*.tex"))]
+    paths = args.paths or [
+        ROOT / "main.tex",
+        ROOT / "appendix-quantum.tex",
+        *sorted((ROOT / "figures").glob("*.tex")),
+    ]
     errors = []
     for path in paths:
         errors.extend(f"{path}:{line}: {message}" for line, message in violations(path.read_text()))

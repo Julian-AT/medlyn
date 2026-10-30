@@ -28,8 +28,8 @@ class NumbersTest(unittest.TestCase):
         self.assertIsNone(metrics["RegressionPassed"])
         self.assertEqual(formatted(None), r"\textit{pending}")
         self.assertEqual(formatted(0), "0")
-        self.assertIn(
-            r"\newcommand{\RegressionPassed}{\textit{pending}}",
+        self.assertNotIn(
+            r"\newcommand{\RegressionPassed}",
             (self.root / "paper/generated/numbers.tex").read_text(),
         )
 
@@ -170,7 +170,7 @@ class NumbersTest(unittest.TestCase):
         metrics, _ = write_outputs(self.root)
         self.assertEqual(metrics["RegressionPassed"], 1)
         tex = (self.root / "paper/generated/numbers.tex").read_text()
-        self.assertIn(r"\newcommand{\RegressionPassed}{\textit{pending}}", tex)
+        self.assertNotIn(r"\newcommand{\RegressionPassed}", tex)
 
     def test_approval_requires_exact_value_and_source_identity(self):
         self.put("eval/output/results.json", self.report())
@@ -233,6 +233,43 @@ class NumbersTest(unittest.TestCase):
         metrics, _ = collect(self.root)
         self.assertIsNone(metrics["LocalVerifierFscore"])
         self.assertIsNone(metrics["LocalVerifierCoverage"])
+
+    def test_current_reliability_schema_and_accuracy_from_confusion(self):
+        self.put(
+            "ml/verifier/results.json",
+            {
+                "sets": {
+                    "test": {
+                        "local_qlora": {
+                            "n": 4,
+                            "confusion": {"supported": {"supported": 3, "unsupported": 1}},
+                            "calibration": {
+                                "ece": 0.1,
+                                "reliability": [{"count": 4, "confidence": 0.9, "accuracy": 0.75}],
+                            },
+                        }
+                    }
+                }
+            },
+        )
+        metrics, _ = collect(self.root)
+        self.assertEqual(metrics["VerifierAccuracy"], 0.75)
+        self.assertEqual(metrics["LocalBin0Confidence"], 0.9)
+        self.assertEqual(metrics["LocalEce"], 0.1)
+
+    def test_submission_snapshot_rejects_changed_dependencies(self):
+        import hashlib
+
+        self.put("source.json", {"value": 7})
+        digest = hashlib.sha256((self.root / "source.json").read_bytes()).hexdigest()
+        self.put(
+            "paper/results/submission-results.json",
+            {"dependencyHashes": {"source.json": digest}, "metrics": {"Measured": 7}},
+        )
+        self.assertEqual(collect(self.root)[0]["Measured"], 7)
+        self.put("source.json", {"value": 8})
+        with self.assertRaisesRegex(ValueError, "dependency changed"):
+            collect(self.root)
 
     def test_pending_plots_have_no_measured_marks(self):
         tex = plot_macros({})
