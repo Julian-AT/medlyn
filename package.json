@@ -1,0 +1,17 @@
+{
+  "name": "medlyn",
+  "private": true,
+  "packageManager": "pnpm@10.18.0",
+  "type": "module",
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "smoke": "pnpm --filter @medlyn/engine smoke",
+    "db:push": "pnpm --filter @medlyn/engine db:push",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.9.0"
+  }
+}

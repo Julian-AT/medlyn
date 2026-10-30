@@ -1,0 +1,26 @@
+{
+  "name": "@medlyn/engine",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./contracts": "./contracts.ts",
+    "./db/schema": "./db/schema.ts",
+    "./lens/mock": "./lens/mock.ts"
+  },
+  "scripts": {
+    "smoke": "node --env-file=../../.env --experimental-strip-types llm/smoke.ts",
+    "db:push": "drizzle-kit push",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "drizzle-orm": "^0.44.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "drizzle-kit": "^0.31.0",
+    "vitest": "^3.2.0"
+  }
+}
