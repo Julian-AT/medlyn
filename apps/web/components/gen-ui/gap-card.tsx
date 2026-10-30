@@ -18,10 +18,11 @@ export function GapCard(props: Props) {
     (output?.status === "not_documented" && (!complete || output.segmentIds.length > 0));
   const retry = () =>
     window.dispatchEvent(
-      new CustomEvent("medlyn:retry-tool", {
+      new CustomEvent("medlyn:investigate", {
         detail: {
-          toolName: "check_documented",
-          input: { concept: output?.concept || props.input?.concept },
+          question: {
+            title: `Check whether ${output?.concept || props.input?.concept || "this concept"} is documented in the eligible sources`,
+          },
         },
       }),
     );
@@ -34,14 +35,20 @@ export function GapCard(props: Props) {
             ? `Not documented as of ${displayDates(output.searched.asOf)} · searched ${eligible} of ${eligible} eligible documents`
             : "Documented in the source passages"}
       </CardDescription>
-      <CardContent className="flex flex-wrap gap-1.5 px-0">
+      <CardContent className="flex flex-wrap gap-1.5 p-0">
         {output?.segmentIds.map((segmentId) => (
           <SourceChip key={segmentId} segmentId={segmentId} />
         ))}
       </CardContent>
       {unavailable ? (
-        <Button className="rounded-full" type="button" variant="outline" size="sm" onClick={retry}>
-          Retry check
+        <Button
+          className="rounded-control"
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={retry}
+        >
+          Retry in a new chat
         </Button>
       ) : null}
     </ToolFrame>
