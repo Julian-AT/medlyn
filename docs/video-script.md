@@ -29,7 +29,7 @@ Type: "I'm the anaesthetist, pre-op check before her quadrantectomy on 16 May."
 "Two towers. Ingestion keeps a fact only if its quote is located in the text. At query time the model never writes facts: it selects fact IDs, templates render, and one claim validator gates chat, cards, speech and the GP letter. Retrieval fuses BM25 with Gemini embeddings."
 
 **5. Own model (0:56 to 1:16)**
-"To train our own verifier we generated one hundred thousand synthetic patients: nine hundred thousand documents, four point eight million labelled facts, sixty thousand planted contradictions. We fine-tuned Qwen3 with QLoRA in MLX on a MacBook. In a cascade it answers first and calls GPT only when unsure: forty-seven percent fewer GPT calls for under four points of accuracy. Dataset and model are on Hugging Face."
+"To train our own verifier we generated one hundred thousand synthetic patients: nine hundred thousand documents, four point eight million labelled facts, sixty thousand planted contradictions. We fine-tuned Qwen3 with QLoRA in MLX on a MacBook. In a cascade it answers first and calls GPT only when unsure: fifty-five percent fewer GPT calls, and six points more accurate than GPT alone on held-out synthetic claims. Dataset and model are on Hugging Face."
 
 **6. Quantum (1:16 to 1:36)**
 "And we went quantum. An eight-qubit ZZ feature-map kernel and QAOA for evidence selection, built in Qiskit, and run on IBM's one-hundred-fifty-six-qubit Marrakesh processor: one hundred thirty-six circuits, fifty-three seconds of QPU time. In simulation it matches a classical SVM. On hardware, circuit depth of seven hundred sixty drowns the signal in noise. Measured, not hyped."
