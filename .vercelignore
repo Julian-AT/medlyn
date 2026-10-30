@@ -1,7 +1,7 @@
 .env*
 **/.env*
 TRACK-1-*/
-data/
+/data/
 ml/data/
 ml/.venv/
 ml/.hf/
