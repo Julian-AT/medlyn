@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["NEXT_PUBLIC_APP_URL", "MEDLYN_MOCK"],
+  "globalEnv": ["NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_SITE_URL", "MEDLYN_MOCK"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
