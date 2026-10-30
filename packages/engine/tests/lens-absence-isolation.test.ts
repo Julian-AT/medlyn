@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Document, Segment } from "../contracts.ts";
 import { checkDocumented } from "../lens/absence.ts";
-import { searchAbsenceCandidates } from "../lens/absence-retrieval.ts";
 
 const window = { asOf: "2025-01-01", corpusRevision: "test-revision", eligibleDocumentIds: ["d"] };
 const document: Document & { normText: string } = {
@@ -50,14 +49,7 @@ describe("absence patient and retrieval boundaries", () => {
     ).toBe("unavailable");
   });
 
-  it("requires vector configuration instead of treating a missing leg as an empty result", async () => {
-    vi.stubEnv("GEMINI_API_KEY", "");
-    await expect(
-      searchAbsenceCandidates("Missing marker", window, { patientId: "synth-one" }),
-    ).rejects.toThrow("Vector retrieval is not configured");
-  });
-
-  it("preserves unavailable when candidate retrieval fails after a complete negative text pass", async () => {
+  it("preserves unavailable when lexical retrieval fails after a complete negative text pass", async () => {
     vi.stubEnv("DATABASE_URL", "synthetic-test");
     const result = await checkDocumented("Missing marker", [], window, {
       patientId: "synth-one",
@@ -66,7 +58,7 @@ describe("absence patient and retrieval boundaries", () => {
       total: 1,
       search: async () => [],
       candidateSearch: async () => {
-        throw new Error("Synthetic vector failure");
+        throw new Error("Synthetic lexical failure");
       },
     });
     expect(result.status).toBe("unavailable");
