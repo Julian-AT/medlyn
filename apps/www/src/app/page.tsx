@@ -10,15 +10,20 @@ import { NavProvider } from "@/components/nav-context";
 import { SiteNav } from "@/components/site-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { StaticFeatures } from "@/components/static-features";
+import { StructuredData } from "@/components/structured-data";
 
 export default function Home() {
   return (
     <NavProvider>
+      <StructuredData />
       <SiteNav />
       <SmoothScroll>
         <main className="relative z-[1] bg-background-primary">
           <Hero />
-          <section className="mb-[10rem] bg-background-primary pt-[10rem] tablet:mb-0 tablet:pt-[15rem] desktop:pt-[27rem]">
+          <section
+            aria-label="How Medlyn works"
+            className="mb-[10rem] bg-background-primary pt-[10rem] tablet:mb-0 tablet:pt-[15rem] desktop:pt-[27rem]"
+          >
             <HowItWorksIntro />
             <FeaturesCarousel />
           </section>
