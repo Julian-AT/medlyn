@@ -59,11 +59,11 @@ export function ShellSidebarFooter() {
               <SidebarMenuButton
                 size="lg"
                 tooltip="Patient and workspace settings"
-                className="h-14 gap-2 rounded-[10px] border border-sidebar-border bg-card px-2 text-foreground data-open:bg-sidebar-accent group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent"
+                className="h-11 gap-2 rounded-[10px] px-2 text-foreground hover:bg-sidebar-accent data-open:bg-sidebar-accent group-data-[collapsible=icon]:h-8"
                 aria-label="Patient and workspace settings"
               >
-                <Avatar className="size-8 shrink-0 rounded-[10px]">
-                  <AvatarFallback className="rounded-[10px] bg-secondary font-medium text-foreground">
+                <Avatar className="size-6 shrink-0 rounded-md">
+                  <AvatarFallback className="rounded-md bg-(image:--gradient-4) text-[10px] font-semibold text-foreground/80">
                     {patient.displayName
                       .split(/\s+/)
                       .map((part) => part[0])
