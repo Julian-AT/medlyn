@@ -26,8 +26,8 @@ export function ChatToolSteps({
   return (
     <ChainOfThought className="w-full max-w-none space-y-2">
       <ChainOfThoughtHeader className="w-fit max-w-full text-xs">
-        {busy ? (
-          <Shimmer as="span">{active?.label ?? "Checking answer against sources…"}</Shimmer>
+        {active ? (
+          <Shimmer as="span">{active.label}</Shimmer>
         ) : (
           progressSummary(message.parts, factIds)
         )}
