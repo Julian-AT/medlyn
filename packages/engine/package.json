@@ -12,7 +12,8 @@
     "db:push": "drizzle-kit push",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "warm": "node --env-file=../../.env --experimental-strip-types --no-warnings lens/warm.ts"
+    "warm": "node --env-file=../../.env --experimental-strip-types --no-warnings lens/warm.ts",
+    "lint": "biome check ."
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/node": "^24.0.0",
     "drizzle-kit": "^0.31.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "@medlyn/tsconfig": "workspace:*"
   }
 }
