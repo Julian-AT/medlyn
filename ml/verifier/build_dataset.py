@@ -51,22 +51,36 @@ def perturbations(claim, fact):
     # Changes are made only to a corresponding explicit field, never arbitrary prose numbers.
     attrs = fact["attrs"]
     side = attrs.get("side")
-    if side in ("left", "right") and re.search(rf"\b{side}\b", claim, re.IGNORECASE):
-        yield (
-            "side_flip",
-            re.sub(
-                rf"\b{side}\b", "right" if side == "left" else "left", claim, flags=re.IGNORECASE
-            ),
-        )
+    variants = {
+        "left": ("left", "links"),
+        "links": ("left", "links"),
+        "right": ("right", "rechts"),
+        "rechts": ("right", "rechts"),
+    }
+    opposites = {"left": "right", "right": "left", "links": "rechts", "rechts": "links"}
+    if side in variants:
+        pattern = r"\b(?:" + "|".join(variants[side]) + r")\b"
+        if re.search(pattern, claim, re.IGNORECASE):
+            yield (
+                "side_flip",
+                re.sub(
+                    pattern, lambda match: opposites[match[0].lower()], claim, flags=re.IGNORECASE
+                ),
+            )
     for key in ("strength", "value"):
         value = str(attrs.get(key, ""))
         match = re.fullmatch(r"(\d+(?:[.,]\d+)?)(\s*[a-zA-Zµμ/]+)?", value)
-        if match and value in claim:
+        if match and re.search(rf"(?<![\w.,]){re.escape(value)}(?![\w.,])", claim):
             changed = str(round(float(match[1].replace(",", ".")) + 7, 2)).removesuffix(".0")
             changed += match[2] or ""
             yield (
                 "dose_change" if key == "strength" else "number_change",
-                claim.replace(value, changed, 1),
+                re.sub(
+                    rf"(?<![\w.,]){re.escape(value)}(?![\w.,])",
+                    lambda _, replacement=changed: replacement,
+                    claim,
+                    count=1,
+                ),
             )
     date = fact.get("eventDate")
     if date and date in claim:
@@ -138,6 +152,37 @@ def patient_examples(row, family, prepared):
         yield {**base, "claim": fact["claim"], "label": "supported", "mutation": "none"}
         for mutation, claim in perturbations(fact["claim"], fact):
             yield {**base, "claim": claim, "label": "contradicted", "mutation": mutation}
+        if fact["assertion"] == "present" and fact["kind"] in {"diagnosis", "symptom", "allergy"}:
+            yield {
+                **base,
+                "claim": "It is not the case that " + fact["claim"],
+                "label": "contradicted",
+                "mutation": "negation_scope",
+            }
+        # Swap values between explicit fields from the same measurement kind.
+        value = str(fact["attrs"].get("value", ""))
+        if value and re.fullmatch(r"\d+(?:[.,]\d+)?", value):
+            for other in facts:
+                replacement = str(other["attrs"].get("value", ""))
+                if (
+                    other["kind"] == fact["kind"]
+                    and replacement != value
+                    and re.fullmatch(r"\d+(?:[.,]\d+)?", replacement)
+                ):
+                    changed, count = re.subn(
+                        rf"(?<![\w.,]){re.escape(value)}(?![\w.,])",
+                        replacement,
+                        fact["claim"],
+                        count=1,
+                    )
+                    if count:
+                        yield {
+                            **base,
+                            "claim": changed,
+                            "label": "contradicted",
+                            "mutation": "number_swap",
+                        }
+                    break
         # An unrelated, explicitly absent novel concept is an unsupported assertion,
         # not proof of its negation. The concept is checked against all shown context.
         additions = (
@@ -384,15 +429,35 @@ def build(sources, out, limit=5001, seed=37):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, action="append")
-    parser.add_argument("--out", type=Path, default=VERIFIER_DIR / "datasets")
-    parser.add_argument("--train-limit", type=int, default=5001)
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--version", type=int, choices=(1, 2), default=2)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--train-limit", type=int, default=24000)
     args = parser.parse_args()
     if args.train_limit < 3:
         parser.error("train-limit must allow at least one example per class")
     sources = args.source or [ROOT / "ml/data/sample", ROOT / "ml/data/synth-v1"]
     if not any(source.exists() for source in sources):
         raise SystemExit("Synthetic sources have not arrived; no dataset was fabricated")
-    print(json.dumps(build(sources, args.out, args.train_limit), indent=2))
+    if args.version == 1:
+        print(
+            json.dumps(
+                build(sources, args.out or VERIFIER_DIR / "datasets", args.train_limit), indent=2
+            )
+        )
+        return
+    from .dataset_v2 import build_v2
+
+    caps = {"train": 30, "valid": 12, "test": 18, "rewritten": 6} if args.dry_run else None
+    if caps is None:
+        caps = {"train": args.train_limit, "valid": 3000, "test": 3000, "rewritten": 900}
+    out = args.out or VERIFIER_DIR / "runs" / ("dry-data" if args.dry_run else "data-v2")
+    report = build_v2(
+        sources, out, caps=caps, rewritten_patients=2 if args.dry_run else 300, dry_run=args.dry_run
+    )
+    print(
+        json.dumps({key: value for key, value in report.items() if key != "assignment"}, indent=2)
+    )
 
 
 if __name__ == "__main__":
