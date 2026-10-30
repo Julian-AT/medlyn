@@ -1,4 +1,6 @@
 "use client";
+import { AiChat02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useActivePatient } from "@/components/patient/active-patient-provider";
@@ -14,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { CommandSearch } from "./command-search";
 import { routeTitle } from "./navigation";
 export function PageHeader() {
   const { patient } = useActivePatient();
@@ -41,11 +44,15 @@ export function PageHeader() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        {pathname !== "/" && !pathname.startsWith("/chat/") && (
-          <Button asChild variant="outline" size="sm" className="ml-auto shrink-0">
-            <Link href="/">Ask Medlyn</Link>
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <CommandSearch />
+          <Button asChild size="sm" className="h-8 gap-1.5 rounded-[10px] px-3">
+            <Link href="/">
+              <HugeiconsIcon icon={AiChat02Icon} strokeWidth={2} data-icon="inline-start" />
+              Ask Medlyn
+            </Link>
           </Button>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
