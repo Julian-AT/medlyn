@@ -27,7 +27,7 @@ export function Question({
   onReview: ReviewHandler;
 }) {
   return (
-    <Card size="sm">
+    <Card size="sm" className="rounded-xl border border-gray-alpha-150 shadow-xs ring-0">
       <CardHeader>
         <Badge
           variant="outline"
@@ -45,6 +45,7 @@ export function Question({
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         <Button
+          className="rounded-full"
           size="sm"
           variant="secondary"
           onClick={() =>
@@ -64,7 +65,12 @@ export function Question({
           />
         </Button>
         {finding && (
-          <Button variant="outline" size="sm" onClick={() => onCompare(finding.id)}>
+          <Button
+            className="rounded-full"
+            variant="outline"
+            size="sm"
+            onClick={() => onCompare(finding.id)}
+          >
             Compare sources
           </Button>
         )}

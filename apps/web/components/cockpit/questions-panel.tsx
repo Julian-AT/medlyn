@@ -28,7 +28,7 @@ export function QuestionsPanel({
 }: Props) {
   const questions = screen?.openQuestions ?? [];
   return (
-    <Card className="bg-transparent ring-0">
+    <Card className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
         <CardTitle>Open questions</CardTitle>
         <CardDescription>Uncertainties and missing evidence for this task.</CardDescription>
@@ -64,7 +64,11 @@ export function QuestionsPanel({
             <Separator />
             <CardTitle>Dismissed · {dismissed.length}</CardTitle>
             {dismissed.map((item) => (
-              <Card key={item.id} size="sm">
+              <Card
+                key={item.id}
+                size="sm"
+                className="rounded-xl border border-gray-alpha-150 shadow-xs ring-0"
+              >
                 <CardHeader>
                   <CardTitle>{item.title}</CardTitle>
                   <CardDescription>
