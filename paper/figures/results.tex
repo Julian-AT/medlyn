@@ -1,54 +1,35 @@
 \begin{figure}[!htbp]
 \centering
-\begin{minipage}{.48\linewidth}
+\begin{minipage}{.47\linewidth}
 \centering
 \begin{tikzpicture}
-\begin{axis}[paperplot,ybar,med bars,bar width=6pt,xmin=.5,xmax=3.5,
-  xtick={1,2,3},xticklabels={BM25,Vector,Hybrid},
-  ymin=0,ymax=1,ytick={0,.5,1},ylabel={Recall},title={(a) Retrieval},
-  legend style={at={(.5,-.2)},anchor=north,legend columns=2}]
-\RetrievalPlot
-\end{axis}
-\end{tikzpicture}
-\end{minipage}\hfill
-\begin{minipage}{.48\linewidth}
-\centering
-\begin{tikzpicture}
-\begin{axis}[paperplot,ybar,med bars,bar width=13pt,xmin=.5,xmax=3.5,
-  xtick={1,2,3},xticklabels={Rules,Proxy,Local},
-  ymin=0,ymax=1,ytick={0,.5,1},ylabel={Macro F-score},title={(b) Verifier}]
-\VerifierPlot
-\end{axis}
-\end{tikzpicture}
-\end{minipage}
-\par\vspace{10mm}
-\begin{minipage}{.48\linewidth}
-\centering
-\begin{tikzpicture}
-\begin{axis}[paperplot,xmin=0,xmax=1,ymin=0,ymax=1,
-  xtick={0,.5,1},ytick={0,.5,1},xlabel={Mean confidence},
-  ylabel={Accuracy},title={(c) Reliability},
-  legend style={at={(.5,-.32)},anchor=north,legend columns=3}]
+\begin{axis}[paperplot,width=\linewidth,height=58mm,
+  xmin=0,xmax=1,ymin=0,ymax=1,xtick={0,.5,1},ytick={0,.5,1},
+  xlabel={Mean confidence},ylabel={Accuracy},title={(a) Reliability},
+  legend style={at={(.5,-.32)},anchor=north,legend columns=2}]
 \addplot[black!45,dashed,line width=.4pt,domain=0:1,forget plot,
   /pgfplots/every axis plot post/.style={}] {x};
 \ReliabilityPlot
 \end{axis}
 \end{tikzpicture}
 \end{minipage}\hfill
-\begin{minipage}{.48\linewidth}
+\begin{minipage}{.47\linewidth}
 \centering
 \begin{tikzpicture}
-\begin{axis}[paperplot,latencybounds,xlabel={Median latency (ms)},ylabel={Macro F-score},
-  ymin=0,ymax=1,ytick={0,.5,1},title={(d) Latency and quality},
-  nodes near coords style={font=\footnotesize},clip=false,
-  xtick distance={\pgfkeysvalueof{/pgfplots/xmax}/3},
-  enlarge x limits={lower,value=.08}]
+\begin{axis}[paperplot,width=\linewidth,height=58mm,latencybounds,
+  xlabel={Median latency (ms)},ylabel={Macro F-score},
+  ymin=0,ymax=1.08,ytick={0,.5,1},title={(b) Latency and quality},
+  nodes near coords style={font=\scriptsize},clip=false,
+  xtick={0,1000,2000},scaled x ticks=false,
+  enlarge x limits={lower,value=.15}]
 \LatencyPlot
 \end{axis}
 \end{tikzpicture}
 \end{minipage}
-\caption{Separate synthetic retrieval and verifier experiments. Only measurements
-approved against current source hashes are plotted. Pending panels have no measured
-marks. The dashed line is the calibration reference.}
+\par\vspace{6mm}
+\caption{Synthetic test-set aggregates from the same evaluation. Reliability uses
+calibrated local scores and the accepted local subset of the cascade; GPT and rules
+provide no measured confidence. The dashed line denotes perfect calibration.
+Latency includes the saved request times, with projected serial routing for the cascade.}
 \label{fig:results}
 \end{figure}

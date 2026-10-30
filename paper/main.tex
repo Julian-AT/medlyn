@@ -26,17 +26,21 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-We present Medlyn, a prototype that constructs a clinical view for a clinician's role
-and task. We extract atomic facts from a longitudinal record, retain their source
-locations, and select fact identifiers for registered display templates. We apply a
-shared claim validator to cards, chat answers, letters and text prepared for speech.
-We distinguish documented negatives, missing documentation and checks that could not
-be completed. We also describe a synthetic clinical corpus and an experiment that
-adapts a small language model to verify claims. We report regression, synthetic
-pipeline, retrieval and verifier evaluations separately. Measurements enter the
-manuscript only after human review of their values and source identities; unreviewed
-or missing measurements remain pending. We do not establish clinical efficacy or
-transfer from generated notes to patient care.
+We present Medlyn, a prototype that constructs a source-linked clinical view from
+German documents for a clinician's role and task. We extract located facts, select
+fact identifiers and render registered templates through a shared claim validator.
+In an agent-reviewed API check of the challenge situations, each primary cold matrix
+answered \ReviewedAnswerPassed{} of \ReviewedAnswerTotal{} questions, with
+\ReviewedTraceLocated{} of \ReviewedTraceTotal{} cited facts located and
+\ReviewedUnsupported{} unsupported lines found among \ReviewedLines{} reviewed lines.
+The slowest primary cold request took \ReviewedColdSeconds{} s, missing the
+under-\ChallengeLimit{} s target; confirmed cached requests took at most
+\ReviewedCachedSeconds{} s. On synthetic held-out claims, our local verifier reached
+macro F-score \LocalVerifierFscore{}, compared with \ProxyVerifierFscore{} for GPT
+and \RulesVerifierFscore{} for rules. An offline cascade reached
+\CascadeVerifierFscore{} with a projected \CascadeSavedPercent{}\% fewer GPT calls.
+On the separate real-text rule-labelled set, the cascade trailed GPT. These results
+are agent-reviewed, not clinician-reviewed, and do not establish clinical efficacy.
 \end{abstract}
 
 \section{Introduction}
@@ -261,7 +265,8 @@ The quantised-base approach is related to QLoRA \citep{qlora}. We do not equate 
 MLX run with the original CUDA implementation or assert that it uses all of its
 quantisation methods. We mask the prompt during training and bound the input length
 at \SequenceLimit{} tokens. The configured wall-time cap is \TrainingMinuteCap{}
-minutes. A cap and an epoch target do not establish that a run completed.
+minutes. The full-data run reached that cap before completing its epoch. We evaluate
+the saved checkpoint, rather than claiming completed training.
 
 We compare rules-only checks, the configured proxy semantic judge and the local
 adapter. We measure macro F-score, coverage and latency together. We reserve model
@@ -275,35 +280,42 @@ decision approves the local verifier.
 \FloatBarrier
 \section{Results}
 \subsection{Evaluation Protocol}
-We keep the challenge regression, blind challenge situations, synthetic pipeline,
-retrieval and verifier experiments separate. Evaluation uses an empty review layer.
-The regression protocol specifies \RegressionTarget{} answers across
-\SituationCount{} configured situations. The blind set specifies \HeldoutTarget{}
-independently authored situations. The paper build does not open its results by
-default; release requires the orchestrator's scheduled review.
+We keep the challenge regression, synthetic pipeline, retrieval and verifier
+experiments separate. Evaluation uses an empty review layer. The primary challenge
+review covers \RegressionTarget{} answers across \SituationCount{} situations,
+entered once as free text and once through configured chips. We use existing review
+records and do not run or publish new challenge blind results.
 
-All empirical quantities enter through \texttt{generated/numbers.tex}. We extract
-only numeric aggregates from allowlisted artifact fields and record input hashes.
-A human review must approve a value against the complete current source identity
-before the manuscript prints it. Missing, invalid and unapproved values render as
-\textit{pending}; they never become zero observations. The machine-readable aggregate
-file remains available for that review. No approval of measurements is implied by
-this manuscript build.
+Every empirical value enters through \texttt{generated/numbers.tex}. We extract
+numeric aggregates from allowlisted result fields and retain source hashes. The
+measurement review binds exact values to those hashes. The reviewer is an agent
+acting under the author's delegation, not a clinician. Synthetic labels remain
+code checked. We omit unmeasured browser visibility, blind relevance and vector-only
+retrieval results rather than treating them as observations.
 
 \subsection{Challenge Regression}
-Table~\ref{tab:regression} separates answer-and-citation passes from complete suite
-passes. The latter can additionally depend on timing, findings and audits. We report
-cold requests, warm attempts and confirmed cache hits separately. A failed browser
-launch is not an observed visibility failure rate. Counts of located references
-measure source location, while an audit of composed claims measures a different
-property. Neither establishes that all task-relevant facts were selected.
+Table~\ref{tab:regression} reports the primary cold API matrices and the source audit.
+Each cold matrix answered \ReviewedAnswerPassed/\ReviewedAnswerTotal{} questions.
+We located \ReviewedTraceLocated/\ReviewedTraceTotal{} cited facts and found
+\ReviewedUnsupported{} unsupported lines among \ReviewedLines{} distinct reviewed
+card lines. We recovered \ReviewedContradictions{} qualifying contradictions with
+\ReviewedFalseAlarms{} false findings. These checks cover API screen data; they do
+not certify browser visibility, chat, speech, letters or clinical correctness.
 \begin{table}[!htbp]
 \centering
 \input{generated/evaluation.tex}
-\caption{Challenge regression aggregates eligible for publication after human review.
-We do not merge rows or timing metadata from different saved runs.}
+\caption{Agent-reviewed challenge API checks. Counts retain their own denominators;
+the located-fact audit also includes repeat and cached requests.}
 \label{tab:regression}
 \end{table}
+The slowest primary cold completion, \ReviewedColdSeconds{} s, misses the
+under-\ChallengeLimit{} s challenge target. Confirmed cache hits completed within
+\ReviewedCachedSeconds{} s. Additional cache-fill requests failed availability or
+strict source and warning checks. We therefore do not claim that every repeated or
+cached run passed. The older saved automatic regression reports
+\RegressionPassed/\RegressionTotal{} answer passes and
+\SuitePassed/\RegressionTotal{} full-suite passes; it is a separate run and does
+not replace the primary review.
 
 \subsection{Synthetic Pipeline and Retrieval}
 Table~\ref{tab:synthetic} separates generated data from executed evaluation cases.
@@ -311,8 +323,7 @@ We do not count an unexecuted challenge as a pass or a failure. The number of
 generated patients is also distinct from the number ingested into the shared database.
 Table~\ref{tab:retrieval} compares query-level retrieval aggregates at the configured
 cutoffs. These experiments concern synthetic query labels and do not establish
-challenge-patient recall. Figure~\ref{fig:results} reserves separate panels for
-retrieval, verifier quality, reliability and latency.
+challenge-patient recall. Figure~\ref{fig:results} shows measured verifier reliability and the latency/quality comparison.
 \begin{table}[!htbp]
 \centering
 \input{generated/research.tex}
@@ -323,8 +334,8 @@ from human gold. An experiment can have generated cases without measured cases.}
 \begin{table}[!htbp]
 \centering
 \input{generated/retrieval.tex}
-\caption{Synthetic retrieval evaluation. A missing or failed mode remains pending;
-we do not infer a retrieval benefit from the presence of a hybrid index.}
+\caption{Synthetic retrieval evaluation. We omit the unmeasured vector-only mode; the identical BM25 and hybrid scores do
+not establish a vector retrieval benefit.}
 \label{tab:retrieval}
 \end{table}
 
@@ -342,40 +353,46 @@ held-out mutation experiments and real-patient weak labels. Median latency is sp
 to the saved evaluation conditions.}
 \label{tab:verifier}
 \end{table}
+On the synthetic test set, the local verifier reaches \LocalVerifierFscore{}
+macro F-score, below GPT at \ProxyVerifierFscore{} and above rules at
+\RulesVerifierFscore{}. A validation-selected cascade reaches
+\CascadeVerifierFscore{} and routes a projected \CascadeSavedPercent{}\% of claims
+away from GPT. This is offline replay with both predictions collected; it is not a
+measurement of reduced live service traffic. The real-text set, labelled
+\texttt{real-gold} in the result file, contains rule-derived test labels rather than
+clinician gold. On its \ProxyRealN{} claims, the cascade scores
+\CascadeRealFscore{} versus GPT's \ProxyRealFscore{} and the local model's
+\LocalRealFscore{}. Macro F-score includes absent classes, which limits comparisons
+with the balanced synthetic task.
 \input{figures/results.tex}
 \FloatBarrier
 
 \subsection{Limitations}
-We have a prototype, a narrow challenge workflow and synthetic data whose labels
-primarily follow code checks. We have not established clinical efficacy, diagnostic
-accuracy, reduced clinician workload or safety in deployment. Template rendering
-limits unsupported composition but cannot repair an incorrect extraction. A model
-judge can share systematic errors with the extractor. A source citation can be
-correctly located while the statement loses a qualification in translation.
-
-Synthetic held-out families test a bounded kind of variation. They do not substitute
-for external records from different institutions, independent clinicians or new
-writing conventions. Real-patient weak labels measure agreement with a validator;
-they do not provide an adjudicated clinical test set. We also need independent
-page-level verification for scans and PDFs. We do not infer a speed and quality
-tradeoff from runs with different populations or measurement conditions.
-
-The record contains sensitive clinical content even when the challenge describes
-it as synthetic. We retain access restrictions and omit document text from this
-report. Before clinical use, we would need independent annotation, error analysis
-by claim type, prospective workflow evaluation and access-control review. A
-clinician review action is an authorship record, not a substitute for these studies.
+We evaluate a narrow challenge workflow and generated records with code-checked
+labels. The primary review is agent performed, the cached checks expose source and
+warning failures, and cold completion misses the challenge target. Located quotes
+cannot establish semantic correctness, translation fidelity or complete selection.
+The local verifier and cascade trail GPT on real text; the real-text set is test
+only and its rule-derived labels do not provide clinician gold. PDF/scan recall,
+independent relevance annotation and browser completion are outside our measured
+claims. The hosted demonstration is public without authentication. We establish
+neither clinical efficacy nor reduced workload, and prospective deployment requires
+independent annotation, workflow evaluation and access-control review.
 
 \FloatBarrier
 \section{Conclusion}
-We presented a task-specific clinical view built from located evidence. We separate
-fact selection from rendering, apply one validation boundary across output channels
-and preserve the distinction between missing documentation and a failed check.
-We described a synthetic data pipeline and a local verifier experiment with separate
-evaluation tracks. The next empirical step is independent annotation and matched
-comparisons of coverage, support and latency. Until then, we treat this system as an
-inspectable prototype with explicit unresolved measurements.
+We construct task-specific clinical views by separating located evidence, fact
+selection, template rendering and a shared claim boundary. The primary challenge
+API review answers \ReviewedAnswerPassed/\ReviewedAnswerTotal{} questions in each
+cold matrix, but its \ReviewedColdSeconds{} s maximum misses the latency target.
+Our synthetic cascade reaches \CascadeVerifierFscore{} macro F-score with
+\CascadeSavedPercent{}\% projected GPT-call savings; its real-text score of
+\CascadeRealFscore{} remains below GPT's \ProxyRealFscore{}. We retain GPT as the
+application's semantic verifier. Our separate IBM hardware experiment characterises
+a small synthetic kernel block and makes no claim of clinical or quantum advantage.
 
+\FloatBarrier
+\input{appendix-quantum}
 \FloatBarrier
 \bibliographystyle{plainnat}
 \bibliography{refs}
