@@ -5,10 +5,12 @@ export function LensHeader({
   screen,
   mock,
   loading,
+  error = null,
 }: {
   screen: Screen | null;
   mock: boolean;
   loading: boolean;
+  error?: string | null;
 }) {
   return (
     <Card className="rounded-none bg-transparent py-0 shadow-none ring-0">
@@ -23,7 +25,13 @@ export function LensHeader({
                 : undefined
             }
           >
-            {mock ? "Demo replay" : loading ? "Checking sources" : "Source-linked"}
+            {mock
+              ? "Demo replay"
+              : loading
+                ? "Checking sources"
+                : error
+                  ? "Check incomplete"
+                  : "Source-linked"}
           </Badge>
           {screen && (
             <Badge variant="secondary">
@@ -32,7 +40,8 @@ export function LensHeader({
           )}
         </CardDescription>
         <CardTitle className="text-xl font-semibold tracking-tight">
-          {screen?.situation.task ?? "Preparing your clinical lens"}
+          {screen?.situation.task ??
+            (error ? "Try your situation again" : "Preparing your clinical lens")}
         </CardTitle>
         <CardDescription>
           {screen?.situation.role ?? "The eligible documents are being checked."}
