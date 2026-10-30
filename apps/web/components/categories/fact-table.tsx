@@ -57,10 +57,10 @@ export function FactTable({
       </CardHeader>
       <FactToolbar query={query} filter={filter} onQuery={setQuery} onFilter={setFilter} />
       <CardContent className="px-0 [&>[data-slot=table-container]]:max-h-[36rem] [&_[data-slot=table-row]]:border-gray-alpha-100">
-        <Table>
+        <Table className="table-fixed [&_th]:whitespace-normal">
           <TableHeader className="sticky top-0 z-10 bg-muted [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-head]]:text-muted-foreground">
             <TableRow>
-              <TableHead>Documented fact</TableHead>
+              <TableHead className="w-3/5">Documented fact</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Source</TableHead>
             </TableRow>
@@ -70,18 +70,30 @@ export function FactTable({
               <TableRow key={claim.id} data-claim-id={claim.id}>
                 <TableCell className="max-w-xl whitespace-normal py-4">
                   <CardDescription className="text-foreground">{claim.text}</CardDescription>
-                  {(fact.assertion !== "present" || fact.temporalStatus !== "stated") && (
-                    <Badge variant="secondary" className="mt-2">
-                      {[
-                        fact.assertion !== "present" ? fact.assertion : null,
-                        fact.temporalStatus !== "stated"
-                          ? fact.temporalStatus.replaceAll("_", " ")
-                          : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </Badge>
-                  )}
+                  <CardContent className="flex flex-wrap gap-1 p-0">
+                    {fact.assertion !== "present" && (
+                      <Badge variant="outline" className="mt-2">
+                        {
+                          { negated: "Negated", suspected: "Suspected", historical: "Historical" }[
+                            fact.assertion
+                          ]
+                        }
+                      </Badge>
+                    )}
+                    {fact.temporalStatus !== "stated" && (
+                      <Badge variant="outline" className="mt-2">
+                        {
+                          {
+                            planned: "Planned",
+                            recommended: "Recommended",
+                            done: "Completed",
+                            ongoing: "Ongoing",
+                            given_once: "Given once",
+                          }[fact.temporalStatus]
+                        }
+                      </Badge>
+                    )}
+                  </CardContent>
                 </TableCell>
                 <TableCell className="font-mono text-xs">
                   {formatDate(fact.eventDate ?? fact.docDate, fact.datePrecision)}
