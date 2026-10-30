@@ -1,0 +1,46 @@
+\usetikzlibrary{fit,backgrounds,calc}
+\definecolor{medorange}{RGB}{252,225,190}
+\definecolor{medblue}{RGB}{204,230,243}
+\definecolor{medyellow}{RGB}{249,242,190}
+\definecolor{medpink}{RGB}{248,219,226}
+\definecolor{medgreen}{RGB}{211,233,210}
+\definecolor{medgrey}{RGB}{245,245,245}
+\definecolor{medink}{RGB}{45,45,45}
+\tikzset{
+  med diagram/.style={font=\small,draw=medink,text=black,line width=.45pt},
+  med block/.style={draw=medink,rounded corners=2pt,minimum height=8mm,
+    text width=25mm,align=center,inner xsep=3pt,inner ysep=3pt},
+  med code/.style={med block,fill=medblue},
+  med model/.style={med block,fill=medorange},
+  med check/.style={med block,fill=medyellow},
+  med data/.style={med block,fill=medpink},
+  med store/.style={med block,fill=medgreen},
+  med stack/.style={draw=medink,fill=medgrey,rounded corners=5pt,
+    inner sep=2.5mm,line width=.45pt},
+  med flow/.style={draw=medink,line width=.45pt,-{Latex[length=1.6mm,width=1.1mm]}},
+  med wire/.style={draw=medink,line width=.45pt},
+  med note/.style={font=\footnotesize,align=center,inner sep=2pt},
+  med io/.style={font=\small,align=center,inner sep=2pt},
+  med merge/.style={circle,draw=medink,fill=white,inner sep=0pt,
+    minimum size=5mm,font=\normalsize}
+}
+\pgfplotsset{paperplot/.style={
+  width=\linewidth,height=51mm,scale only axis=false,
+  axis lines=left,axis line style={medink,line width=.4pt},
+  tick style={medink,line width=.35pt},tick align=outside,
+  tick label style={font=\footnotesize},label style={font=\small},
+  title style={font=\small,yshift=2pt},
+  legend style={font=\footnotesize,draw=none,fill=none,cells={anchor=west}},
+  grid=none,ymajorgrids=true,grid style={black!9,line width=.3pt},
+  scaled ticks=false,enlargelimits=false
+},med bars/.style={
+  every axis plot no 0/.style={
+    every axis plot post/.style={draw=medink,fill=medblue}
+  },
+  every axis plot no 1/.style={
+    every axis plot post/.style={draw=medink,fill=medorange}
+  },
+  every axis plot no 2/.style={
+    every axis plot post/.style={draw=medink,fill=medpink}
+  }
+}}
