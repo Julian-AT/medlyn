@@ -277,7 +277,9 @@ def collect(root=ROOT, include_heldout=False):
         )
     dataset = evidence.read("ml/verifier/datasets/manifest.json") or {}
     methods = {"Rules": "rules_only", "Proxy": "proxy_fast", "Local": "local_qlora"}
-    heldout_verifier = verifier.get("sets", {}).get("synthetic_heldout_families", {})
+    sets = verifier.get("sets", {})
+    heldout_verifier = sets.get("synthetic_heldout_families") or sets.get("test", {})
+    heldout_verifier = heldout_verifier.get("metrics", heldout_verifier)
     for label, method in methods.items():
         result = heldout_verifier.get(method, {})
         measured = integer(result.get("n")) not in (None, 0)
