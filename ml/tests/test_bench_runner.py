@@ -69,7 +69,7 @@ def test_dry_runner_never_loads_models_and_paper_remains_pending(tmp_path, monke
     assert report["sets"] == {}
     exported = export(out / "benchmark.json", generated=tmp_path / "generated")
     assert not exported["approved"]
-    assert "pending" in (tmp_path / "generated/bench_table.tex").read_text()
+    assert "pending" in (tmp_path / "generated/bench-table.tex").read_text()
     assert len((tmp_path / "generated/bench_latency.dat").read_text().splitlines()) == 1
 
 

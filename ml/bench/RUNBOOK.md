@@ -124,10 +124,10 @@ uv run --no-sync python -m bench.run export --out bench/results/full
 ```
 
 Outputs are the local `benchmark.json`, per-system prediction JSONL and
-`ml/bench/REPORT.md`. To use the required canonical aggregate location, aggregate
+`ml/bench/report.md`. To use the required canonical aggregate location, aggregate
 without `--out` for the delivered rules run; the full run's aggregate is under
 `bench/results/full/benchmark.json`. All files below `bench/results/` are ignored.
-The report contains aggregates only. Paper export writes `bench_table.tex`,
+The report contains aggregates only. Paper export writes `bench-table.tex`,
 `bench_reliability.dat` and `bench_latency.dat`; it leaves numbers pending until a
 human review is bound to the exact benchmark SHA-256.
 

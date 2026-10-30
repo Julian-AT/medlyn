@@ -11,7 +11,7 @@ root `.env`; do not create a package dotenv. Never run MLX in the sandbox. Set
   rewritten suite from 30 eligible test patients. Span/split/frozen-hash audit passes.
 - `verifier/runs/real/real-gold.examples.jsonl`: 100 test-only real-text rule-labelled claims.
   `real-gold-manifest.json` contains only counts, ids and offsets.
-- `results.json` and `RESULTS.md`: existing pilot predictions reanalysed with CIs, confusion and
+- `results.json` and `results.md`: existing pilot predictions reanalysed with CIs, confusion and
   calibration. Status explicitly says no v2 retraining. Error exports stay in ignored runs.
 - No v2 adapter, selected threshold, GPT savings or cascade regression score exists yet.
 
@@ -82,7 +82,7 @@ uv run --no-sync python -m verifier.evaluate --data verifier/runs/data-v2-final 
 ```
 
 The command fits temperature and threshold on validation, then evaluates frozen synthetic,
-rewritten and real-rule suites separately. It writes `results.json`, `RESULTS.md`,
+rewritten and real-rule suites separately. It writes `results.json`, `results.md`,
 `runs/data-v2-final/cascade-policy.json`, prediction artifacts, reliability bins and up to 30
 failure records per method/suite. Cascade savings here are offline routing projections: both sets
 of predictions are collected for comparison. Automatic failure tags await human annotation. Proxy cache

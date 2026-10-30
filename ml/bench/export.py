@@ -94,7 +94,7 @@ def export(path, review=None, generated=None):
     if not count:
         rows.append(r"\multicolumn{8}{c}{\textit{pending measured benchmark}} \\")
     rows += [r"\bottomrule", r"\end{tabular}"]
-    (generated / "bench_table.tex").write_text("\n".join(rows) + "\n")
+    (generated / "bench-table.tex").write_text("\n".join(rows) + "\n")
     (generated / "bench_reliability.dat").write_text("\n".join(reliability) + "\n")
     (generated / "bench_latency.dat").write_text("\n".join(latency) + "\n")
     return {

@@ -274,7 +274,7 @@ def evaluate(args):
 
     write_markdown(
         report,
-        VERIFIER_DIR / "RESULTS.md"
+        VERIFIER_DIR / "results.md"
         if out == VERIFIER_DIR / "results.json"
         else out.with_suffix(".md"),
     )

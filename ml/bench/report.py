@@ -44,7 +44,7 @@ def markdown(report, path):
         "",
         "Bootstrap intervals and paired deltas are in the local benchmark JSON. Significance tests are exploratory and unadjusted; the centered bootstrap is approximate. Single-patient intervals are conditional on that patient. Held-out mutations are a subset of the family test set and are not independent evidence. Binary F1 treats supported as positive. Missing decisions count against recall and coverage. Binary F1 is undefined without supported references; balanced accuracy is undefined when either binary reference class is absent. Inspect class support before comparing macro-F1. Local probabilities are uncalibrated. Latency uses successful requests only; cache hits retain original timings. No measured result has been human-approved for the paper.",
         "",
-        "Commands, model sources and publication review are in RUNBOOK.md.",
+        "Commands, model sources and publication review are in runbook.md.",
     ]
     start = next(i for i, line in enumerate(lines) if line.startswith("|"))
     end = start

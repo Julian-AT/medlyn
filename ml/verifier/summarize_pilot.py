@@ -65,7 +65,7 @@ def summarize():
     result_path.write_text(json.dumps(report, indent=2) + "\n")
     from .report import write_markdown
 
-    write_markdown(report, VERIFIER_DIR / "RESULTS.md")
+    write_markdown(report, VERIFIER_DIR / "results.md")
     return {"status": report["status"], "version": 2}
 
 

@@ -442,7 +442,7 @@ def write_results(results):
         f"Proxy calls: {results['cost']['proxyCalls']}; concurrency ≤3. Monetary cost unavailable.",
         f"Cached proxy predictions reused: {results['cost'].get('cachedProxyPredictions', 0)}; their original request latencies are retained.",
     ]
-    (VERIFIER_DIR / "RESULTS.md").write_text("\n".join(lines) + "\n")
+    (VERIFIER_DIR / "results.md").write_text("\n".join(lines) + "\n")
     print(json.dumps(results, indent=2))
 
 

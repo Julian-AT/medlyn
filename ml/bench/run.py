@@ -203,7 +203,7 @@ def aggregate(args):
     write_json(args.out / "benchmark.json", report)
     from .report import markdown
 
-    markdown(report, BENCH / "REPORT.md")
+    markdown(report, BENCH / "report.md")
     return report
 
 

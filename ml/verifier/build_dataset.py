@@ -398,7 +398,7 @@ def build(sources, out, limit=5001, seed=37):
         "exactPromptOverlapRemoved": overlap_removed,
     }
     (out / "manifest.json").write_text(json.dumps(report, indent=2))
-    (VERIFIER_DIR / "DATASET.md").write_text(
+    (VERIFIER_DIR / "dataset.md").write_text(
         "# Verifier dataset\n\nSources: "
         + ", ".join(f"`{source['path']}`" for source in manifests)
         + f". Sampling seed: {seed}. Input manifest hashes are recorded in datasets/manifest.json.\n\n"
