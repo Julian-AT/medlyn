@@ -33,7 +33,7 @@ export function MedicationSourceLists({
   return (
     <CardContent className="flex min-w-0 flex-col gap-6 p-0">
       <Tabs value={selected.id} onValueChange={setSelectedId} className="min-w-0 gap-4">
-        <CardContent className="flex flex-col gap-3 p-0">
+        <CardContent className="flex min-w-0 flex-col gap-3 p-0">
           <CardContent className="flex flex-wrap items-center justify-between gap-2 p-0">
             <CardDescription className="text-xs font-medium">Source lists</CardDescription>
             <CardDescription className="text-xs tabular-nums">
@@ -48,7 +48,7 @@ export function MedicationSourceLists({
               <TabsTrigger
                 key={list.id}
                 value={list.id}
-                className="h-auto min-h-9 flex-none whitespace-normal rounded-lg px-3 py-2 text-left text-sm tabular-nums"
+                className="h-auto min-h-9 min-w-0 max-w-full flex-none whitespace-normal break-words rounded-lg px-3 py-2 text-left text-sm leading-snug tabular-nums"
               >
                 {list.listLabel}
               </TabsTrigger>
