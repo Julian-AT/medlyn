@@ -55,6 +55,11 @@ const TrendPoint = z.object({
   segmentId: z.string(),
   quote: z.string(),
   line: ClaimLine,
+  documentId: z.string().optional(),
+  displayValue: z.string().optional(),
+  diastolic: z.number().optional(),
+  sourceCount: z.number().int().positive().optional(),
+  sources: z.array(EvidenceLine).optional(),
 });
 
 export const UiToolSchemas = {
@@ -240,54 +245,177 @@ export function medicationUiLists(
   };
 }
 
-/** Numeric chart values come from checked fields; planned/negative measurements never become points. */
-export function labUiPoints(facts: Fact[], lines: DisplayLine[], measure: string) {
-  const patterns: Record<string, RegExp> = {
-    weight: /\b(weight|gewicht|korpergewicht)\b/,
-    hba1c: /\bhba1c\b/,
-    blood_pressure: /blood pressure|blutdruck|\brr\b/,
-    bmi: /\bbmi\b|body mass index/,
+const MEASURES: Record<string, RegExp> = {
+  weight: /\b(weight|gewicht|korpergewicht)\b/,
+  height: /\bheight\b/,
+  hba1c: /\bhba1c\b/,
+  blood_pressure: /blood pressure|blutdruck|\brr\b|\bsystolic\b|\bdiastolic\b/,
+  bmi: /\bbmi\b|body mass index/,
+  pulse: /\bpulse\b|heart rate/,
+  temperature: /\btemperature\b/,
+  ejection_fraction: /ejection fraction|\blvef\b|\bef\b/,
+};
+
+export function measurementKey(fact: Fact): string {
+  const label = fold(fact.labelEn);
+  const known = Object.entries(MEASURES).find(([, pattern]) => pattern.test(label))?.[0];
+  if (known) return known;
+  if (fact.entityId) return fact.entityId;
+  const value = String(fact.attrs.value ?? "").trim();
+  let concept = value ? label.replace(fold(value), "") : label;
+  const unit = typeof fact.attrs.unit === "string" ? fold(fact.attrs.unit.trim()) : "";
+  if (unit && concept.trimEnd().endsWith(unit)) concept = concept.trimEnd().slice(0, -unit.length);
+  return (
+    concept
+      .replace(/\s+/g, " ")
+      .replace(/[\s:·,;()]+$/u, "")
+      .trim() || label
+  );
+}
+
+function measurementUnit(value: unknown): string {
+  if (typeof value !== "string") return "";
+  const unit = value.trim();
+  if (!unit || /^(?:none|null|unknown|n\/?a|unitless|undefined|[-–—])$/i.test(unit)) return "";
+  const aliases: Record<string, string> = {
+    mmhg: "mmHg",
+    kilogramm: "kg",
+    prozent: "%",
+    percent: "%",
+    percentage: "%",
+    "kg/m2": "kg/m²",
+    "kg/m^2": "kg/m²",
+    bpm: "bpm",
+    "°c": "°C",
   };
+  return aliases[unit.toLowerCase()] ?? unit;
+}
+
+/** Unit-less fragments stay in fact tables; BP components pair only within the same passage. */
+export function labUiPoints(facts: Fact[], lines: DisplayLine[], measure: string) {
   const query = fold(measure.replaceAll("_", " "));
   const byId = new Map(lines.map((line) => [line.factId, line]));
   const points: z.infer<typeof TrendPoint>[] = [];
-  for (const fact of facts) {
+  const components = new Map<
+    string,
+    { fact: Fact; line: DisplayLine; value: number; unit: string }[]
+  >();
+  for (const fact of [...facts].sort((a, b) => a.id.localeCompare(b.id))) {
     const label = fold(fact.labelEn);
     const line = byId.get(fact.id);
     if (
       !line ||
+      !isShowable(line.line) ||
+      !fact.locationOk ||
+      fact.support !== "supported" ||
       !["lab", "measurement"].includes(fact.kind) ||
       fact.assertion !== "present" ||
       ["planned", "recommended"].includes(fact.temporalStatus) ||
-      !(patterns[measure]?.test(label) ?? label.includes(query))
+      !(
+        MEASURES[measure]?.test(label) ??
+        (measurementKey(fact) === measure || label.includes(query))
+      )
     )
       continue;
     const raw = String(fact.attrs.value ?? "").trim();
-    const unit = typeof fact.attrs.unit === "string" ? fact.attrs.unit : "";
+    const unit = measurementUnit(fact.attrs.unit);
+    if (!unit) continue;
     const bp = measure === "blood_pressure" ? raw.match(/^(\d+)\s*\/\s*(\d+)$/) : null;
-    const values = bp
-      ? [
-          ["systolic", bp[1]],
-          ["diastolic", bp[2]],
-        ]
-      : [[measure, raw]];
-    for (const [series, value] of values) {
-      if (!/^[+-]?\d+(?:[.,]\d+)?$/.test(value)) continue;
-      const number = Number(value.replace(",", "."));
-      if (!Number.isFinite(number)) continue;
-      points.push({
-        date: fact.eventDate ?? fact.docDate,
-        value: number,
+    const value = bp
+      ? Number(bp[1])
+      : /^[+-]?\d+(?:[.,]\d+)?$/.test(raw)
+        ? Number(raw.replace(",", "."))
+        : NaN;
+    if (!Number.isFinite(value)) continue;
+    if (measure === "blood_pressure" && !bp) {
+      if (!/\b(systolic|diastolic)\b/.test(label)) continue;
+      const key = JSON.stringify([
+        fact.documentId,
+        fact.segmentId,
+        fact.eventDate ?? fact.docDate,
         unit,
-        series,
-        factId: fact.id,
-        segmentId: fact.segmentId,
-        quote: fact.quote,
-        line: line.line,
-      });
+      ]);
+      components.set(key, [...(components.get(key) ?? []), { fact, line, value, unit }]);
+      continue;
     }
+    points.push({
+      date: fact.eventDate ?? fact.docDate,
+      value,
+      unit,
+      series: measure,
+      factId: fact.id,
+      segmentId: fact.segmentId,
+      documentId: fact.documentId,
+      quote: fact.quote,
+      line: line.line,
+      sources: [line],
+      displayValue: `${bp ? `${value}/${Number(bp[2])}` : value} ${unit}`,
+      ...(bp ? { diastolic: Number(bp[2]) } : {}),
+    });
   }
-  return points.sort((a, b) => a.date.localeCompare(b.date) || a.factId.localeCompare(b.factId));
+  for (const entries of components.values()) {
+    const systolic = entries.filter(({ fact }) => /\bsystolic\b/.test(fold(fact.labelEn)));
+    const diastolic = entries.filter(({ fact }) => /\bdiastolic\b/.test(fold(fact.labelEn)));
+    // Multiple different readings in one passage cannot be paired by position or magnitude.
+    if (
+      new Set(systolic.map((entry) => entry.value)).size !== 1 ||
+      new Set(diastolic.map((entry) => entry.value)).size !== 1
+    )
+      continue;
+    const first = systolic[0];
+    const second = diastolic[0];
+    const { fact, value, unit, line } = first;
+    points.push({
+      date: fact.eventDate ?? fact.docDate,
+      value,
+      diastolic: second.value,
+      unit,
+      series: "blood_pressure",
+      displayValue: `${value}/${second.value} ${unit}`,
+      factId: fact.id,
+      segmentId: fact.segmentId,
+      documentId: fact.documentId,
+      quote: fact.quote,
+      line: line.line,
+      sources: entries.map((entry) => entry.line),
+    });
+  }
+  const unique = new Map<string, z.infer<typeof TrendPoint>>();
+  for (const point of points) {
+    const key = JSON.stringify([
+      point.date,
+      point.value,
+      point.diastolic,
+      point.unit,
+      point.documentId,
+    ]);
+    const existing = unique.get(key);
+    if (existing) {
+      existing.sources = [
+        ...new Map(
+          [...(existing.sources ?? []), ...(point.sources ?? [])].map((source) => [
+            source.factId,
+            source,
+          ]),
+        ).values(),
+      ];
+    } else unique.set(key, point);
+  }
+  const documents = new Map<string, Set<string>>();
+  for (const point of unique.values()) {
+    const key = JSON.stringify([point.date, point.value, point.diastolic, point.unit]);
+    const ids = documents.get(key) ?? new Set<string>();
+    if (point.documentId) ids.add(point.documentId);
+    documents.set(key, ids);
+  }
+  return [...unique.values()]
+    .map((point) => ({
+      ...point,
+      sourceCount:
+        documents.get(JSON.stringify([point.date, point.value, point.diastolic, point.unit]))
+          ?.size ?? 1,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date) || a.factId.localeCompare(b.factId));
 }
 
 export function uiTools(ctx: UiToolContext) {
@@ -407,7 +535,11 @@ export function uiTools(ctx: UiToolContext) {
             ctx,
           );
           const points = labUiPoints(data.facts, lines, measure);
-          const selectedIds = new Set(points.map((point) => point.factId));
+          const selectedIds = new Set(
+            points.flatMap(
+              (point) => point.sources?.map((source) => source.factId) ?? [point.factId],
+            ),
+          );
           const selected = data.facts.filter((fact) => selectedIds.has(fact.id));
           const deltas = trendLines(selected, ctx).filter((line) => line.factIds.length > 1);
           const checked = await validateClaims(deltas, { ...ctx, ...data });
