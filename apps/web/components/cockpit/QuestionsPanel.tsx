@@ -1,6 +1,7 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 import type { Finding, OpenQuestion, ReviewEntry, Screen } from "@medlyn/engine/contracts";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -50,7 +51,7 @@ export function QuestionsPanel({
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <Search />
+                <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle>
                 {loading ? "Checking eligible documents…" : "No open questions in this lens"}

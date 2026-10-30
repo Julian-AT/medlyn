@@ -1,5 +1,6 @@
 "use client";
-import { ArrowUpRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import type { Finding, OpenQuestion } from "@medlyn/engine/contracts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,12 @@ export function Question({
           }
         >
           Investigate
-          <ArrowUpRight data-icon="inline-end" />
+          <HugeiconsIcon
+            icon={ArrowUpRight01Icon}
+            strokeWidth={2}
+            aria-hidden="true"
+            data-icon="inline-end"
+          />
         </Button>
         {finding && (
           <Button variant="outline" size="sm" onClick={() => onCompare(finding.id)}>

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ComposerPrimitive, type AssistantRuntime } from "@assistant-ui/react";
-import { Mic, Send, Square } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Mic01Icon, SentIcon, StopIcon } from "@hugeicons/core-free-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
@@ -89,21 +90,31 @@ export function DockComposer({ busy, runtime }: { busy: boolean; runtime: Assist
                       }
                     }}
                   >
-                    <Mic />
+                    <HugeiconsIcon icon={Mic01Icon} strokeWidth={2} aria-hidden="true" />
                   </Button>
                 </>
               ) : null}
               {busy ? (
                 <ComposerPrimitive.Cancel asChild>
                   <Button type="button" variant="outline" size="sm">
-                    <Square data-icon="inline-start" />
+                    <HugeiconsIcon
+                      icon={StopIcon}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      data-icon="inline-start"
+                    />
                     Stop
                   </Button>
                 </ComposerPrimitive.Cancel>
               ) : (
                 <ComposerPrimitive.Send asChild>
                   <Button type="submit" size="sm">
-                    <Send data-icon="inline-start" />
+                    <HugeiconsIcon
+                      icon={SentIcon}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      data-icon="inline-start"
+                    />
                     Ask
                   </Button>
                 </ComposerPrimitive.Send>

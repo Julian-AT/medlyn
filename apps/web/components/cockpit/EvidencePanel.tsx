@@ -1,7 +1,8 @@
 "use client";
 
 import { useEvidence } from "@/hooks/use-evidence";
-import { FileSearch } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FileSearchIcon } from "@hugeicons/core-free-icons";
 import { type Finding, type Screen } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
 import { cn } from "@/lib/utils";
@@ -47,7 +48,7 @@ export function EvidencePanel({ segmentId, finding, screen, onSource, onReview }
       <Empty className="min-h-80">
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <FileSearch />
+            <HugeiconsIcon icon={FileSearchIcon} strokeWidth={2} aria-hidden="true" />
           </EmptyMedia>
           <EmptyTitle>Follow a fact to its source</EmptyTitle>
           <EmptyDescription>

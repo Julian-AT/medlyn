@@ -1,5 +1,6 @@
 "use client";
-import { Search } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
 import {
   Command,
@@ -39,7 +40,7 @@ export function SituationPalette({
           <CommandGroup heading="Clinical situations">
             {CHIPS.map((chip) => (
               <CommandItem key={chip.id} onSelect={() => submit(chip.text, chip.id)}>
-                <Search />
+                <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
                 {chip.label}
               </CommandItem>
             ))}

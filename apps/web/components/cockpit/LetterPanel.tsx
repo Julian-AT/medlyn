@@ -1,6 +1,7 @@
 "use client";
 
-import { Printer, FilePenLine } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { PrinterIcon, FileEditIcon } from "@hugeicons/core-free-icons";
 import { formatDate } from "@medlyn/engine/dates";
 import { useLetter } from "@/hooks/use-letter";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -51,7 +52,12 @@ export function LetterPanel({
         {letter && (
           <CardAction>
             <Button variant="outline" size="sm" disabled={stale} onClick={() => window.print()}>
-              <Printer data-icon="inline-start" />
+              <HugeiconsIcon
+                icon={PrinterIcon}
+                strokeWidth={2}
+                aria-hidden="true"
+                data-icon="inline-start"
+              />
               Print
             </Button>
           </CardAction>
@@ -78,7 +84,7 @@ export function LetterPanel({
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <FilePenLine />
+                <HugeiconsIcon icon={FileEditIcon} strokeWidth={2} aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle>A source-linked draft for the GP</EmptyTitle>
               <EmptyDescription>

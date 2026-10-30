@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, ArrowUpRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File02Icon, ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { PassageView, type PassageView as Passage } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
 import { Badge } from "@/components/ui/badge";
@@ -62,9 +63,9 @@ export function SourceChip({
             onFocus={load}
             onClick={() => onOpen(segmentId)}
           >
-            <FileText />
+            <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
             {index ? `Source ${index}` : "Source"}
-            <ArrowUpRight />
+            <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} aria-hidden="true" />
           </button>
         </Badge>
       </HoverCardTrigger>

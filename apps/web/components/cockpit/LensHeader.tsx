@@ -1,4 +1,5 @@
-import { CheckCheck } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TickDouble02Icon } from "@hugeicons/core-free-icons";
 import type { Screen } from "@medlyn/engine/contracts";
 import { SectionCards } from "@/components/section-cards";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,12 @@ export function LensHeader({
       <Card className="bg-transparent py-0 ring-0 print:hidden">
         <CardHeader className="gap-2 px-0">
           <CardDescription className="flex flex-wrap items-center gap-2">
-            <CheckCheck className="size-4 text-primary" />
+            <HugeiconsIcon
+              icon={TickDouble02Icon}
+              strokeWidth={2}
+              aria-hidden="true"
+              className="size-4 text-primary"
+            />
             Clinical lens
             <Badge variant={mock ? "outline" : "secondary"}>
               {mock ? "Situation 1 · demo replay" : "Source-linked"}

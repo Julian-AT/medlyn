@@ -1,5 +1,6 @@
 "use client";
-import { FileText, ListChecks, NotebookPen } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File02Icon, Task01Icon, NoteEditIcon } from "@hugeicons/core-free-icons";
 import type { useLens } from "@/hooks/use-lens";
 import type { useReviews } from "@/hooks/use-reviews";
 import { AskMedlynDock } from "@/components/dock/AskMedlynDock";
@@ -43,16 +44,16 @@ export function EvidenceWorkspace({
           <CardHeader className="p-3 print:hidden">
             <TabsList className="w-full">
               <TabsTrigger value="evidence">
-                <FileText />
+                <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
                 Evidence
               </TabsTrigger>
               <TabsTrigger value="questions">
-                <ListChecks />
+                <HugeiconsIcon icon={Task01Icon} strokeWidth={2} aria-hidden="true" />
                 Open questions
                 <Badge variant="secondary">{screen?.openQuestions.length ?? 0}</Badge>
               </TabsTrigger>
               <TabsTrigger value="letter">
-                <NotebookPen />
+                <HugeiconsIcon icon={NoteEditIcon} strokeWidth={2} aria-hidden="true" />
                 Letter
               </TabsTrigger>
             </TabsList>

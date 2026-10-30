@@ -1,4 +1,10 @@
-import { CircleHelp, Clock3, FileCheck2, TriangleAlert } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  HelpCircleIcon,
+  Clock01Icon,
+  FileValidationIcon,
+  Alert02Icon,
+} from "@hugeicons/core-free-icons";
 import type { Screen } from "@medlyn/engine/contracts";
 import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
 
@@ -13,36 +19,41 @@ export function SectionCards({ screen, loading }: { screen: Screen | null; loadi
         0,
       ),
       detail: "Attached to source passages",
-      icon: FileCheck2,
+      icon: FileValidationIcon,
     },
     {
       label: "Evidence gaps",
       value: cards.filter((card) => card.availability === "not_documented").length,
       detail: "Full absence checks completed",
-      icon: CircleHelp,
+      icon: HelpCircleIcon,
     },
     {
       label: "Contradictions",
       value: screen?.findings.filter((finding) => finding.type === "contradiction").length ?? 0,
       detail: "Compare original passages",
-      icon: TriangleAlert,
+      icon: Alert02Icon,
     },
     {
       label: "Load time",
       value: loading ? "…" : `${((screen?.timings.totalMs ?? 0) / 1000).toFixed(2)} s`,
       detail: screen?.timings.cached ? "Reused validated lens" : "Complete clinical lens",
-      icon: Clock3,
+      icon: Clock01Icon,
     },
   ];
   return (
     <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      {metrics.map(({ label, value, detail, icon: Icon }) => (
+      {metrics.map(({ label, value, detail, icon }) => (
         <Card key={label} size="sm">
           <CardHeader>
             <CardDescription>{label}</CardDescription>
             <CardTitle className="font-mono text-2xl tabular-nums">{value}</CardTitle>
             <CardAction>
-              <Icon className="size-4 text-muted-foreground" />
+              <HugeiconsIcon
+                icon={icon}
+                strokeWidth={2}
+                aria-hidden="true"
+                className="size-4 text-muted-foreground"
+              />
             </CardAction>
             <CardDescription>{detail}</CardDescription>
           </CardHeader>

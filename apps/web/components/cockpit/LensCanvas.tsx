@@ -1,7 +1,8 @@
 "use client";
 
 import { LayoutGroup } from "motion/react";
-import { ShieldAlert } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ShieldAlertIcon } from "@hugeicons/core-free-icons";
 import type { Annotation, Screen } from "@medlyn/engine/contracts";
 import type { LensState } from "@/lib/lens-state";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -64,7 +65,7 @@ export function LensCanvas({
         {critical.length > 0 && (
           <>
             <Alert variant="destructive">
-              <ShieldAlert />
+              <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={2} aria-hidden="true" />
               <AlertTitle>Critical for this task</AlertTitle>
               <AlertDescription>
                 Review the safety-critical facts and their attached sources.

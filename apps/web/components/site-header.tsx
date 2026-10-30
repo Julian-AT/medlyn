@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, Mic, Search } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight02Icon, Mic01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import type { Situation } from "@medlyn/engine/contracts";
 import { useSituationVoice } from "@/hooks/use-situation-voice";
 import {
@@ -74,7 +75,7 @@ export function SiteHeader({ situation, recent, onRun }: Props) {
         >
           <InputGroup className="h-12">
             <InputGroupAddon>
-              <Search />
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
             </InputGroupAddon>
             <InputGroupInput
               aria-label="Who are you and what are you about to do?"
@@ -109,7 +110,7 @@ export function SiteHeader({ situation, recent, onRun }: Props) {
                     }
                   }}
                 >
-                  <Mic />
+                  <HugeiconsIcon icon={Mic01Icon} strokeWidth={2} aria-hidden="true" />
                 </InputGroupButton>
               )}
               <InputGroupButton
@@ -125,7 +126,7 @@ export function SiteHeader({ situation, recent, onRun }: Props) {
                 disabled={!text.trim()}
                 aria-label="Open clinical lens"
               >
-                <ArrowRight />
+                <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>

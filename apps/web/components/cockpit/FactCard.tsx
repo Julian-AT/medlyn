@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "motion/react";
-import { AlertCircle, ArrowRight, CircleDashed, ShieldAlert } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  AlertCircleIcon,
+  ArrowRight02Icon,
+  DashedLineCircleIcon,
+  ShieldAlertIcon,
+} from "@hugeicons/core-free-icons";
 import type { Card as ClinicalCard } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
 import { showClaim } from "@/lib/lens-state";
@@ -71,7 +77,7 @@ export function FactCard({
         {card.critical && (
           <CardAction>
             <Badge variant="destructive">
-              <ShieldAlert />
+              <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={2} aria-hidden="true" />
               Critical
             </Badge>
           </CardAction>
@@ -82,7 +88,7 @@ export function FactCard({
           <Badge asChild variant="outline" className="w-fit border-warning/40 text-warning">
             <button onClick={() => onFinding(conflict)}>
               {card.conflict === "contradicted" ? "Contradiction" : "Needs clarification"}
-              <ArrowRight />
+              <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
             </button>
           </Badge>
         )}
@@ -91,7 +97,7 @@ export function FactCard({
           <Empty className="p-2">
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <CircleDashed />
+                <HugeiconsIcon icon={DashedLineCircleIcon} strokeWidth={2} aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle>
                 Not documented as of {formatDate(card.searched?.asOf ?? "2016-04-15")}
@@ -105,7 +111,7 @@ export function FactCard({
           </Empty>
         ) : card.availability === "unavailable" ? (
           <Alert>
-            <AlertCircle />
+            <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} aria-hidden="true" />
             <AlertTitle>Couldn't check</AlertTitle>
             <AlertDescription>
               <p>The evidence check did not complete.</p>

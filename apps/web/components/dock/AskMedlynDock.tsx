@@ -1,7 +1,8 @@
 "use client";
 
 import { AssistantRuntimeProvider, ThreadPrimitive } from "@assistant-ui/react";
-import { Volume2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { VolumeHighIcon } from "@hugeicons/core-free-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -43,7 +44,12 @@ function Dock({ lensKey, sessionId }: Props) {
                 onPressedChange={dock.toggleSpeech}
                 aria-label="Speak validated answers"
               >
-                <Volume2 data-icon="inline-start" />
+                <HugeiconsIcon
+                  icon={VolumeHighIcon}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  data-icon="inline-start"
+                />
                 Speak {dock.speakEnabled ? "on" : "off"}
               </Toggle>
             </CardAction>

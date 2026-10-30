@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Edit02Icon } from "@hugeicons/core-free-icons";
 import type { LetterClaim } from "@medlyn/engine/contracts";
 import { showClaim } from "@/lib/lens-state";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -66,7 +67,12 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy }: Pro
         ))}
         {claim.kind !== "boilerplate" && (
           <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
-            <Pencil data-icon="inline-start" />
+            <HugeiconsIcon
+              icon={Edit02Icon}
+              strokeWidth={2}
+              aria-hidden="true"
+              data-icon="inline-start"
+            />
             Edit
           </Button>
         )}

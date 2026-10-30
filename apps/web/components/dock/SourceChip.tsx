@@ -1,6 +1,7 @@
 "use client";
 
-import { FileText } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File02Icon } from "@hugeicons/core-free-icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -18,7 +19,12 @@ export function SourceChip({ segmentId, label }: { segmentId: string; label?: st
         onClick={() => showSource(segmentId)}
         aria-label={`Open source ${segmentId}`}
       >
-        <FileText data-icon="inline-start" />
+        <HugeiconsIcon
+          icon={File02Icon}
+          strokeWidth={2}
+          aria-hidden="true"
+          data-icon="inline-start"
+        />
         {label ?? segmentId}
       </Button>
     </Badge>

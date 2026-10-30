@@ -1,14 +1,15 @@
 "use client";
 
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Activity,
-  CalendarDays,
-  ChevronRight,
-  HeartPulse,
-  Moon,
-  RotateCcw,
-  Sun,
-} from "lucide-react";
+  Activity01Icon,
+  Calendar03Icon,
+  ArrowRight01Icon,
+  Cardiogram01Icon,
+  Moon02Icon,
+  ReloadIcon,
+  Sun03Icon,
+} from "@hugeicons/core-free-icons";
 import type { Screen } from "@medlyn/engine/contracts";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
 import { formatDate } from "@medlyn/engine/dates";
@@ -59,7 +60,7 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
               <a href="/" aria-label="Medlyn home">
-                <HeartPulse />
+                <HugeiconsIcon icon={Cardiogram01Icon} strokeWidth={2} aria-hidden="true" />
                 <span>Medlyn</span>
                 <Badge variant="outline" className="ml-auto">
                   Clinical
@@ -87,7 +88,12 @@ export function AppSidebar({
               }
             >
               {screen ? ageAt(screen.patient.birthDate, asOf) : 57} y as of {formatDate(asOf)}
-              <ChevronRight data-icon="inline-end" />
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                strokeWidth={2}
+                aria-hidden="true"
+                data-icon="inline-end"
+              />
             </Button>
           </CardContent>
         </Card>
@@ -103,9 +109,16 @@ export function AppSidebar({
                   tooltip={chip.label}
                   onClick={() => onSituation(chip.text, chip.id)}
                 >
-                  <Activity />
+                  <HugeiconsIcon icon={Activity01Icon} strokeWidth={2} aria-hidden="true" />
                   <span>{chip.label}</span>
-                  {activeChip === chip.id && <ChevronRight className="ml-auto" />}
+                  {activeChip === chip.id && (
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      className="ml-auto"
+                    />
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -117,7 +130,7 @@ export function AppSidebar({
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <span>
-                  <CalendarDays />
+                  <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} aria-hidden="true" />
                   <span>As of {formatDate(asOf)}</span>
                 </span>
               </SidebarMenuButton>
@@ -130,13 +143,17 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={onTheme}>
-              {theme === "dark" ? <Sun /> : <Moon />}
+              {theme === "dark" ? (
+                <HugeiconsIcon icon={Sun03Icon} strokeWidth={2} aria-hidden="true" />
+              ) : (
+                <HugeiconsIcon icon={Moon02Icon} strokeWidth={2} aria-hidden="true" />
+              )}
               <span>Switch to {theme === "dark" ? "light" : "dark"} theme</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={onReset} disabled={!reviewCount}>
-              <RotateCcw />
+              <HugeiconsIcon icon={ReloadIcon} strokeWidth={2} aria-hidden="true" />
               <span>Reset review layer</span>
               <Badge variant="secondary" className="ml-auto">
                 {reviewCount}

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Clock3, MoreHorizontal, Pencil, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Tick02Icon,
+  Clock01Icon,
+  MoreHorizontalCircle01Icon,
+  Edit02Icon,
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
 import { toast } from "sonner";
 import type { ReviewRequest } from "@medlyn/engine/contracts";
 import { Button } from "@/components/ui/button";
@@ -62,31 +69,36 @@ export function ReviewControls({
   return (
     <>
       <Button variant="ghost" size="sm" disabled={busy} onClick={() => act("accept")}>
-        <Check data-icon="inline-start" />
+        <HugeiconsIcon
+          icon={Tick02Icon}
+          strokeWidth={2}
+          aria-hidden="true"
+          data-icon="inline-start"
+        />
         Accept
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon-sm" disabled={busy} aria-label="More review actions">
-            <MoreHorizontal />
+            <HugeiconsIcon icon={MoreHorizontalCircle01Icon} strokeWidth={2} aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
             {allowCorrect && (
               <DropdownMenuItem onSelect={() => setMode("correct")}>
-                <Pencil />
+                <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} aria-hidden="true" />
                 Correct
               </DropdownMenuItem>
             )}
             {allowDismiss && (
               <DropdownMenuItem onSelect={() => setMode("dismiss")}>
-                <X />
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} aria-hidden="true" />
                 Dismiss with reason
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onSelect={() => act("leave_open")}>
-              <Clock3 />
+              <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} aria-hidden="true" />
               Leave open
             </DropdownMenuItem>
           </DropdownMenuGroup>
