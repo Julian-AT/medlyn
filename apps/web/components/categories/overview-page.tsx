@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CategoryEmpty } from "./category-empty";
 import { DocumentsTable } from "./documents-table";
 import { FactTable } from "./fact-table";
+import { LatestValues } from "./latest-values";
 import { OverviewStats } from "./overview-stats.tsx";
 import { PageHeading } from "./page-heading";
 import { PageShell } from "./page-shell.tsx";
@@ -41,6 +42,7 @@ export async function OverviewPage() {
         <>
           <OverviewStats data={data} />
           <SafetyBand rows={data.rows.filter(({ fact }) => fact.kind === "allergy")} />
+          <LatestValues data={data} />
           <FactTable
             title="Upcoming care"
             description="Plans retain the status stated in their source document."
