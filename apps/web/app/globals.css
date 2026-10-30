@@ -124,6 +124,7 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --radius-control: 0.625rem;
   --radius-sm: 0.125rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
@@ -343,16 +344,42 @@
   }
 }
 [data-slot="button"]:not([aria-invalid="true"]):focus-visible,
-[data-slot="input"]:not([aria-invalid="true"]):focus-visible,
-[data-slot="textarea"]:not([aria-invalid="true"]):focus-visible,
+[data-slot="input"]:not([aria-invalid="true"]):not([data-pointer-focus="true"]):focus-visible,
+[data-slot="textarea"]:not([aria-invalid="true"]):not([data-pointer-focus="true"]):focus-visible,
 [data-slot="toggle"]:not([aria-invalid="true"]):focus-visible,
 [data-slot="tabs-trigger"]:not([aria-invalid="true"]):focus-visible,
 [data-slot="sidebar-menu-button"]:not([aria-invalid="true"]):focus-visible,
-[data-slot="input-group"]:not(:has([aria-invalid="true"])):has(
+[data-slot="input-group"]:not([data-pointer-focus="true"]):not(:has([aria-invalid="true"])):has(
   [data-slot="input-group-control"]:focus-visible
 ) {
   --tw-ring-shadow: 0 0 #0000;
-  outline: 1.5px solid var(--ring);
+  outline: 1px solid var(--ring);
+  outline-offset: 2px;
+}
+
+[data-slot="input"]:focus,
+[data-slot="textarea"]:focus,
+[data-slot="input-group"]:has([data-slot="input-group-control"]:focus) {
+  border-color: color-mix(in srgb, var(--ring) 40%, transparent);
+  --tw-ring-shadow: 0 0 #0000;
+}
+
+[data-slot="input"][aria-invalid="true"]:focus,
+[data-slot="textarea"][aria-invalid="true"]:focus,
+[data-slot="input-group"]:has([aria-invalid="true"]) {
+  border-color: var(--destructive);
+}
+
+[data-slot="input-group"]:not([data-pointer-focus="true"]):has(
+  [data-slot="input-group-control"]:focus-visible
+) {
+  outline: 1px solid var(--ring);
+  outline-offset: 2px;
+}
+
+[data-slot="input"][aria-invalid="true"]:not([data-pointer-focus="true"]):focus-visible,
+[data-slot="textarea"][aria-invalid="true"]:not([data-pointer-focus="true"]):focus-visible {
+  outline: 1px solid var(--destructive);
   outline-offset: 2px;
 }
 
