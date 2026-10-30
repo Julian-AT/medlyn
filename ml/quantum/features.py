@@ -18,7 +18,8 @@ from verifier.integrity import file_hash, verify_frozen
 
 ML = Path(__file__).resolve().parents[1]
 CACHE = ML / "data/quantum"
-MODEL = "gemini-embedding-2"
+# gemini-embedding-2 hit the free-tier daily quota; 001 has a separate quota.
+MODEL = os.environ.get("MEDLYN_QUANTUM_EMBED_MODEL", "gemini-embedding-001")
 DIM = 768
 SEED = 73
 
