@@ -3,13 +3,13 @@
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Dot, Line, LineChart, XAxis, YAxis } from "recharts";
 import { usePatientFacts } from "@/components/patient/use-patient-facts";
-import { SourceChips } from "@/components/sources/source-chips";
-import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { groupEvidence } from "@/lib/group-evidence";
 import { ClaimLine } from "./claim-line";
 import { displayDates } from "./display-dates";
+import { SourceChips } from "./evidence-sources";
+import { useToolPreview } from "./hooks/use-tool-preview";
 import { showSource } from "./source-chip";
 import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
@@ -26,12 +26,13 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
     (point) => facts.get(point.factId),
     (point) => [point.series, point.date, point.value, point.unit],
   );
+  const preview = useToolPreview(sourceGroups.length, props.expanded, 5);
   const sourceById = new Map(
     sourceGroups.map((group) => [`${group.item.factId}:${group.item.series}`, group.sources]),
   );
   const groups = new Map<string, Point[]>();
   for (const { item: point } of sourceGroups) {
-    const key = `${point.series} · ${point.unit}`;
+    const key = `${point.series.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase())} · ${point.unit}`;
     const group = groups.get(key) ?? [];
     group.push(point);
     groups.set(key, group);
@@ -45,9 +46,12 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
       description={output ? `As of ${displayDates(output.asOf)}` : undefined}
       action={
         output && (
-          <Badge variant="secondary" className="font-mono">
-            {sourceGroups.length} points
-          </Badge>
+          <CardContent className="flex flex-wrap items-center gap-2 p-0">
+            <CardDescription className="text-xs tabular-nums">
+              {sourceGroups.length} points
+            </CardDescription>
+            {preview.toggle}
+          </CardContent>
         )
       }
     >
@@ -61,9 +65,15 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
         <CardContent key={label} className="flex flex-col gap-3 p-0">
           <CardDescription className="text-xs font-medium">{label}</CardDescription>
           <ChartContainer config={config} className="h-48 w-full tabular-nums">
-            <LineChart data={points} accessibilityLayer>
+            <LineChart
+              data={points}
+              margin={{ top: 8, right: 24, bottom: 8, left: 4 }}
+              accessibilityLayer
+            >
               <XAxis
                 dataKey="date"
+                padding={{ left: 24, right: 32 }}
+                height={40}
                 tickFormatter={displayDates}
                 tickLine={false}
                 axisLine={false}
@@ -107,7 +117,7 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
               />
             </LineChart>
           </ChartContainer>
-          {points.map((point) => (
+          {points.slice(0, preview.limit).map((point) => (
             <SourceChips
               key={`${point.factId}:${point.series}`}
               sources={(sourceById.get(`${point.factId}:${point.series}`) ?? [point]).map(
