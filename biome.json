@@ -12,6 +12,8 @@
       "!!**/.next",
       "!!**/node_modules",
       "!!ml/data",
+      "!!ml/verifier/runs",
+      "!!ml/quantum/results.json",
       "!!ml/.venv",
       "!!ml/.hf",
       "!!paper/build",
@@ -92,6 +94,12 @@
             "noDefaultExport": "off"
           }
         }
+      }
+    },
+    {
+      "includes": ["packages/engine/contracts.ts"],
+      "formatter": {
+        "enabled": false
       }
     }
   ]

@@ -3,6 +3,7 @@
   "globalEnv": ["NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_SITE_URL", "MEDLYN_MOCK"],
   "globalPassThroughEnv": [
     "DATABASE_URL",
+    "MEDLYN_DATA_PATH",
     "OPENAI_BASE_URL",
     "OPENAI_API_KEY",
     "MODEL_FAST",
