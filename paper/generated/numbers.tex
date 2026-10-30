@@ -27,16 +27,6 @@
 \newcommand{\ContradictionsFound}{5}
 \newcommand{\ClarificationsFound}{3}
 \newcommand{\FalseAlarms}{0}
-\newcommand{\BrowserPassed}{\textit{pending}}
-\newcommand{\TierOneCount}{6}
-\newcommand{\TierOneRelevance}{\textit{pending}}
-\newcommand{\TierOneGrounding}{0}
-\newcommand{\TierTwoCount}{7}
-\newcommand{\TierTwoRelevance}{\textit{pending}}
-\newcommand{\TierTwoGrounding}{0}
-\newcommand{\TierThreeCount}{7}
-\newcommand{\TierThreeRelevance}{\textit{pending}}
-\newcommand{\TierThreeGrounding}{1}
 \newcommand{\DocumentCount}{8}
 \newcommand{\SegmentCount}{359}
 \newcommand{\FactCount}{425}
@@ -53,23 +43,27 @@
 \newcommand{\SynthSamplePatients}{20}
 \newcommand{\SynthSampleDocuments}{190}
 \newcommand{\VerifierMacroFone}{0.764}
-\newcommand{\VerifierAccuracy}{\textit{pending}}
+\newcommand{\VerifierAccuracy}{0.787}
 \newcommand{\VerifierLatencyMs}{629.132}
 \newcommand{\RulesVerifierN}{300}
 \newcommand{\RulesVerifierFscore}{0.295}
-\newcommand{\RulesVerifierCoverage}{1.000}
+\newcommand{\RulesVerifierCoverage}{1}
 \newcommand{\RulesVerifierLatency}{0.068}
 \newcommand{\ProxyVerifierN}{300}
 \newcommand{\ProxyVerifierFscore}{0.896}
-\newcommand{\ProxyVerifierCoverage}{1.000}
+\newcommand{\ProxyVerifierCoverage}{1}
 \newcommand{\ProxyVerifierLatency}{1739.708}
 \newcommand{\LocalVerifierN}{300}
 \newcommand{\LocalVerifierFscore}{0.764}
-\newcommand{\LocalVerifierCoverage}{1.000}
+\newcommand{\LocalVerifierCoverage}{1}
 \newcommand{\LocalVerifierLatency}{629.132}
-\newcommand{\TrainExamples}{5,001}
-\newcommand{\ValidationExamples}{600}
-\newcommand{\TestExamples}{900}
+\newcommand{\CascadeVerifierN}{300}
+\newcommand{\CascadeVerifierFscore}{0.956}
+\newcommand{\CascadeVerifierCoverage}{1}
+\newcommand{\CascadeVerifierLatency}{785.210}
+\newcommand{\TrainExamples}{24,000}
+\newcommand{\ValidationExamples}{3,000}
+\newcommand{\TestExamples}{3,000}
 \newcommand{\SyntheticChallenges}{27}
 \newcommand{\SyntheticGenerated}{150}
 \newcommand{\RetrievalRecall}{0.371}
@@ -77,26 +71,75 @@
 \newcommand{\LexicalRecallFive}{0.362}
 \newcommand{\LexicalRecallTen}{0.371}
 \newcommand{\LexicalMrrTen}{0.344}
-\newcommand{\VectorRetrievalN}{\textit{pending}}
-\newcommand{\VectorRecallFive}{\textit{pending}}
-\newcommand{\VectorRecallTen}{\textit{pending}}
-\newcommand{\VectorMrrTen}{\textit{pending}}
 \newcommand{\HybridRetrievalN}{32}
 \newcommand{\HybridRecallFive}{0.362}
 \newcommand{\HybridRecallTen}{0.371}
 \newcommand{\HybridMrrTen}{0.344}
+\newcommand{\ReviewedAnswerPassed}{15}
+\newcommand{\ReviewedAnswerTotal}{15}
+\newcommand{\ReviewedTraceLocated}{166}
+\newcommand{\ReviewedTraceTotal}{166}
+\newcommand{\ReviewedUnsupported}{0}
+\newcommand{\ReviewedLines}{167}
+\newcommand{\ReviewedContradictions}{5}
+\newcommand{\ReviewedFalseAlarms}{0}
+\newcommand{\ReviewedNetContradictions}{5}
+\newcommand{\ReviewedColdSeconds}{10.138}
+\newcommand{\ReviewedCachedSeconds}{0.239}
+\newcommand{\QuantumBlockSize}{16}
+\newcommand{\QuantumCircuits}{136}
+\newcommand{\QuantumDepth}{760}
+\newcommand{\QuantumSeconds}{52.903}
+\newcommand{\QuantumMae}{0.066}
+\newcommand{\QuantumShots}{1,024}
+\newcommand{\QuantumTrain}{400}
+\newcommand{\QuantumTest}{200}
+\newcommand{\QuantumQubits}{8}
+\newcommand{\QuantumReps}{2}
+\newcommand{\RulesRealFscore}{0.301}
+\newcommand{\RulesRealN}{100}
+\newcommand{\ProxyRealFscore}{0.657}
+\newcommand{\ProxyRealN}{100}
+\newcommand{\LocalRealFscore}{0.421}
+\newcommand{\LocalRealN}{100}
+\newcommand{\CascadeRealFscore}{0.616}
+\newcommand{\CascadeRealN}{100}
+\newcommand{\CascadeSavedPercent}{55}
+\newcommand{\RulesVerifierAccuracy}{0.397}
+\newcommand{\ProxyVerifierAccuracy}{0.900}
+\newcommand{\LocalVerifierAccuracy}{0.787}
+\newcommand{\LocalEce}{0.085}
+\newcommand{\LocalBinFiveConfidence}{0.548}
+\newcommand{\LocalBinFiveAccuracy}{0.353}
+\newcommand{\LocalBinSixConfidence}{0.647}
+\newcommand{\LocalBinSixAccuracy}{0.516}
+\newcommand{\LocalBinSevenConfidence}{0.752}
+\newcommand{\LocalBinSevenAccuracy}{0.535}
+\newcommand{\LocalBinEightConfidence}{0.846}
+\newcommand{\LocalBinEightAccuracy}{0.767}
+\newcommand{\LocalBinNineConfidence}{0.982}
+\newcommand{\LocalBinNineAccuracy}{1}
+\newcommand{\CascadeVerifierAccuracy}{0.957}
+\newcommand{\CascadeEce}{0.020}
+\newcommand{\CascadeBinEightConfidence}{0.895}
+\newcommand{\CascadeBinEightAccuracy}{1}
+\newcommand{\CascadeBinNineConfidence}{0.982}
+\newcommand{\CascadeBinNineAccuracy}{1}
 \pgfplotsset{latencybounds/.style={xmin=0,xmax=2087.649175}}
 \newcommand{\RetrievalPlot}{%
-\node[fill=white,inner sep=3pt] at (axis description cs:.5,.5) {\textit{pending}};
 }
 \newcommand{\VerifierPlot}{%
-\addplot[black,fill=black!25] coordinates {(1,0.295087) (2,0.896292) (3,0.763986)};
+\addplot[black,fill=black!25] coordinates {(1,0.295087) (2,0.896292) (3,0.763986) (4,0.956149)};
 }
 \newcommand{\LatencyPlot}{%
 \addplot[only marks,black,mark=*,nodes near coords,point meta=explicit symbolic] coordinates {(0.067583,0.295087) [Rules]};
-\addplot[only marks,black,mark=*,nodes near coords,point meta=explicit symbolic] coordinates {(1739.707646,0.896292) [Proxy]};
+\addplot[only marks,black,mark=*,nodes near coords,point meta=explicit symbolic] coordinates {(1739.707646,0.896292) [GPT]};
 \addplot[only marks,black,mark=*,nodes near coords,point meta=explicit symbolic] coordinates {(629.132167,0.763986) [Local]};
+\addplot[only marks,black,mark=*,nodes near coords,point meta=explicit symbolic] coordinates {(785.209854,0.956149) [Cascade]};
 }
 \newcommand{\ReliabilityPlot}{%
-\node[fill=white,inner sep=3pt] at (axis description cs:.5,.5) {\textit{pending}};
+\addplot[black,mark=o] coordinates {(0.547919,0.352941) (0.646961,0.516129) (0.752175,0.534884) (0.845794,0.766667) (0.981617,1.000000)};
+\addlegendentry{Local}
+\addplot[black,mark=diamond*] coordinates {(0.894625,1.000000) (0.981617,1.000000)};
+\addlegendentry{Cascade}
 }

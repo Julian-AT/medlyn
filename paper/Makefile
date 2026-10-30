@@ -3,7 +3,7 @@ UV ?= uv
 TECTONIC ?= tectonic
 UV_CACHE_DIR ?= /private/tmp/medlyn-paper-uv-cache
 TECTONIC_CACHE_DIR ?= /private/tmp/medlyn-paper-tectonic-cache
-NUMBERS_ARGS ?= --include-heldout
+NUMBERS_ARGS ?=
 FIGURES := $(wildcard figures/*.tex)
 
 .PHONY: all numbers lint test clean

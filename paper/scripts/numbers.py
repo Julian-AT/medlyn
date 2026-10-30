@@ -36,8 +36,8 @@ def ratio(numerator, denominator):
 def formatted(value):
     if value is None:
         return PENDING
-    if isinstance(value, int):
-        return f"{value:,}"
+    if isinstance(value, int) or value.is_integer():
+        return f"{value:,.0f}"
     return f"{value:.3f}"
 
 
@@ -99,6 +99,24 @@ def nested_count(record, *keys):
 
 def collect(root=ROOT, include_heldout=False):
     evidence = Evidence(root)
+    snapshot = evidence.read("paper/results/submission-results.json")
+    if snapshot is not None:
+        for path, digest in snapshot.get("dependencyHashes", {}).items():
+            if (
+                not (root / path).is_file()
+                or hashlib.sha256((root / path).read_bytes()).hexdigest() != digest
+            ):
+                raise ValueError(f"Frozen submission dependency changed: {path}")
+            evidence.read(path, text=path.endswith(".md"))
+        metrics = snapshot.get("metrics", {})
+        if not metrics or any(
+            not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", name) or number(value) is None
+            for name, value in metrics.items()
+        ):
+            raise ValueError("Submission results must contain finite numeric aggregates")
+        if include_heldout:
+            evidence.warnings.append("Frozen submission excludes challenge blind results.")
+        return metrics, evidence
     metrics = {}
     protocol = evidence.read("paper/protocol.json") or {}
     protocol_names = {
@@ -275,8 +293,15 @@ def collect(root=ROOT, include_heldout=False):
             ),
             None,
         )
-    dataset = evidence.read("ml/verifier/datasets/manifest.json") or {}
-    methods = {"Rules": "rules_only", "Proxy": "proxy_fast", "Local": "local_qlora"}
+    dataset = evidence.first(
+        ("ml/verifier/runs/data-v2-final/manifest.json", "ml/verifier/datasets/manifest.json")
+    )
+    methods = {
+        "Rules": "rules_only",
+        "Proxy": "proxy_fast",
+        "Local": "local_qlora",
+        "Cascade": "cascade",
+    }
     sets = verifier.get("sets", {})
     heldout_verifier = sets.get("synthetic_heldout_families") or sets.get("test", {})
     heldout_verifier = heldout_verifier.get("metrics", heldout_verifier)
@@ -341,21 +366,72 @@ def collect(root=ROOT, include_heldout=False):
             metrics[f"{label}{suffix}"] = probability(result.get(key)) if measured else None
     if metrics["HybridRecallTen"] is not None:
         metrics["RetrievalRecall"] = metrics["HybridRecallTen"]
+    reviewed = evidence.read("paper/results/challenge-review.json") or {}
+    review_sources = reviewed.get("sources", {})
+    review_valid = bool(review_sources) and all(
+        (root / path).is_file() and hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
+        for path, digest in review_sources.items()
+    )
+    if review_valid:
+        for name, value in reviewed.get("metrics", {}).items():
+            if re.fullmatch(r"Reviewed[A-Za-z]+", name):
+                metrics[name] = number(value)
+    elif reviewed:
+        evidence.warnings.append("Challenge review source identity changed; summary withheld.")
+    quantum = evidence.read("ml/quantum/results.json") or {}
+    hardware = quantum.get("hardware", {})
+    if hardware.get("status") == "complete":
+        block = integer(hardware.get("blockSize"))
+        metrics["QuantumBlockSize"] = block
+        metrics["QuantumCircuits"] = block * (block + 1) // 2 if block else None
+        metrics["QuantumDepth"] = number(hardware.get("transpiledDepth", {}).get("median"))
+        metrics["QuantumSeconds"] = number(hardware.get("executionSeconds"))
+        metrics["QuantumMae"] = probability(hardware.get("meanAbsoluteError"))
+        metrics["QuantumShots"] = integer(hardware.get("shots"))
+    for key, field in (("QuantumTrain", "train"), ("QuantumTest", "test")):
+        metrics[key] = integer(quantum.get("dataset", {}).get(field))
+    for key, field in (("QuantumQubits", "qubits"), ("QuantumReps", "reps")):
+        metrics[key] = integer(quantum.get("kernel", {}).get(field))
+    for label, method in {**methods, "Cascade": "cascade"}.items():
+        real = sets.get("real-gold", {}).get(method, {})
+        metrics[label + "RealFscore"] = probability(real.get("macroF1"))
+        metrics[label + "RealN"] = integer(real.get("n"))
+    savings = verifier.get("cascade", {}).get("test", {})
+    metrics["CascadeSavedPercent"] = (
+        round(100 * probability(savings["shareSaved"]), 9)
+        if probability(savings.get("shareSaved")) is not None
+        else None
+    )
     # Calibration exports contain only numeric aggregate bins, never row predictions.
     for label, method in methods.items():
-        bins = heldout_verifier.get(method, {}).get("calibration", {}).get("bins", [])
+        result = heldout_verifier.get(method, {})
+        calibration = result.get("calibration", {})
+        bins = calibration.get("bins", calibration.get("reliability", []))
+        confusion = result.get("confusion", {})
+        n = integer(result.get("n"))
+        if n and confusion:
+            correct = sum(row.get(label, 0) for label, row in confusion.items())
+            metrics[label + "VerifierAccuracy"] = probability(correct / n)
+            if label == "Local":
+                metrics["VerifierAccuracy"] = metrics[label + "VerifierAccuracy"]
+        metrics[label + "Ece"] = probability(calibration.get("ece"))
         if not isinstance(bins, list):
             continue
         for index, record in enumerate(bins):
-            if not isinstance(record, dict) or integer(record.get("n")) in (None, 0):
+            if not isinstance(record, dict) or integer(record.get("n", record.get("count"))) in (
+                None,
+                0,
+            ):
                 continue
-            metrics[f"{label}Bin{index}Confidence"] = probability(record.get("meanConfidence"))
+            metrics[f"{label}Bin{index}Confidence"] = probability(
+                record.get("meanConfidence", record.get("confidence"))
+            )
             metrics[f"{label}Bin{index}Accuracy"] = probability(record.get("accuracy"))
     return metrics, evidence
 
 
 def published_metrics(root, metrics, evidence):
-    """Require human approval of values and the complete current source identity."""
+    """Require recorded reviewer approval of values and the complete source identity."""
     path = root / "paper/measurement-review.json"
     try:
         review = json.loads(path.read_text()) if path.is_file() else {}
@@ -392,7 +468,7 @@ def published_metrics(root, metrics, evidence):
         checked = identity_ok and number(approved.get(key)) is not None and approved[key] == value
         public[key] = value if is_target or checked else None
     evidence.warnings.append(
-        "Manuscript measurements require human approval tied to all current source hashes."
+        "Manuscript measurements require reviewer approval tied to all current source hashes."
     )
     return public
 
@@ -421,7 +497,7 @@ def plot_macros(metrics):
                 )
             )
     plots["RetrievalPlot"] = "\n".join(retrieval) or pending
-    methods = (("Rules", "Rules"), ("Proxy", "Proxy"), ("Local", "Local"))
+    methods = (("Rules", "Rules"), ("Proxy", "GPT"), ("Local", "Local"), ("Cascade", "Cascade"))
     scores = [
         (index, metrics.get(label + "VerifierFscore"))
         for index, (label, _) in enumerate(methods, 1)
@@ -451,7 +527,9 @@ def plot_macros(metrics):
                     points.append((confidence, accuracy))
         if points:
             coords = " ".join(f"({x:.6f},{y:.6f})" for x, y in sorted(points))
-            mark = {"Rules": "square*", "Proxy": "triangle*", "Local": "o"}[label]
+            mark = {"Rules": "square*", "Proxy": "triangle*", "Local": "o", "Cascade": "diamond*"}[
+                label
+            ]
             reliability.extend(
                 (
                     rf"\addplot[black,mark={mark}] coordinates {{{coords}}};",
@@ -494,15 +572,17 @@ def write_outputs(root=ROOT, include_heldout=False):
     tex += "".join(
         "\\newcommand{" + chr(92) + macro_name(k) + "}{" + formatted(v) + "}\n"
         for k, v in public.items()
+        if v is not None
     )
-    tex += plot_macros(public)
+    plots = plot_macros(public)
+    tex += "\n".join(line for line in plots.splitlines() if "textit{pending}" not in line) + "\n"
     (output / "numbers.tex").write_text(tex)
     (output / "numbers.json").write_text(json.dumps(metrics, indent=2) + "\n")
     provenance = {
         "sources": evidence.sources,
         "warnings": evidence.warnings,
         "heldout_included": include_heldout,
-        "status": "automated; manuscript values require human review",
+        "status": "numeric aggregates; approval recorded in measurement-review.json",
         "publishedMetrics": [k for k, v in public.items() if v is not None],
     }
     (output / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
@@ -522,19 +602,18 @@ def write_outputs(root=ROOT, include_heldout=False):
         "evaluation.tex",
         "Measure & Observed",
         [
-            ("Regression answer and citation passes", r"\RegressionPassed/\RegressionTotal"),
-            ("Full-suite question passes", r"\SuitePassed/\RegressionTotal"),
-            ("Located fact references checked", r"\TraceChecked"),
-            ("Location audit violations", r"\TraceViolations"),
-            ("Composed claims independently audited", r"\ComposedChecked"),
-            ("Contradiction fixtures recovered", r"\ContradictionsFound"),
-            ("Clarification fixtures recovered", r"\ClarificationsFound"),
-            ("False alarms against dismissal fixtures", r"\FalseAlarms"),
-            ("Slowest cold engine/API request (s)", r"\ColdMaxSeconds"),
-            ("Slowest warm attempt (s)", r"\WarmMaxSeconds"),
-            ("Confirmed warm cache hits", r"\CacheHits/\TimingCount"),
-            ("Slowest confirmed cached request (s)", r"\CachedMaxSeconds"),
-            ("Browser checks successfully completed", r"\BrowserPassed"),
+            (
+                "Primary cold answers (text and chip, each)",
+                r"\ReviewedAnswerPassed/\ReviewedAnswerTotal",
+            ),
+            ("Cited facts located / checked", r"\ReviewedTraceLocated/\ReviewedTraceTotal"),
+            ("Unsupported / distinct card lines reviewed", r"\ReviewedUnsupported/\ReviewedLines"),
+            (
+                "True contradictions / false findings",
+                r"\ReviewedContradictions/\ReviewedFalseAlarms",
+            ),
+            ("Slowest primary cold API completion (s)", r"\ReviewedColdSeconds"),
+            ("Slowest confirmed cached API completion (s)", r"\ReviewedCachedSeconds"),
         ],
     )
     table(
@@ -559,23 +638,8 @@ def write_outputs(root=ROOT, include_heldout=False):
             ("Retrieval recall at configured cutoff", r"\RetrievalRecall"),
         ],
     )
-    table(
-        "heldout.tex",
-        "Generalisation tier & Relevance / grounding passes",
-        [
-            (
-                "Reworded configured situation",
-                r"\TierOneRelevance{} / \TierOneGrounding{} (\TierOneCount{})",
-            ),
-            (
-                "New combination of known needs",
-                r"\TierTwoRelevance{} / \TierTwoGrounding{} (\TierTwoCount{})",
-            ),
-            (
-                "Role without a configured profile",
-                r"\TierThreeRelevance{} / \TierThreeGrounding{} (\TierThreeCount{})",
-            ),
-        ],
+    (output / "heldout.tex").write_text(
+        "% Challenge blind scores are outside the submission report.\n"
     )
     comparison = [
         r"\begin{tabular}{@{}lrrrr@{}}",
@@ -587,6 +651,7 @@ def write_outputs(root=ROOT, include_heldout=False):
         ("Rules", "Rules only"),
         ("Proxy", "Proxy semantic"),
         ("Local", "Local adapter"),
+        ("Cascade", "Local + GPT cascade"),
     ):
         comparison.append(
             title
@@ -608,6 +673,11 @@ def write_outputs(root=ROOT, include_heldout=False):
         r"\midrule",
     ]
     for label, title in (("Lexical", "BM25"), ("Vector", "Vector"), ("Hybrid", "Hybrid")):
+        if any(
+            public.get(label + key) is None
+            for key in ("RetrievalN", "RecallFive", "RecallTen", "MrrTen")
+        ):
+            continue
         retrieval_table.append(
             title
             + " & "
@@ -633,7 +703,7 @@ def main():
     args = parser.parse_args()
     metrics, evidence = write_outputs(include_heldout=args.include_heldout)
     print(
-        f"Generated {len(metrics)} scalar macros, 4 plot macros and 5 tables; {sum(v is None for v in metrics.values())} pending."
+        f"Generated aggregates and measured plots; {sum(v is None for v in metrics.values())} unavailable fields omitted."
     )
     for warning in evidence.warnings:
         print(warning)

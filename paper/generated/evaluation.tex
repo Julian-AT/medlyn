@@ -2,18 +2,11 @@
 \toprule
 Measure & Observed \\
 \midrule
-Regression answer and citation passes & \RegressionPassed/\RegressionTotal \\
-Full-suite question passes & \SuitePassed/\RegressionTotal \\
-Located fact references checked & \TraceChecked \\
-Location audit violations & \TraceViolations \\
-Composed claims independently audited & \ComposedChecked \\
-Contradiction fixtures recovered & \ContradictionsFound \\
-Clarification fixtures recovered & \ClarificationsFound \\
-False alarms against dismissal fixtures & \FalseAlarms \\
-Slowest cold engine/API request (s) & \ColdMaxSeconds \\
-Slowest warm attempt (s) & \WarmMaxSeconds \\
-Confirmed warm cache hits & \CacheHits/\TimingCount \\
-Slowest confirmed cached request (s) & \CachedMaxSeconds \\
-Browser checks successfully completed & \BrowserPassed \\
+Primary cold answers (text and chip, each) & \ReviewedAnswerPassed/\ReviewedAnswerTotal \\
+Cited facts located / checked & \ReviewedTraceLocated/\ReviewedTraceTotal \\
+Unsupported / distinct card lines reviewed & \ReviewedUnsupported/\ReviewedLines \\
+True contradictions / false findings & \ReviewedContradictions/\ReviewedFalseAlarms \\
+Slowest primary cold API completion (s) & \ReviewedColdSeconds \\
+Slowest confirmed cached API completion (s) & \ReviewedCachedSeconds \\
 \bottomrule
 \end{tabular}

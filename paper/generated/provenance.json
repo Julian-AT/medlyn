@@ -1,56 +1,43 @@
 {
   "sources": [
     {
+      "path": "paper/results/submission-results.json",
+      "sha256": "4551c12a8c4732daac6f6a2eadc0840ff863209eec941ca4b766882ed3f37057"
+    },
+    {
       "path": "paper/protocol.json",
       "sha256": "157cc6270053883161b978f96a79b9af1ec1c0bdd61362b956e4b73201f3c719"
     },
     {
-      "path": "eval/output/results.json",
-      "sha256": "61b8f8906ec6e80a0c83504c06946607c4fd9ec1acf8f724d3ce70f3387c4c7c"
-    },
-    {
-      "path": "eval/output/regression.json",
-      "sha256": "6bf3cf36e2a061e48b5be676a1933ae426bb5f5d169d2d1c67c2231176da45c7"
-    },
-    {
-      "path": "eval/output/playwright.json",
-      "sha256": "2b3a066d4c8c6a24dd904bac2d5774a78d94de74733a300cd87dc98d2edb3f3e"
-    },
-    {
-      "path": "eval/output/heldout.json",
-      "sha256": "c7702f201a92ad2e3eb5c9ff02fc3e60365003776b1c8fb24b403796a5ab5125"
-    },
-    {
-      "path": ".agents/reports/ingest-llm.md",
-      "sha256": "19ba60afc2b1176f649f3a00211005eb4d56140e8ba399ab62e2db611bf8c853"
-    },
-    {
-      "path": "ml/data/synth-v1/manifest.json",
-      "sha256": "29dafc9f0ce37dfec12bd4ab1b1c87e8211aacf23c01900634b237a97296201d"
+      "path": "paper/results/challenge-review.json",
+      "sha256": "b9fbbfc2cea84d88d266ac4f41fb20d5469127119d3e266bded4044fcc9772b7"
     },
     {
       "path": "ml/verifier/results.json",
-      "sha256": "8d3aabe075ec545bbf1a3875b127af37a2debf44ece17b3d22d81f0db1f55258"
+      "sha256": "1f29f906e0f2787e54456de9f3a46bdcb39b09cd2e761fdcf70ee5496806d053"
+    },
+    {
+      "path": "ml/quantum/results.json",
+      "sha256": "3ea1caa9890afb95a307ca4d86d931f69a2623e536c587548316d57d79ff696a"
     },
     {
       "path": "ml/data/sample/manifest.json",
       "sha256": "11d56f71238a1ab0064620b0706123d920d7e9b01e44edeb741ae66e87d76bdd"
     },
     {
-      "path": "ml/verifier/datasets/manifest.json",
-      "sha256": "98be57a2f52b53315a247014bdc6593b73b3fc2e57066faebe8451adf960d75a"
+      "path": "METRICS.md",
+      "sha256": "5609adbf56cceaedc7d5014504a060eb445bc7395ff092ca3af9706860a9582f"
     },
     {
-      "path": "eval/output/synthetic.json",
-      "sha256": "a5345d9006305e63f3a0409c7b4ecdc19fa5ba17b03347dc094e7f5ab0a079bf"
+      "path": "docs/submission/human-check.md",
+      "sha256": "75453facbd0bffd4dfa9e32513e40519caef8b2a7bf1eb27a472acd78880606b"
     }
   ],
   "warnings": [
-    "Ingestion counts use the prior lane summary when JSON is absent; no new ingest was run.",
-    "Manuscript measurements require human approval tied to all current source hashes."
+    "Manuscript measurements require reviewer approval tied to all current source hashes."
   ],
-  "heldout_included": true,
-  "status": "automated; manuscript values require human review",
+  "heldout_included": false,
+  "status": "numeric aggregates; approval recorded in measurement-review.json",
   "publishedMetrics": [
     "RegressionTarget",
     "SituationCount",
@@ -80,12 +67,6 @@
     "ContradictionsFound",
     "ClarificationsFound",
     "FalseAlarms",
-    "Tier1Count",
-    "Tier1Grounding",
-    "Tier2Count",
-    "Tier2Grounding",
-    "Tier3Count",
-    "Tier3Grounding",
     "DocumentCount",
     "SegmentCount",
     "FactCount",
@@ -102,6 +83,7 @@
     "SynthSamplePatients",
     "SynthSampleDocuments",
     "VerifierMacroFone",
+    "VerifierAccuracy",
     "VerifierLatencyMs",
     "RulesVerifierN",
     "RulesVerifierFscore",
@@ -115,6 +97,10 @@
     "LocalVerifierFscore",
     "LocalVerifierCoverage",
     "LocalVerifierLatency",
+    "CascadeVerifierN",
+    "CascadeVerifierFscore",
+    "CascadeVerifierCoverage",
+    "CascadeVerifierLatency",
     "TrainExamples",
     "ValidationExamples",
     "TestExamples",
@@ -128,6 +114,56 @@
     "HybridRetrievalN",
     "HybridRecallFive",
     "HybridRecallTen",
-    "HybridMrrTen"
+    "HybridMrrTen",
+    "ReviewedAnswerPassed",
+    "ReviewedAnswerTotal",
+    "ReviewedTraceLocated",
+    "ReviewedTraceTotal",
+    "ReviewedUnsupported",
+    "ReviewedLines",
+    "ReviewedContradictions",
+    "ReviewedFalseAlarms",
+    "ReviewedNetContradictions",
+    "ReviewedColdSeconds",
+    "ReviewedCachedSeconds",
+    "QuantumBlockSize",
+    "QuantumCircuits",
+    "QuantumDepth",
+    "QuantumSeconds",
+    "QuantumMae",
+    "QuantumShots",
+    "QuantumTrain",
+    "QuantumTest",
+    "QuantumQubits",
+    "QuantumReps",
+    "RulesRealFscore",
+    "RulesRealN",
+    "ProxyRealFscore",
+    "ProxyRealN",
+    "LocalRealFscore",
+    "LocalRealN",
+    "CascadeRealFscore",
+    "CascadeRealN",
+    "CascadeSavedPercent",
+    "RulesVerifierAccuracy",
+    "ProxyVerifierAccuracy",
+    "LocalVerifierAccuracy",
+    "LocalEce",
+    "LocalBin5Confidence",
+    "LocalBin5Accuracy",
+    "LocalBin6Confidence",
+    "LocalBin6Accuracy",
+    "LocalBin7Confidence",
+    "LocalBin7Accuracy",
+    "LocalBin8Confidence",
+    "LocalBin8Accuracy",
+    "LocalBin9Confidence",
+    "LocalBin9Accuracy",
+    "CascadeVerifierAccuracy",
+    "CascadeEce",
+    "CascadeBin8Confidence",
+    "CascadeBin8Accuracy",
+    "CascadeBin9Confidence",
+    "CascadeBin9Accuracy"
   ]
 }

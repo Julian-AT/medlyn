@@ -1,0 +1,21 @@
+{
+  "status": "agent-reviewed; not clinician-reviewed",
+  "sources": {
+    "METRICS.md": "5609adbf56cceaedc7d5014504a060eb445bc7395ff092ca3af9706860a9582f",
+    "docs/submission/human-check.md": "75453facbd0bffd4dfa9e32513e40519caef8b2a7bf1eb27a472acd78880606b"
+  },
+  "scope": "Primary free-text and chip cold matrices; API screen data only. Cached strict checks each fail one question. Not an all-runs or browser pass.",
+  "metrics": {
+    "ReviewedAnswerPassed": 15,
+    "ReviewedAnswerTotal": 15,
+    "ReviewedTraceLocated": 166,
+    "ReviewedTraceTotal": 166,
+    "ReviewedUnsupported": 0,
+    "ReviewedLines": 167,
+    "ReviewedContradictions": 5,
+    "ReviewedFalseAlarms": 0,
+    "ReviewedNetContradictions": 5,
+    "ReviewedColdSeconds": 10.138,
+    "ReviewedCachedSeconds": 0.239
+  }
+}
