@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowDownIcon } from "lucide-react";
+import { ArrowDown01Icon as ArrowDownIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ComponentProps } from "react";
 import { useCallback } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
@@ -80,7 +81,7 @@ export const ConversationScrollButton = ({
         variant="outline"
         {...props}
       >
-        <ArrowDownIcon className="size-4" />
+        <HugeiconsIcon icon={ArrowDownIcon} className="size-4" />
       </Button>
     )
   );

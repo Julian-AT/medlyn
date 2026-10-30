@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  ArrowLeft01Icon as ChevronLeftIcon,
+  ArrowRight01Icon as ChevronRightIcon,
+  Attachment01Icon as PaperclipIcon,
+  Cancel01Icon as XIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { FileUIPart, UIMessage } from "ai";
-import { ChevronLeftIcon, ChevronRightIcon, PaperclipIcon, XIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
 import { Streamdown } from "streamdown";
@@ -218,7 +224,7 @@ export const MessageBranchPrevious = ({ children, ...props }: MessageBranchPrevi
       variant="ghost"
       {...props}
     >
-      {children ?? <ChevronLeftIcon size={14} />}
+      {children ?? <HugeiconsIcon icon={ChevronLeftIcon} size={14} />}
     </Button>
   );
 };
@@ -238,7 +244,7 @@ export const MessageBranchNext = ({ children, className, ...props }: MessageBran
       variant="ghost"
       {...props}
     >
-      {children ?? <ChevronRightIcon size={14} />}
+      {children ?? <HugeiconsIcon icon={ChevronRightIcon} size={14} />}
     </Button>
   );
 };
@@ -306,7 +312,7 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
               type="button"
               variant="ghost"
             >
-              <XIcon />
+              <HugeiconsIcon icon={XIcon} />
               <span className="sr-only">Remove</span>
             </Button>
           )}
@@ -316,7 +322,7 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex size-full shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                <PaperclipIcon className="size-4" />
+                <HugeiconsIcon icon={PaperclipIcon} className="size-4" />
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -334,7 +340,7 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
               type="button"
               variant="ghost"
             >
-              <XIcon />
+              <HugeiconsIcon icon={XIcon} />
               <span className="sr-only">Remove</span>
             </Button>
           )}

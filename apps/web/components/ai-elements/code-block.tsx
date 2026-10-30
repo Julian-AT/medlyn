@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckIcon, CopyIcon } from "lucide-react";
+import { Tick01Icon as CheckIcon, Copy01Icon as CopyIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   type ComponentProps,
   createContext,
@@ -168,7 +169,7 @@ export const CodeBlockCopyButton = ({
       variant="ghost"
       {...props}
     >
-      {children ?? <Icon size={14} />}
+      {children ?? <HugeiconsIcon icon={Icon} size={14} />}
     </Button>
   );
 };

@@ -1,6 +1,10 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import {
+  ArrowLeft01Icon as ArrowLeftIcon,
+  ArrowRight01Icon as ArrowRightIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   type ComponentProps,
   createContext,
@@ -179,7 +183,7 @@ export const InlineCitationCarouselPrev = ({
       type="button"
       {...props}
     >
-      <ArrowLeftIcon className="size-4 text-muted-foreground" />
+      <HugeiconsIcon icon={ArrowLeftIcon} className="size-4 text-muted-foreground" />
     </button>
   );
 };
@@ -206,7 +210,7 @@ export const InlineCitationCarouselNext = ({
       type="button"
       {...props}
     >
-      <ArrowRightIcon className="size-4 text-muted-foreground" />
+      <HugeiconsIcon icon={ArrowRightIcon} className="size-4 text-muted-foreground" />
     </button>
   );
 };

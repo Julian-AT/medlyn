@@ -1,16 +1,17 @@
 "use client";
 
-import type { ChatStatus, FileUIPart } from "ai";
 import {
-  CornerDownLeftIcon,
-  ImageIcon,
-  Loader2Icon,
-  MicIcon,
-  PaperclipIcon,
-  PlusIcon,
-  SquareIcon,
-  XIcon,
-} from "lucide-react";
+  ArrowTurnDownIcon as CornerDownLeftIcon,
+  Image01Icon as ImageIcon,
+  Loading03Icon as Loader2Icon,
+  Mic01Icon as MicIcon,
+  Attachment01Icon as PaperclipIcon,
+  Add01Icon as PlusIcon,
+  StopIcon as SquareIcon,
+  Cancel01Icon as XIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type { ChatStatus, FileUIPart } from "ai";
 import { nanoid } from "nanoid";
 import {
   type ChangeEvent,
@@ -299,7 +300,7 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
                 />
               ) : (
                 <div className="flex size-5 items-center justify-center text-muted-foreground">
-                  <PaperclipIcon className="size-3" />
+                  <HugeiconsIcon icon={PaperclipIcon} className="size-3" />
                 </div>
               )}
             </div>
@@ -313,7 +314,7 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
               type="button"
               variant="ghost"
             >
-              <XIcon />
+              <HugeiconsIcon icon={XIcon} />
               <span className="sr-only">Remove</span>
             </Button>
           </div>
@@ -392,7 +393,7 @@ export const PromptInputActionAddAttachments = ({
         attachments.openFileDialog();
       }}
     >
-      <ImageIcon className="mr-2 size-4" /> {label}
+      <HugeiconsIcon icon={ImageIcon} className="mr-2 size-4" /> {label}
     </DropdownMenuItem>
   );
 };
@@ -914,7 +915,7 @@ export const PromptInputActionMenuTrigger = ({
 }: PromptInputActionMenuTriggerProps) => (
   <DropdownMenuTrigger asChild>
     <PromptInputButton className={className} {...props}>
-      {children ?? <PlusIcon className="size-4" />}
+      {children ?? <HugeiconsIcon icon={PlusIcon} className="size-4" />}
     </PromptInputButton>
   </DropdownMenuTrigger>
 );
@@ -948,14 +949,14 @@ export const PromptInputSubmit = ({
   children,
   ...props
 }: PromptInputSubmitProps) => {
-  let Icon = <CornerDownLeftIcon className="size-4" />;
+  let Icon = <HugeiconsIcon icon={CornerDownLeftIcon} className="size-4" />;
 
   if (status === "submitted") {
-    Icon = <Loader2Icon className="size-4 animate-spin" />;
+    Icon = <HugeiconsIcon icon={Loader2Icon} className="size-4 animate-spin" />;
   } else if (status === "streaming") {
-    Icon = <SquareIcon className="size-4" />;
+    Icon = <HugeiconsIcon icon={SquareIcon} className="size-4" />;
   } else if (status === "error") {
-    Icon = <XIcon className="size-4" />;
+    Icon = <HugeiconsIcon icon={XIcon} className="size-4" />;
   }
 
   return (
@@ -978,10 +979,10 @@ interface SpeechRecognition extends EventTarget {
   lang: string;
   start(): void;
   stop(): void;
-  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
-  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null;
+  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -1011,16 +1012,10 @@ interface SpeechRecognitionErrorEvent extends Event {
   error: string;
 }
 
-declare global {
-  interface Window {
-    SpeechRecognition: {
-      new (): SpeechRecognition;
-    };
-    webkitSpeechRecognition: {
-      new (): SpeechRecognition;
-    };
-  }
-}
+type SpeechWindow = {
+  SpeechRecognition?: new () => SpeechRecognition;
+  webkitSpeechRecognition?: new () => SpeechRecognition;
+};
 
 export type PromptInputSpeechButtonProps = ComponentProps<typeof PromptInputButton> & {
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
@@ -1042,7 +1037,9 @@ export const PromptInputSpeechButton = ({
       typeof window !== "undefined" &&
       ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
     ) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const browser = window as unknown as SpeechWindow;
+      const SpeechRecognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
       const speechRecognition = new SpeechRecognition();
 
       speechRecognition.continuous = true;
@@ -1117,7 +1114,7 @@ export const PromptInputSpeechButton = ({
       onClick={toggleListening}
       {...props}
     >
-      <MicIcon className="size-4" />
+      <HugeiconsIcon icon={MicIcon} className="size-4" />
     </PromptInputButton>
   );
 };

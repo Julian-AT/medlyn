@@ -1,7 +1,12 @@
 "use client";
 
+import {
+  Brain01Icon as BrainIcon,
+  ArrowDown01Icon as ChevronDownIcon,
+  CircleSmallIcon as DotIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import { BrainIcon, ChevronDownIcon, DotIcon, type LucideIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, memo, useContext, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -71,9 +76,10 @@ export const ChainOfThoughtHeader = memo(
           )}
           {...props}
         >
-          <BrainIcon className="size-4" />
+          <HugeiconsIcon icon={BrainIcon} className="size-4" />
           <span className="flex-1 text-left">{children ?? "Chain of Thought"}</span>
-          <ChevronDownIcon
+          <HugeiconsIcon
+            icon={ChevronDownIcon}
             className={cn("size-4 transition-transform", isOpen ? "rotate-180" : "rotate-0")}
           />
         </CollapsibleTrigger>
@@ -83,7 +89,7 @@ export const ChainOfThoughtHeader = memo(
 );
 
 export type ChainOfThoughtStepProps = ComponentProps<"div"> & {
-  icon?: LucideIcon;
+  icon?: IconSvgElement;
   label: ReactNode;
   description?: ReactNode;
   status?: "complete" | "active" | "pending";
@@ -116,7 +122,7 @@ export const ChainOfThoughtStep = memo(
         {...props}
       >
         <div className="relative mt-0.5">
-          <Icon className="size-4" />
+          <HugeiconsIcon icon={Icon} className="size-4" />
           <div className="-mx-px absolute top-7 bottom-0 left-1/2 w-px bg-border" />
         </div>
         <div className="flex-1 space-y-2 overflow-hidden">
