@@ -40,14 +40,14 @@ export function CollapsibleSidebarGroup({
       >
         <SidebarGroupLabel
           asChild
-          className="mb-1.5 h-5 rounded-none px-1.5 text-sm/5 font-medium text-sidebar-foreground group-data-[collapsible=icon]:hidden"
+          className="mb-1 h-8 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground group-data-[collapsible=icon]:hidden"
         >
           <CollapsibleTrigger className="group/section gap-2">
             {label}
             <HugeiconsIcon
               icon={ArrowDown01Icon}
               strokeWidth={2}
-              className="ml-auto transition-transform group-data-[state=closed]/section:-rotate-90 motion-reduce:transition-none"
+              className="ml-auto size-4 opacity-0 transition group-hover/section:opacity-100 group-focus-visible/section:opacity-100 group-data-[state=closed]/section:-rotate-90 motion-reduce:transition-none"
             />
           </CollapsibleTrigger>
         </SidebarGroupLabel>
