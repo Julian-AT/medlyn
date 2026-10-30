@@ -1,4 +1,4 @@
-data/
+/data/
 TRACK-1-clinical-documentation/
 *.zip
 *.dump
@@ -54,3 +54,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .husky/_
+
+"Startseite _ ElevenLabs.html"
+*_files/
