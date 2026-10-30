@@ -125,7 +125,7 @@ hardware budget.
 
 ## Integration
 
-- Mount `<QuantumCard />` from `apps/web/components/research/quantum-card.tsx` on Research /
+- Mount `<QuantumCard />` from `apps/app/components/research/quantum-card.tsx` on Research /
   Evaluation. It reads only the compact aggregate summary and labels feature provenance.
 - After the bibliography, add `\input{appendix-quantum}` in `paper/main.tex` (the orchestrator
   owns that file). Main already loads `figures/styles.tex`. The appendix defaults to protocol

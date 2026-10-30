@@ -40,6 +40,6 @@
       "fitPredictSeconds": 0.003236875003494788
     }
   },
-  "hardwareStatus": "not_run_no_token_in_lane",
+  "hardwareStatus": "complete",
   "qaoaInstances": 5
 }
