@@ -8,8 +8,10 @@ import {
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { formatDate } from "@medlyn/engine/dates";
 import Link from "next/link";
 import { useState } from "react";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -33,6 +35,7 @@ import {
 import { useWorkspace } from "./workspace-provider";
 
 export function ShellSidebarFooter() {
+  const { patient, patients, selectPatient } = useActivePatient();
   const { reviews, theme, toggleTheme, sessionId } = useWorkspace();
   const { isMobile } = useSidebar();
   const [resetting, setResetting] = useState(false);
@@ -61,12 +64,18 @@ export function ShellSidebarFooter() {
               >
                 <Avatar className="size-8 shrink-0 rounded-[10px]">
                   <AvatarFallback className="rounded-[10px] bg-secondary font-medium text-foreground">
-                    AM
+                    {patient.displayName
+                      .split(/\s+/)
+                      .map((part) => part[0])
+                      .slice(0, 2)
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <SidebarGroupContent className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden [&>span]:block [&>span]:truncate [&>span:first-child]:font-medium [&>span:last-child]:text-xs [&>span:last-child]:text-muted-foreground">
-                  <span>Anna Musterfrau</span>
-                  <span>F · 57 y · as of 15 Apr 2016</span>
+                  <span>{patient.displayName}</span>
+                  <span>
+                    {patient.sex} · as of {formatDate(patient.asOf)}
+                  </span>
                 </SidebarGroupContent>
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
@@ -79,10 +88,16 @@ export function ShellSidebarFooter() {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Patient workspace</DropdownMenuLabel>
               </DropdownMenuGroup>
-              <DropdownMenuRadioGroup value="patient-0000-0001">
-                <DropdownMenuRadioItem value="patient-0000-0001">
-                  Anna Musterfrau
-                </DropdownMenuRadioItem>
+              <DropdownMenuRadioGroup
+                value={patient.id}
+                onValueChange={selectPatient}
+                className="max-h-72 overflow-y-auto"
+              >
+                {patients.map((entry) => (
+                  <DropdownMenuRadioItem key={entry.id} value={entry.id}>
+                    {entry.displayName}
+                  </DropdownMenuRadioItem>
+                ))}
               </DropdownMenuRadioGroup>
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>

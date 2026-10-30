@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { routeTitle } from "./navigation";
 export function PageHeader() {
+  const { patient } = useActivePatient();
   const pathname = usePathname();
   return (
     <Card className="shrink-0 gap-0 rounded-none border-0 border-b bg-transparent py-0 shadow-none ring-0 print:hidden">
@@ -28,7 +30,7 @@ export function PageHeader() {
           <BreadcrumbList className="flex-nowrap gap-2 overflow-hidden whitespace-nowrap text-sm font-medium sm:gap-2">
             <BreadcrumbItem className="hidden shrink-0 sm:inline-flex">
               <BreadcrumbLink asChild>
-                <Link href="/patient">Anna Musterfrau</Link>
+                <Link href="/patient">{patient.displayName}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden sm:block" />
