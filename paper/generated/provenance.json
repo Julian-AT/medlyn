@@ -26,7 +26,7 @@
     },
     {
       "path": "ml/verifier/results.json",
-      "sha256": "c32c2ea69934dc05f5ba88a86d2a7c0e487da8479b2d5012e4568c7be763a862"
+      "sha256": "d09293a1faf58094a663645320c27fe9161b31b8bc59d9168fb6931e66bf0b92"
     },
     {
       "path": "ml/data/sample/manifest.json",
