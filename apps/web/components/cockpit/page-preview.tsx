@@ -23,7 +23,7 @@ export function PagePreview({
   title = "Source page",
 }: PagePreviewProps) {
   return (
-    <Card size="sm">
+    <Card size="sm" className="rounded-xl border border-gray-alpha-150 shadow-xs ring-0">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <Badge variant="secondary">Page {page}</Badge>

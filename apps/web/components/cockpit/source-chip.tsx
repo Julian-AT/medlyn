@@ -53,7 +53,7 @@ export function SourceChip({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 rounded-lg px-2 text-xs"
+          className="rounded-full h-6 gap-1 rounded-full border-gray-alpha-150 bg-transparent px-2 text-[11px] font-normal text-muted-foreground shadow-none hover:text-foreground"
           type="button"
           aria-label={`Open source ${index ?? "passage"}`}
           onFocus={load}
