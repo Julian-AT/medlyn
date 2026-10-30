@@ -6,18 +6,16 @@ the patient app on `app.medlyn.health`. The app has no demo password (user decis
 refuses to serve production traffic when mock data, the local verifier or a non-OpenAI
 model endpoint is configured. All database API routes export `runtime = "nodejs"`.
 
-| Project name | Root Directory                             | Domain              | Workspace filter |
-| ------------ | ------------------------------------------ | ------------------- | ---------------- |
-| `medlyn-www` | `apps/www`                                 | `medlyn.health`     | `@medlyn/www`    |
-| `medlyn-app` | `apps/web` (or `apps/app` after the sweep) | `app.medlyn.health` | `@medlyn/web`    |
+| Project name | Root Directory | Domain              | Workspace filter |
+| ------------ | -------------- | ------------------- | ---------------- |
+| `medlyn-www` | `apps/www`     | `medlyn.health`     | `@medlyn/www`    |
+| `medlyn-app` | `apps/app`     | `app.medlyn.health` | `@medlyn/app`    |
 
 Use Node.js **24.x** in both projects' Build and Deployment settings. Enable
 **Include source files outside of the Root Directory in the Build Step**, so the
 engine and workspace configuration are available. Keep the default `.next` output
 directory. Each app's `vercel.json` installs at the workspace root using
-`pnpm install --frozen-lockfile` and runs its filtered Turbo build. The app's
-directory name can change without changing the package filter; if its package
-name also changes, update the app's `vercel.json` build filter in the same sweep.
+`pnpm install --frozen-lockfile` and runs its filtered Turbo build. The patient app uses the `@medlyn/app` build filter.
 See Vercel's [monorepo settings](https://vercel.com/docs/monorepos/monorepo-faq).
 
 ## Before deploying
@@ -25,12 +23,17 @@ See Vercel's [monorepo settings](https://vercel.com/docs/monorepos/monorepo-faq)
 Ingest and warm the chosen Neon database locally. Deployment never ingests files.
 The evidence reader uses stored documents and segments and propagates database
 failures; it has no local corpus fallback. Runtime trace exclusions keep challenge
-files, local datasets, archives and `.env` files out of functions. Research APIs
-are disabled in production because their reports currently live on disk.
+files, local datasets, archives and `.env` files out of functions. Research APIs serve the committed `apps/app/data/research-snapshot.json` in production.
+Regenerate it before deployment with `node scripts/research-snapshot.mjs`. The builder
+uses committed verifier/quantum results and synthetic samples, optional local aggregate
+reports and the documented METRICS.md observations. Source hashes travel with the
+snapshot; real captures, source passages, blind results and local paths are excluded.
+The builder runs the challenge-text scan before returning successfully. Local APIs use
+live files when present and fall back to the snapshot when a report is missing.
 
-Before any CLI deployment, the orchestrator must add a root `.vercelignore` (outside
-this lane's ownership) excluding at least the following. Also exclude local saved
-reference pages, screenshots, dumps and other private files in this working tree.
+The root `.vercelignore` excludes local evidence, datasets, model artifacts,
+private reports and build outputs. Keep it in place for every CLI deployment;
+its minimum exclusions include the following.
 [Vercel uploads source files unless excluded](https://vercel.com/docs/deployments/vercel-ignore);
 Next.js tracing exclusions only control the function bundle.
 
@@ -49,15 +52,12 @@ ml/adapters/
 ```
 
 Prefer deploying an integrated, clean checkout containing only reviewed source
-files. Do not upload the active shared hackathon tree before upload exclusions
-have been integrated. Existing project-level `.vercelignore` files take precedence
+files. Do not upload the active shared hackathon tree without reviewing upload exclusions. Existing project-level `.vercelignore` files take precedence
 over the root file and must carry the same exclusions.
 
-The orchestrator must also align `/api/chat`'s source `maxDuration` export with
-60 seconds (it was 120 at this lane's audit), add the same explicit export to
-`/api/lens`. Lens failures return an unavailable response with status `503`.
-These routes are owned by other lanes. The app's Vercel configuration sets
-the API default to 60 seconds; per-route source settings need to agree. See
+Both `/api/chat` and `/api/lens` export a 60-second `maxDuration`, matching
+the API default in the app's Vercel configuration. Lens failures return an
+unavailable response with status `503`. See
 [function duration configuration](https://vercel.com/docs/functions/configuring-functions/duration).
 
 ## Production environment
@@ -71,8 +71,6 @@ Fill the root `.env`, using `.env.example` as the inventory. Never create packag
   deployment time. If unset, the helper uses `MODEL_FAST` and `MODEL_REASONING`;
   verify those are direct OpenAI IDs rather than local proxy aliases.
 - `DATABASE_URL_DEMO` for the frozen demo database, or `DATABASE_URL` otherwise.
-  `openssl rand -hex 32` and put it in the root `.env`. It must be at least
-  32 characters. Changing either credential revokes existing sessions.
 - `NEXT_PUBLIC_SITE_URL=https://medlyn.health` and
   `NEXT_PUBLIC_APP_URL=https://app.medlyn.health`. Both must be set **before
   building** so metadata and cross-app links use the deployed origins.
@@ -98,9 +96,7 @@ required value or project link is missing.
 ```sh
 vercel login
 
-# Before the rename:
-MEDLYN_APP_DIR=apps/web
-# After the rename use: MEDLYN_APP_DIR=apps/app
+MEDLYN_APP_DIR=apps/app
 
 vercel link --cwd apps/www --project medlyn-www
 vercel link --cwd "$MEDLYN_APP_DIR" --project medlyn-app
@@ -162,20 +158,18 @@ curl -i -X POST https://app.medlyn.health/api/lens
 curl -i -X POST https://app.medlyn.health/api/chat
 ```
 
-Expect a public landing page, a `303` redirect to `/login` for the patient page,
-and `401` JSON for unauthenticated APIs. Unconfigured authentication returns `503`.
-is host-only, HttpOnly, Secure in production, SameSite=Lax, and expires after seven
-days. A forged or expired cookie must fail. Exercise one situation, a source link,
+Expect public landing and patient pages. Production returns `503` when the
+service guard detects mock data, a local verifier or a non-OpenAI endpoint.
+Research endpoints return the bundled aggregate snapshot without local files.
+Exercise one situation, a source link,
 chat and a letter against the ingested database; no deployed model call was made
 by this lane's dummy-value build checks.
 
 For concurrent local build verification, run Next directly with
 `MEDLYN_NEXT_DIST_DIR=.next-deploy-prep` to isolate this lane's app output from
 other agents' `.next` builds. Do not set this variable on Vercel. Delete only that
-lane-owned build directory after checking it. Run focused auth/env tests with:
+lane-owned build directory after checking it. Run the app tests with:
 
 ```sh
-pnpm --dir packages/engine exec vitest run --root ../../apps/web 'app/(auth)'
+pnpm --dir packages/engine exec vitest run --root ../../apps/app
 ```
-
-After the directory sweep, replace `apps/web` with `apps/app` in the test command.
