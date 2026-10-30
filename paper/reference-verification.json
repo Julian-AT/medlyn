@@ -1,0 +1,21 @@
+{
+  "checked": "2026-10-30",
+  "method": "Web search followed by primary publication pages or official repositories",
+  "references": {
+    "factsr": "https://arxiv.org/abs/2505.10360",
+    "hao": "https://arxiv.org/abs/2509.06602",
+    "langextract": "https://github.com/google/langextract",
+    "nhs": "https://arxiv.org/abs/2606.26879",
+    "inconsistency": "https://arxiv.org/abs/2607.22954",
+    "negex": "https://www.dbmi.pitt.edu/wp-content/uploads/2022/10/A-simple-algorithm-for-identifying-negated-findings-and-diseases-in-discharge-summaries.pdf",
+    "cotik": "https://aclanthology.org/W16-5113/",
+    "pynegex": "https://github.com/DFKI-NLP/pynegex",
+    "rrf": "https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf",
+    "bm25": "https://www.ccs.neu.edu/home/vip/teach/IRcourse/IR_surveys/robertson_foundations.pdf",
+    "lora": "https://arxiv.org/abs/2106.09685",
+    "qlora": "https://arxiv.org/abs/2305.14314",
+    "mlx": "https://github.com/ml-explore/mlx",
+    "pgvector": "https://github.com/pgvector/pgvector",
+    "gemini": "https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2"
+  }
+}

@@ -17,7 +17,7 @@ export function LensHeader({
   return (
     <>
       {" "}
-      <Card className="bg-transparent py-0 ring-0 print:hidden">
+      <Card className="overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0 print:hidden">
         <CardHeader className="gap-2 px-0">
           <CardDescription className="flex flex-wrap items-center gap-2">
             <HugeiconsIcon
@@ -43,7 +43,7 @@ export function LensHeader({
           </CardDescription>
         </CardHeader>
       </Card>
-      <Card className="bg-transparent py-0 ring-0 print:hidden">
+      <Card className="overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0 print:hidden">
         <CardContent className="px-0">
           <SectionCards screen={screen} loading={loading} />
         </CardContent>

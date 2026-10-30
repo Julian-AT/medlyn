@@ -1,0 +1,12 @@
+{
+  "source": "docs/PRD.md and the paper lane brief; targets, never measurements",
+  "regression_questions": 15,
+  "regression_situations": 5,
+  "heldout_situations": 20,
+  "synthetic_patients_target": 100000,
+  "synthetic_challenges_minimum": 150,
+  "first_card_target_seconds": 1.5,
+  "cold_target_seconds": 5,
+  "cached_target_seconds": 1,
+  "challenge_limit_seconds": 10
+}

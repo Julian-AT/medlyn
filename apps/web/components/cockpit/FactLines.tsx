@@ -17,7 +17,7 @@ export function FactLines({
         <Card
           key={line.id}
           size="sm"
-          className="gap-2 bg-transparent py-0 ring-0"
+          className="gap-2 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0"
           data-claim-id={line.id}
         >
           <CardContent className="px-0">

@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "path": "paper/protocol.json",
+      "sha256": "a3e848f881cd2cdf8cc325621014fda2243aec41d11637d09ce6727b2ff2c943"
+    },
+    {
+      "path": "eval/output/results.json",
+      "sha256": "ed3536b9810b32905a3864c6ab53d16270fbb21523f138eb0701fc0abf826344"
+    },
+    {
+      "path": "eval/output/regression.json",
+      "sha256": "c4867595b06cb40720b66b9d814683891f8b41b7658ca2c673abb13ced312ae4"
+    },
+    {
+      "path": "eval/output/playwright.json",
+      "sha256": "fcfab6b6cb5226ae6533015319a14f91900e5404dbd4dafd61715c004af1463e"
+    },
+    {
+      "path": ".agents/reports/ingest-llm.md",
+      "sha256": "19ba60afc2b1176f649f3a00211005eb4d56140e8ba399ab62e2db611bf8c853"
+    },
+    {
+      "path": "ml/data/synth-v1/manifest.json",
+      "sha256": "0230ddb3ffc0eef3381840c2057cf84fc18bcae15a7d1265934314a785ceb9a1"
+    },
+    {
+      "path": "ml/verifier/results.json",
+      "sha256": "7fbdab007bfe09b26fdaf131a3631001539b2189dedfc8946636950f39105cc3"
+    },
+    {
+      "path": "ml/data/sample/manifest.json",
+      "sha256": "6bc0d1befc3770634697d687ac9b43f470ffc215ff7d6c747bbf657ed0f6d93c"
+    },
+    {
+      "path": "ml/verifier/datasets/manifest.json",
+      "sha256": "f7895ce8c6e4c0187fb88df96ac9977fdb653d2b8f51eb7dc24adcbe0831e048"
+    },
+    {
+      "path": "eval/output/synthetic.json",
+      "sha256": "d8120bfa7c11883a3164df283064a5af8a323fc26a1837a6af301d8382a01cc9"
+    }
+  ],
+  "warnings": [
+    "Standalone regression differs from results.json; using the complete result bundle without merging runs.",
+    "Held-out results not opened: pass --include-heldout only after the H+7 review.",
+    "Ingestion counts use the prior lane summary when JSON is absent; no new ingest was run."
+  ],
+  "heldout_included": false,
+  "status": "automated; requires human review"
+}

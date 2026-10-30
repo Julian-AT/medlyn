@@ -95,7 +95,10 @@ export function LensCanvas({
           const pending = state.pending.includes(section.id);
           if (!visible.length && !pending) return null;
           return (
-            <Card key={section.id} className="gap-3 bg-transparent py-0 ring-0">
+            <Card
+              key={section.id}
+              className="gap-3 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0"
+            >
               <CardHeader className="flex flex-row items-center justify-between px-0">
                 <CardTitle>{section.title}</CardTitle>
                 {pending && <Badge variant="outline">Checking sources</Badge>}

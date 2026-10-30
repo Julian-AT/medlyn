@@ -1,0 +1,221 @@
+{
+  "sets": {
+    "synthetic_heldout_families": {
+      "rules_only": {
+        "n": 90,
+        "macroF1": 0.2865761689291101,
+        "classes": {
+          "supported": {
+            "precision": 0.5454545454545454,
+            "recall": 1.0,
+            "f1": 0.7058823529411764,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 0.14285714285714285,
+            "recall": 0.16666666666666666,
+            "f1": 0.15384615384615383,
+            "support": 30
+          },
+          "contradicted": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 30
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 0.1228731776387172,
+          "p50": 0.053937499615130946,
+          "p95": 0.11612499656621367
+        }
+      },
+      "proxy_fast": {
+        "n": 90,
+        "macroF1": 0.8976982097186701,
+        "classes": {
+          "supported": {
+            "precision": 0.7692307692307693,
+            "recall": 1.0,
+            "f1": 0.8695652173913044,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 30
+          },
+          "contradicted": {
+            "precision": 1.0,
+            "recall": 0.7,
+            "f1": 0.8235294117647058,
+            "support": 30
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 2026.6606282442808,
+          "p50": 1745.8303124985832,
+          "p95": 3636.0077499994077
+        }
+      }
+    },
+    "heldout_mutation_types": {
+      "rules_only": {
+        "n": 14,
+        "macroF1": 0.0,
+        "classes": {
+          "supported": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "unsupported": {
+            "precision": 0.0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 14
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 0.05716685700463131,
+          "p50": 0.049271002353634685,
+          "p95": 0.11612499656621367
+        }
+      },
+      "proxy_fast": {
+        "n": 14,
+        "macroF1": 0.24242424242424243,
+        "classes": {
+          "supported": {
+            "precision": 0.0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "unsupported": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 1.0,
+            "recall": 0.5714285714285714,
+            "f1": 0.7272727272727273,
+            "support": 14
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 1471.4030922150414,
+          "p50": 1399.4741250025982,
+          "p95": 2089.2425420024665
+        }
+      }
+    },
+    "real_patient_weak_labels": {
+      "rules_only": {
+        "n": 30,
+        "macroF1": 0.2585034013605442,
+        "classes": {
+          "supported": {
+            "precision": 1.0,
+            "recall": 0.6333333333333333,
+            "f1": 0.7755102040816326,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 0.0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 0.07782906638264346,
+          "p50": 0.06522900002892129,
+          "p95": 0.23312499979510903
+        }
+      },
+      "proxy_fast": {
+        "n": 30,
+        "macroF1": 0.3333333333333333,
+        "classes": {
+          "supported": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 1942.9288819002977,
+          "p50": 1775.8306030045787,
+          "p95": 2920.226707996335
+        }
+      }
+    }
+  },
+  "realPatientStatus": "38 eligible cached letter claims",
+  "localStatus": "unavailable: ImportError (No Metal device available)",
+  "evaluationIdentity": {
+    "testSha256": "ca47fb282520be47d5826b44e7178ebb6b59de8e721cf77915b9adb0ab12f8b1",
+    "heldOutMutationTypes": [
+      "assertion_flip",
+      "date_typo"
+    ],
+    "seed": 37,
+    "judgeIdentity": "a72c650c3176101fc5cdfee929e195dcfae08d835b271bcd2806552cfb730cab"
+  },
+  "cost": {
+    "proxyCalls": 0,
+    "proxyConcurrency": 3,
+    "currency": null,
+    "note": "Proxy tariff unknown; no monetary cost invented",
+    "cachedProxyPredictions": 120
+  },
+  "limitations": [
+    "Synthetic labels are not human gold",
+    "Real labels reuse the engine judge",
+    "Code-check pass is necessary but does not entail support",
+    "Local probabilities are uncalibrated closed-set sequence scores",
+    "Macro F1 uses all three labels even in subsets with absent classes; inspect per-class support"
+  ]
+}
