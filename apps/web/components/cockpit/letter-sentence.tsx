@@ -24,7 +24,7 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy }: Pro
   const [text, setText] = useState(claim.text);
   if (!showClaim(claim)) return null;
   return (
-    <Card size="sm" className="bg-transparent ring-0">
+    <Card size="sm" className="rounded-none bg-transparent shadow-none ring-0">
       <CardContent>
         {editing ? (
           <form
@@ -35,14 +35,26 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy }: Pro
           >
             <Label htmlFor={`edit-${claim.id}`}>Edit sentence</Label>
             <Textarea
+              className="rounded-xl border-0 bg-gray-alpha-100 shadow-none"
               id={`edit-${claim.id}`}
               value={text}
               onChange={(event) => setText(event.target.value)}
             />
-            <Button size="sm" disabled={busy || !text.trim()} type="submit">
+            <Button
+              className="rounded-full"
+              size="sm"
+              disabled={busy || !text.trim()}
+              type="submit"
+            >
               Check & save
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setEditing(false)} type="button">
+            <Button
+              className="rounded-full"
+              size="sm"
+              variant="ghost"
+              onClick={() => setEditing(false)}
+              type="button"
+            >
               Cancel
             </Button>
           </form>
@@ -66,7 +78,12 @@ export function LetterSentence({ claim, citations, onSource, onSave, busy }: Pro
           <SourceChip key={id} segmentId={id} index={citations.indexOf(id) + 1} onOpen={onSource} />
         ))}
         {claim.kind !== "boilerplate" && (
-          <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+          <Button
+            className="rounded-full"
+            size="sm"
+            variant="ghost"
+            onClick={() => setEditing(true)}
+          >
             <HugeiconsIcon
               icon={Edit02Icon}
               strokeWidth={2}

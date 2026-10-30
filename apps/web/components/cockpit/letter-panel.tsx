@@ -45,13 +45,19 @@ export function LetterPanel({
     ),
   ];
   return (
-    <Card id="gp-letter" className="bg-transparent ring-0">
+    <Card id="gp-letter" className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
         <CardDescription>GP correspondence</CardDescription>
         <CardTitle>Follow-up letter</CardTitle>
         {letter && (
           <CardAction>
-            <Button variant="outline" size="sm" disabled={stale} onClick={() => window.print()}>
+            <Button
+              className="rounded-full"
+              variant="outline"
+              size="sm"
+              disabled={stale}
+              onClick={() => window.print()}
+            >
               <HugeiconsIcon
                 icon={PrinterIcon}
                 strokeWidth={2}
@@ -74,7 +80,13 @@ export function LetterPanel({
             <AlertTitle>Review layer changed</AlertTitle>
             <AlertDescription>
               Refresh to see affected sentences and proposed edits.
-              <Button variant="outline" size="sm" onClick={draft.refresh} disabled={busy}>
+              <Button
+                className="rounded-full"
+                variant="outline"
+                size="sm"
+                onClick={draft.refresh}
+                disabled={busy}
+              >
                 Refresh draft
               </Button>
             </AlertDescription>
@@ -92,7 +104,7 @@ export function LetterPanel({
                 sentence keeps its citations.
               </EmptyDescription>
             </EmptyHeader>
-            <Button onClick={draft.generate} disabled={busy || !lensKey}>
+            <Button className="rounded-full" onClick={draft.generate} disabled={busy || !lensKey}>
               {busy ? "Checking sources & drafting…" : "Generate GP letter"}
             </Button>
           </Empty>
@@ -104,7 +116,11 @@ export function LetterPanel({
             {letter.sections
               .filter((section) => section.id !== "clinician_notes")
               .map((section) => (
-                <Card key={section.id} size="sm">
+                <Card
+                  key={section.id}
+                  size="sm"
+                  className="rounded-xl border border-gray-alpha-150 shadow-none ring-0"
+                >
                   <CardHeader>
                     <CardTitle>{section.title}</CardTitle>
                   </CardHeader>
