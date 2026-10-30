@@ -9,7 +9,8 @@ export function flagLetterClaim(
 ): LetterClaim {
   const { flag: previous, ...original } = claim;
   let flag = previous?.reason === "edit_unsupported" ? previous : undefined;
-  for (const entry of activeReviews(entries)) {
+  const active = activeReviews(entries);
+  for (const entry of active) {
     if (entry.targetType === "fact" && claim.factIds.includes(entry.targetId)) {
       const fact = facts?.find((item) => item.id === entry.targetId);
       if (facts && (!fact || fact.contentHash !== entry.targetHash)) {
@@ -25,6 +26,9 @@ export function flagLetterClaim(
     if (
       entry.targetType === "finding" &&
       entry.action === "dismiss" &&
+      active.findLast(
+        (review) => review.targetType === "finding" && review.targetId === entry.targetId,
+      )?.id === entry.id &&
       (claim.id === `letter-finding-${entry.targetId}` ||
         claim.id.startsWith(`letter-finding-${entry.targetId}-`))
     ) {
