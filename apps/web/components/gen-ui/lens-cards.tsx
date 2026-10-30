@@ -25,21 +25,23 @@ export function LensCards(props: Props) {
           data-card-id={card.id}
           className={
             card.critical
-              ? "rounded-lg border border-destructive/30 shadow-none ring-0"
-              : "rounded-lg border shadow-none ring-0"
+              ? "rounded-xl border border-destructive/30 shadow-none ring-0"
+              : "rounded-xl border shadow-none ring-0"
           }
         >
           <CardHeader>
             <CardDescription className="text-xs">{section.title}</CardDescription>
-            <CardTitle className="text-sm">{card.title}</CardTitle>
+            <CardTitle className="text-sm font-semibold tracking-tight">{card.title}</CardTitle>
             <CardDescription className="text-xs">{card.why}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <CardContent className="flex flex-wrap gap-1.5 px-0">
               {card.critical ? <Badge variant="destructive">Critical</Badge> : null}
               {card.completeness === "partial" ? <Badge variant="outline">Partial</Badge> : null}
               {card.conflict !== "none" ? (
-                <Badge variant="outline">{card.conflict.replaceAll("_", " ")}</Badge>
+                <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning">
+                  {card.conflict.replaceAll("_", " ")}
+                </Badge>
               ) : null}
               {card.review ? <Badge variant="secondary">{card.review.action}</Badge> : null}
             </CardContent>
@@ -57,7 +59,7 @@ export function LensCards(props: Props) {
         </Card>
       ))}
       {output?.openQuestions.length ? (
-        <CardContent className="space-y-1 border-t px-0 pt-3">
+        <CardContent className="flex flex-col gap-1 border-t px-0 pt-3">
           <CardTitle className="text-xs">Open questions</CardTitle>
           {output.openQuestions.map((question) => (
             <CardDescription key={question.id} className="text-xs">

@@ -19,12 +19,14 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
         <CardDescription>No adjudicated findings to display in this view.</CardDescription>
       ) : null}
       {output?.findings.map((finding) => (
-        <Card key={finding.id} size="sm" className="rounded-lg border shadow-none ring-0">
+        <Card key={finding.id} size="sm" className="rounded-xl border shadow-none ring-0">
           <CardHeader>
-            <CardTitle className="text-sm">{finding.title}</CardTitle>
+            <CardTitle className="text-sm font-semibold tracking-tight">{finding.title}</CardTitle>
             <CardDescription className="text-sm">{finding.explanation}</CardDescription>
             <CardContent className="flex flex-wrap gap-1.5 px-0">
-              <Badge variant="outline">{finding.type.replaceAll("_", " ")}</Badge>
+              <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning">
+                {finding.type.replaceAll("_", " ")}
+              </Badge>
               <Badge variant="secondary">{finding.severity}</Badge>
             </CardContent>
           </CardHeader>
@@ -32,7 +34,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
             {finding.passages.map((passage, index) => (
               <CardContent
                 key={`${passage.segmentId}:${passage.start}`}
-                className="space-y-2 rounded-md border p-3"
+                className="flex flex-col gap-2 rounded-md border p-3"
               >
                 <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                   <HighlightDifference
