@@ -2,11 +2,15 @@
 
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Dot, Line, LineChart, XAxis, YAxis } from "recharts";
+import { SourceChips } from "@/components/patient/source-chips";
+import { usePatientFacts } from "@/components/patient/use-patient-facts";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { groupEvidence } from "@/lib/group-evidence";
 import { ClaimLine } from "./claim-line";
-import { SourceChip, showSource } from "./source-chip";
+import { displayDates } from "./display-dates";
+import { showSource } from "./source-chip";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 type Point = UiToolOutputs["show_lab_trend"]["points"][number];
@@ -14,8 +18,18 @@ const config = { value: { label: "Value", color: "var(--chart-1)" } };
 
 export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
   const { output } = props;
+  const facts = usePatientFacts();
+  const sourceGroups = groupEvidence(
+    output?.points ?? [],
+    (point) => point.line,
+    (point) => facts.get(point.factId),
+    (point) => [point.series, point.date, point.value, point.unit],
+  );
+  const sourceById = new Map(
+    sourceGroups.map((group) => [`${group.item.factId}:${group.item.series}`, group.sources]),
+  );
   const groups = new Map<string, Point[]>();
-  for (const point of output?.points ?? []) {
+  for (const { item: point } of sourceGroups) {
     const key = `${point.series} · ${point.unit}`;
     const group = groups.get(key) ?? [];
     group.push(point);
@@ -24,12 +38,13 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
   return (
     <ToolFrame
       {...props}
+      artifact={props.toolCallId ? { kind: "chart", id: props.toolCallId } : undefined}
       title={output?.measure.replaceAll("_", " ") || "Measurement trend"}
-      description={output ? `As of ${output.asOf}` : undefined}
+      description={output ? `As of ${displayDates(output.asOf)}` : undefined}
       action={
         output && (
           <Badge variant="secondary" className="font-mono">
-            {output.points.length} points
+            {sourceGroups.length} points
           </Badge>
         )
       }
@@ -44,9 +59,19 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
           <CardDescription className="text-xs font-medium">{label}</CardDescription>
           <ChartContainer config={config} className="h-48 w-full tabular-nums">
             <LineChart data={points} accessibilityLayer>
-              <XAxis dataKey="date" tickLine={false} axisLine={false} minTickGap={24} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={displayDates}
+                tickLine={false}
+                axisLine={false}
+                minTickGap={24}
+              />
               <YAxis tickLine={false} axisLine={false} width={44} domain={["auto", "auto"]} />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent labelFormatter={(label) => displayDates(String(label))} />
+                }
+              />
               <Line
                 dataKey="value"
                 type="linear"
@@ -80,11 +105,16 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
             </LineChart>
           </ChartContainer>
           {points.map((point) => (
-            <SourceChip
+            <SourceChips
               key={`${point.factId}:${point.series}`}
-              segmentId={point.segmentId}
-              quote={point.quote}
-              label={`${point.date} · ${point.value} ${point.unit}`}
+              sources={(sourceById.get(`${point.factId}:${point.series}`) ?? [point]).map(
+                (entry) => ({
+                  segmentId: entry.segmentId,
+                  quote: entry.quote,
+                  date: facts.get(entry.factId)?.docDate,
+                  label: `${displayDates(entry.date)} · ${entry.value} ${entry.unit}`,
+                }),
+              )}
             />
           ))}
         </CardContent>
