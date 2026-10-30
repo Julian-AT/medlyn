@@ -139,6 +139,10 @@ H+7 end to end, H+9 freeze (fixes only; unmerged work is dropped).
 - [x] Schema pushed to Neon
 - [x] Mock `LensEvent` stream for situation 1, UI lane unblocked (H+0.5):
       `@medlyn/engine/lens/mock` (`mockLensEvents`, `mockLensStream(speed)`)
-- [ ] Thin slice: situation 1, one template card, one citation, real pipeline (H+2)
+- [x] Thin slice: situation 1 through the real pipeline (H+2)
+- [x] Ingest: 425 located facts, 97.5% IBM concept coverage, C1–C5 and D1–D3 stored
+- [x] Lens pipeline, claim validator, review ledger, GP letter, Ask Medlyn, shadcn cockpit, eval harness
+- [ ] 15/15 regression (first live run 9/15: 2.3, 3.2, 3.3, 4.2, 5.1, 5.2 open)
+- [ ] Browser visibility and timing check, METRICS.md, video
 
 Update this list when a checkpoint item lands.
