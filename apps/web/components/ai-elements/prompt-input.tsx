@@ -35,6 +35,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { appendDictation } from "@/components/chat/hooks/use-speech-state";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -65,6 +66,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSituationVoice } from "@/hooks/use-situation-voice";
 import { cn } from "@/lib/utils";
 
 // ============================================================================
@@ -975,50 +977,6 @@ export const PromptInputSubmit = ({
   );
 };
 
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
-  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
-  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
-}
-
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-}
-
-type SpeechRecognitionResultList = {
-  readonly length: number;
-  item(index: number): SpeechRecognitionResult;
-  [index: number]: SpeechRecognitionResult;
-};
-
-type SpeechRecognitionResult = {
-  readonly length: number;
-  item(index: number): SpeechRecognitionAlternative;
-  [index: number]: SpeechRecognitionAlternative;
-  isFinal: boolean;
-};
-
-type SpeechRecognitionAlternative = {
-  transcript: string;
-  confidence: number;
-};
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-}
-
-type SpeechWindow = {
-  SpeechRecognition?: new () => SpeechRecognition;
-  webkitSpeechRecognition?: new () => SpeechRecognition;
-};
-
 export type PromptInputSpeechButtonProps = ComponentProps<typeof PromptInputButton> & {
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
   onTranscriptionChange?: (text: string) => void;
@@ -1028,95 +986,60 @@ export const PromptInputSpeechButton = ({
   className,
   textareaRef,
   onTranscriptionChange,
+  disabled,
+  onClick,
+  children,
   ...props
 }: PromptInputSpeechButtonProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-
+  const controller = useOptionalPromptInputController();
+  const base = useRef("");
+  function update(transcript: string) {
+    const value = appendDictation(base.current, transcript);
+    if (controller) controller.textInput.setInput(value);
+    else if (textareaRef?.current) {
+      const textarea = textareaRef.current;
+      // Use the native setter so React observes a value change on the input event.
+      const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
+      setter?.call(textarea, value);
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    onTranscriptionChange?.(value);
+  }
+  const voice = useSituationVoice(update, {
+    onStart: () => {
+      base.current = controller?.textInput.value ?? textareaRef?.current?.value ?? "";
+    },
+    onInterim: update,
+    language: props.lang,
+    keyboard: false,
+  });
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
-    ) {
-      const browser = window as unknown as SpeechWindow;
-      const SpeechRecognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
-      if (!SpeechRecognition) return;
-      const speechRecognition = new SpeechRecognition();
-
-      speechRecognition.continuous = true;
-      speechRecognition.interimResults = true;
-      speechRecognition.lang = "en-US";
-
-      speechRecognition.onstart = () => {
-        setIsListening(true);
-      };
-
-      speechRecognition.onend = () => {
-        setIsListening(false);
-      };
-
-      speechRecognition.onresult = (event) => {
-        let finalTranscript = "";
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            finalTranscript += result[0]?.transcript ?? "";
-          }
-        }
-
-        if (finalTranscript && textareaRef?.current) {
-          const textarea = textareaRef.current;
-          const currentValue = textarea.value;
-          const newValue = currentValue + (currentValue ? " " : "") + finalTranscript;
-
-          textarea.value = newValue;
-          textarea.dispatchEvent(new Event("input", { bubbles: true }));
-          onTranscriptionChange?.(newValue);
-        }
-      };
-
-      speechRecognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-        setIsListening(false);
-      };
-
-      recognitionRef.current = speechRecognition;
-      setRecognition(speechRecognition);
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, [textareaRef, onTranscriptionChange]);
-
-  const toggleListening = useCallback(() => {
-    if (!recognition) {
-      return;
-    }
-
-    if (isListening) {
-      recognition.stop();
-    } else {
-      recognition.start();
-    }
-  }, [recognition, isListening]);
-
+    if (disabled) voice.cancel();
+  }, [disabled, voice.cancel]);
+  if (!voice.supported) return null;
   return (
     <PromptInputButton
+      {...props}
+      type="button"
+      aria-label={voice.listening ? "Stop listening" : "Dictate question"}
+      aria-pressed={voice.listening}
+      title={voice.listening ? "Listening… Click to stop" : "Dictate question"}
       className={cn(
         "relative transition-all duration-200",
-        isListening && "animate-pulse bg-accent text-accent-foreground",
+        voice.listening && "motion-safe:animate-pulse bg-accent text-accent-foreground",
         className,
       )}
-      disabled={!recognition}
-      onClick={toggleListening}
-      {...props}
+      disabled={disabled}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) {
+          if (voice.listening) voice.stop();
+          else voice.start();
+        }
+      }}
     >
-      <HugeiconsIcon icon={MicIcon} className="size-4" />
+      {children ?? <HugeiconsIcon icon={MicIcon} strokeWidth={2} className="size-4" />}
+      {voice.listening && <span role="status">Listening…</span>}
     </PromptInputButton>
   );
 };
