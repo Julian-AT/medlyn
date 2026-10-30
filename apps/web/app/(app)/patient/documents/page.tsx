@@ -15,7 +15,7 @@ export default async function Page() {
     const window = await evidenceWindow(undefined, patientId);
     const [docs, segments] = await Promise.all([
       loadDocuments(window, patientId),
-      loadSegments(window),
+      loadSegments(window, patientId),
     ]);
     documents = docs.map(({ normText, ...doc }) => ({
       ...doc,
