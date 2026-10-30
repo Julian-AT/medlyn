@@ -187,7 +187,9 @@ export const letters = pgTable("letters", {
 export const segmentEmbeddings = pgTable(
   "segment_embeddings",
   {
-    segmentId: text("segment_id").primaryKey().references(() => segments.id, { onDelete: "cascade" }),
+    segmentId: text("segment_id")
+      .primaryKey()
+      .references(() => segments.id, { onDelete: "cascade" }),
     patientId: text("patient_id").notNull(),
     model: text("model").notNull(),
     dim: integer("dim").notNull(),
@@ -204,7 +206,9 @@ export const pageAssets = pgTable(
   {
     id: text("id").primaryKey(),
     patientId: text("patient_id").notNull(),
-    documentId: text("document_id").notNull().references(() => documents.id, { onDelete: "cascade" }),
+    documentId: text("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
     page: integer("page").notNull(),
     kind: text("kind").notNull(),
     uri: text("uri").notNull(),
@@ -216,4 +220,30 @@ export const pageAssets = pgTable(
     index("page_assets_document_idx").on(t.patientId, t.documentId, t.page),
     index("page_assets_cosine_idx").using("hnsw", t.embedding.op("vector_cosine_ops")),
   ],
+);
+
+export const chats = pgTable(
+  "chats",
+  {
+    id: text("id").primaryKey(),
+    patientId: text("patient_id").notNull(),
+    title: text("title").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("chats_patient_updated_idx").on(t.patientId, t.updatedAt)],
+);
+
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: text("id").primaryKey(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chats.id, { onDelete: "cascade" }),
+    role: text("role", { enum: ["user", "assistant"] }).notNull(),
+    parts: jsonb("parts").$type<Record<string, unknown>[]>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("chat_messages_chat_created_idx").on(t.chatId, t.createdAt)],
 );
