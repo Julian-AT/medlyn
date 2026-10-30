@@ -1,8 +1,8 @@
 "use client";
 
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
-import { SourceChips } from "@/components/patient/source-chips";
 import { usePatientFacts } from "@/components/patient/use-patient-facts";
+import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
