@@ -4,6 +4,7 @@ import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { showClaim } from "@/lib/lens-state";
+import { ClaimText } from "./claim-text";
 
 const assertionLabels = {
   present: "Present",
@@ -25,9 +26,7 @@ export function EvidenceRow({ row }: { row: { fact: Fact; claim: ClaimLine } }) 
   const code = typeof fact.attrs.icd10 === "string" ? fact.attrs.icd10 : null;
   return (
     <CardContent data-claim-id={claim.id} className="flex min-w-0 flex-col gap-2 p-0">
-      <CardDescription className="whitespace-normal break-words text-sm leading-relaxed text-foreground">
-        {claim.text}
-      </CardDescription>
+      <ClaimText claim={claim} />
       <CardContent className="flex flex-wrap items-center gap-2 p-0">
         <CardDescription className="text-xs tabular-nums">
           {formatDate(fact.eventDate ?? fact.docDate, fact.datePrecision)}
