@@ -26,8 +26,8 @@ export function SourceChips({ sources }: { sources: Source[] }) {
           <Button
             type="button"
             variant="outline"
-            size="sm"
-            className="min-h-10 rounded-full px-3 text-xs"
+            size="xs"
+            className="h-5 gap-1 rounded-full px-2 text-xs font-medium tabular-nums [&_svg]:size-3"
             aria-label={`Open source ${first.label ?? first.segmentId}`}
           >
             <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
