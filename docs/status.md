@@ -48,9 +48,33 @@ This is automated engine evidence, not a browser-visible or human clinical score
 
 ## Measurements — keep denominators separate
 
+**Agent-reviewed (Codex), not clinician-reviewed — 30 October 2026.** Live API
+screen review completed for all 15 expected answers and C1–C5/D1–D3. Original
+free-text and chip cold matrices each passed **15/15**; 10/10 random fact-line
+quote checks passed; no unsupported line found among 167 distinct supported card
+lines reviewed; five true contradictions, zero false findings, three separate
+clarifications, all 29 finding passages checked. These are screen-data checks;
+browser visibility and clinician sign-off remain open. See
+[METRICS.md](../METRICS.md) and the [completed sheet](submission/human-check.md).
+
+Slowest lens-cache-bypass API stream: **10.138 s**; slowest confirmed cached API
+stream: **0.239 s**. An additional uncached fill took **12.943 s**. One emergency
+fill returned 12 unavailable cards, then recovered on retry. Cached text lost a
+carotid card warning; cached chip HER2/Ki-67 sources differed from the expected
+document. Both confirmed cached matrices score **14/15 under strict warning/source
+checks**, so this is not an all-runs 15/15 result. The cold <10 s/<5 s gates failed.
+
+The existing regression artefact inspected at 09:39:25Z records **12/15 answer
+passes and 3/15 full suite passes**; existing Playwright output records **five
+failures and zero passes**. The later 15/15 lane report below is a separate run,
+not the current on-disk artefact. Blind results were not inspected. Research
+figures below retain their original denominators and are not clinician-reviewed.
+
+### Earlier automated and research snapshots
+
 | Experiment                     | Measured result                                                  | Scope and limitation                                                                                 |
 | ------------------------------ | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Real regression                | **15/15 automated**, human check pending                         | Latest absence-fallback run; no blind results opened for this docs update                            |
+| Real regression                | **15/15 reported automated; on-disk 12/15**                      | Latest absence-fallback run; no blind results opened for this docs update                            |
 | Cold lens latency              | Final fallback regression **5.6–9.9 s**                          | Still above 5 s; warm-generation times **4.72–7.27 s** are not cached-request timings                |
 | Earlier cached lens sweep      | **0.79–1.10 s**, 3/5 below 1 s                                   | Separate regression snapshot; do not combine with later cold timings                                 |
 | Retrieval recall@10            | **Hybrid 0.633; vector 0.633; BM25 0.433**                       | Three queries on one ingested synthetic patient; tiny pilot, not a 50-patient result                 |
