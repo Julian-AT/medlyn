@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import { Letter } from "@medlyn/engine/contracts";
+import { useEffect, useRef, useState } from "react";
 
 export function useLetter(sessionId: string, lensKey: string | null, reviewVersion: number) {
   const [letter, setLetter] = useState<Letter | null>(null);
@@ -8,14 +8,20 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
   const previousVersion = useRef(reviewVersion);
+  const currentVersion = useRef(reviewVersion);
+  currentVersion.current = reviewVersion;
   const requestId = useRef(0);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: A new session or lens invalidates the draft.
   useEffect(() => {
     requestId.current++;
     setLetter(null);
     setError(null);
     setStale(false);
     setBusy(false);
-  }, [lensKey]);
+    return () => {
+      requestId.current++;
+    };
+  }, [lensKey, sessionId]);
   useEffect(() => {
     if (previousVersion.current !== reviewVersion && letter) setStale(true);
     previousVersion.current = reviewVersion;
@@ -24,6 +30,7 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
   async function refresh() {
     if (!letter) return;
     const id = ++requestId.current;
+    const version = currentVersion.current;
     setBusy(true);
     setError(null);
     try {
@@ -34,7 +41,7 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
       if (!response.ok) throw new Error(body.error ?? "The saved draft could not be refreshed.");
       if (id !== requestId.current) return;
       setLetter(Letter.parse(body));
-      setStale(false);
+      setStale(version !== currentVersion.current);
     } catch (cause) {
       if (id === requestId.current)
         setError(cause instanceof Error ? cause.message : "Draft refresh unavailable.");
@@ -43,20 +50,22 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
     }
   }
   async function generate() {
+    if (!sessionId) return;
     const id = ++requestId.current;
+    const version = currentVersion.current;
     setBusy(true);
     setError(null);
     try {
       const response = await fetch("/api/letter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, lensKey }),
+        body: JSON.stringify({ sessionId, ...(lensKey ? { lensKey } : {}) }),
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "The letter could not be generated. Retry.");
       if (id === requestId.current) {
         setLetter(Letter.parse(body));
-        setStale(false);
+        setStale(version !== currentVersion.current);
       }
     } catch (cause) {
       if (id === requestId.current)
