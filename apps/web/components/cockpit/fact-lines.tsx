@@ -1,8 +1,11 @@
+"use client";
 import type { Card as ClinicalCard } from "@medlyn/engine/contracts";
+import { SourceChips } from "@/components/patient/source-chips";
+import { usePatientFacts } from "@/components/patient/use-patient-facts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
+import { groupEvidence } from "@/lib/group-evidence";
 import { showClaim } from "@/lib/lens-state";
-import { SourceChip } from "./source-chip";
 
 export function FactLines({
   lines,
@@ -11,9 +14,15 @@ export function FactLines({
   lines: ClinicalCard["lines"];
   onSource: (id: string) => void;
 }) {
+  const facts = usePatientFacts();
+  const grouped = groupEvidence(
+    lines.filter(showClaim),
+    (line) => line,
+    (line) => facts.get(line.factIds[0]),
+  );
   return (
     <>
-      {lines.filter(showClaim).map((line) => (
+      {grouped.map(({ item: line, sources }) => (
         <Card
           key={line.id}
           size="sm"
@@ -29,9 +38,15 @@ export function FactLines({
               {line.temporalStatus !== "stated" && (
                 <Badge variant="secondary">{line.temporalStatus.replaceAll("_", " ")}</Badge>
               )}
-              {line.segmentIds.map((id, index) => (
-                <SourceChip key={id} segmentId={id} index={index + 1} onOpen={onSource} />
-              ))}
+              <SourceChips
+                sources={sources.flatMap((entry) =>
+                  entry.segmentIds.map((segmentId) => ({
+                    segmentId,
+                    date: facts.get(entry.factIds[0])?.docDate,
+                  })),
+                )}
+                onOpen={onSource}
+              />
             </CardContent>
           </CardContent>
         </Card>
