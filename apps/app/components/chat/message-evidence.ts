@@ -45,27 +45,37 @@ export function messageEvidence(message: UIMessage) {
       ? toolEvidence(message)
       : { claims: [], sources: [], excerpts: [] };
   const allClaims = [...checked, ...tools.claims];
+  // The API admits patient claims before emitting text; plain replies need no claim payload.
+  const textParts = message.parts.flatMap((part) => (part.type === "text" ? [part.text] : []));
+  const text = textParts.length
+    ? textParts.join("\n\n")
+    : checked.map((claim) => claim.text).join("\n\n");
   return {
     claims: checked,
-    text: checked.map((claim) => claim.text).join("\n\n"),
+    text,
     sources: [...new Set([...checked.flatMap((claim) => claim.segmentIds), ...tools.sources])],
-    copyText: [...new Set([...allClaims.map((claim) => claim.text), ...tools.excerpts])].join(
-      "\n\n",
-    ),
+    copyText: [
+      ...new Set(
+        [text, ...tools.claims.map((claim) => claim.text), ...tools.excerpts].filter(Boolean),
+      ),
+    ].join("\n\n"),
     factIds: [...new Set(allClaims.flatMap((claim) => claim.factIds))],
     checked: allClaims.length > 0,
     speech,
-    notice:
-      message.role === "assistant" &&
-      message.parts.some(
-        (part) =>
-          part.type === "data-response-status" &&
-          z.object({ status: z.literal("view") }).safeParse(part.data).success,
-      )
-        ? "Showing the source-linked view."
-        : null,
+    notice: responseNotice(message),
     unavailable:
       !checked.length &&
       message.parts.some((part) => part.type === "text" && part.text === UNSUPPORTED_ANSWER),
   };
+}
+
+function responseNotice(message: UIMessage): string | null {
+  if (message.role !== "assistant") return null;
+  const statuses = message.parts.flatMap((part) => {
+    if (part.type !== "data-response-status") return [];
+    const result = z.object({ status: z.enum(["view", "error"]) }).safeParse(part.data);
+    return result.success ? [result.data.status] : [];
+  });
+  if (statuses.includes("error")) return "Couldn't complete this response. Try again.";
+  return statuses.includes("view") ? "Showing the source-linked view." : null;
 }

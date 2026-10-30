@@ -14,6 +14,43 @@ const message = (parts) => ({ id: "answer-example", role: "assistant", parts });
 const validated = (claims, speech = null) => ({ type: "data-validated", data: { claims, speech } });
 
 describe("chat claim boundary", () => {
+  it("renders partial streaming text and all subsequent text parts", () => {
+    const partial = messageEvidence(message([{ type: "text", text: "Hello", state: "streaming" }]));
+    expect(partial.text).toBe("Hello");
+    const result = messageEvidence(
+      message([
+        { type: "text", text: "Hello!", state: "done" },
+        { type: "text", text: "How can I help?", state: "streaming" },
+      ]),
+    );
+    expect(result.text).toBe("Hello!\n\nHow can I help?");
+    expect(result.copyText).toBe(result.text);
+    expect(result.checked).toBe(false);
+  });
+  it("retains citations without replacing or duplicating streamed text", () => {
+    const a = claim("a");
+    const result = messageEvidence(
+      message([
+        validated([a]),
+        { type: "text", text: a.text },
+        { type: "text", text: "Choose a follow-up." },
+      ]),
+    );
+    expect(result.text).toBe(`${a.text}\n\nChoose a follow-up.`);
+    expect(result.claims).toEqual([a]);
+    expect(result.sources).toEqual(a.segmentIds);
+  });
+  it("shows retry copy when a finished stream reports a real error", () => {
+    expect(
+      messageEvidence(
+        message([
+          { type: "data-response-status", data: { status: "view" } },
+          { type: "data-response-status", data: { status: "error" } },
+        ]),
+      ).notice,
+    ).toBe("Couldn't complete this response. Try again.");
+  });
+
   it("uses fixed view status copy without accepting server prose as a claim", () => {
     const evidence = messageEvidence(
       message([
@@ -28,9 +65,10 @@ describe("chat claim boundary", () => {
         .notice,
     ).toBeNull();
   });
-  it("never exposes assistant text without a validation payload", () => {
+  it("renders server-admitted plain text without a patient validation payload", () => {
     const evidence = messageEvidence(message([{ type: "text", text: "Unvalidated statement." }]));
-    expect(evidence.text).toBe("");
+    expect(evidence.text).toBe("Unvalidated statement.");
+    expect(evidence.copyText).toBe("Unvalidated statement.");
     expect(evidence.sources).toEqual([]);
     expect(evidence.speech).toEqual([]);
   });
