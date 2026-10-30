@@ -1,0 +1,98 @@
+"use client";
+
+import { BubbleChatIcon, Delete02Icon, MoreHorizontalIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import type { RecentChat } from "./chat-history";
+
+export function ChatHistoryRow({
+  chat,
+  onDelete,
+}: {
+  chat: RecentChat;
+  onDelete: (id: string) => void;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { setOpenMobile } = useSidebar();
+  const [deleting, setDeleting] = useState(false);
+  const href = `/chat/${encodeURIComponent(chat.id)}`;
+
+  async function remove() {
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/chat/${encodeURIComponent(chat.id)}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("The chat could not be deleted. Try again.");
+      onDelete(chat.id);
+      if (pathname === href) router.push("/");
+      toast.success("Chat deleted");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Chat deletion unavailable");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        tooltip={chat.title}
+        isActive={pathname === href}
+        className="h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground data-active:bg-sidebar-accent data-active:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground data-active:[&_svg]:text-foreground"
+      >
+        <Link
+          href={href}
+          aria-current={pathname === href ? "page" : undefined}
+          onClick={() => setOpenMobile(false)}
+        >
+          <span className="-mx-0.5 flex h-8 min-w-5 shrink-0 items-center justify-center">
+            <HugeiconsIcon icon={BubbleChatIcon} strokeWidth={2} />
+          </span>
+          <span className="truncate">{chat.title}</span>
+        </Link>
+      </SidebarMenuButton>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <SidebarMenuAction
+            showOnHover
+            aria-label={`Actions for ${chat.title}`}
+            disabled={deleting}
+          >
+            <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
+          </SidebarMenuAction>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="right" align="start">
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={deleting}
+              onSelect={() => void remove()}
+            >
+              <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+              {deleting ? "Deleting…" : "Delete chat"}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </SidebarMenuItem>
+  );
+}
