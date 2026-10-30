@@ -43,7 +43,7 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
       <PageHeading
         category="situations"
         title="Situations"
-        description="Your task, the relevant facts, and the sources behind them."
+        description="Choose a situation or enter your role and task. Review the relevant facts, compare uncertainties, then draft a GP letter."
       />
       <SituationInput recent={lens.recent} activeChip={lens.activeChip} onRun={run} />
       <LensHeader

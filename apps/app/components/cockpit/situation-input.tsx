@@ -93,7 +93,7 @@ export function SituationInput({ activeChip, recent, onRun }: Props) {
                   variant="default"
                   size="icon-sm"
                   disabled={!text.trim()}
-                  aria-label="Open clinical lens"
+                  aria-label="Show relevant facts"
                 >
                   <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
                 </InputGroupButton>
