@@ -1,5 +1,6 @@
 import { BuildLetterRequest, buildLetter } from "@medlyn/engine/letter/build";
 import { LetterWindowConflict } from "@medlyn/engine/letter/window";
+import { llmErrorDetails } from "@medlyn/engine/llm/client";
 import { DEFAULT_PATIENT_ID, patientIdFromRequest } from "../../../lib/active-patient.ts";
 
 export const runtime = "nodejs";
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
     if (error instanceof LetterWindowConflict) {
       return Response.json({ error: error.message }, { status: error.status });
     }
-    throw error;
+    console.warn("letter_unavailable", llmErrorDetails(error));
+    return Response.json({ error: "Couldn't draft the letter. Try again." }, { status: 503 });
   }
 }
