@@ -1,3 +1,4 @@
+import { hybridSearch } from "../search/hybrid.ts";
 import type { z } from "zod";
 import { AgentTools, FactSummary, type AbsenceResult, type EvidenceWindow, type Fact, type Segment } from "../contracts.ts";
 import { loadFacts, loadFindings, loadSegments } from "../store.ts";
@@ -66,9 +67,11 @@ export function createAgentTools(window: EvidenceWindow) {
   };
   const implementations: Implementations = {
     async search_facts({ query, kinds }) {
-      const expanded = conceptSynonyms(query);
-      const selected = (await facts()).filter((fact) => (!kinds?.length || kinds.includes(fact.kind)) &&
-        expanded.some((term) => matchingFacts([fact], term).length));
+      const hits = await hybridSearch(conceptSynonyms(query).join(" "), window, { kinds, k: 60 });
+      const ranks = new Map(hits.map((hit, rank) => [hit.segmentId, rank]));
+      const selected = (await facts())
+        .filter((fact) => (!kinds?.length || kinds.includes(fact.kind)) && ranks.has(fact.segmentId))
+        .sort((a, b) => ranks.get(a.segmentId)! - ranks.get(b.segmentId)! || a.id.localeCompare(b.id));
       rememberFacts(selected);
       await rememberSegments(selected.map((fact) => fact.segmentId));
       return { facts: selected.map((fact) => FactSummary.parse(fact)) };

@@ -1,3 +1,4 @@
+import { embedCorpus } from "./embed-step.ts";
 import { existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { getDb } from "../db/client.ts";
@@ -15,14 +16,16 @@ export function parseArgs(args: string[]) {
   let dataPath: string | undefined;
   let llmFindings = true;
   let warm = true;
+  let embed = true;
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     if (arg === "--no-llm-findings") llmFindings = false;
     else if (arg === "--no-warm") warm = false;
+    else if (arg === "--no-embed") embed = false;
     else if (arg === "--data" && args[index + 1] && !args[index + 1].startsWith("--")) dataPath = args[++index];
     else throw new Error(`Unknown or incomplete ingest argument: ${arg}`);
   }
-  return { dataPath, llmFindings, warm };
+  return { dataPath, llmFindings, warm, embed };
 }
 
 export async function ingest(args = process.argv.slice(2)) {
@@ -73,6 +76,7 @@ export async function ingest(args = process.argv.slice(2)) {
   const findings = await computeFindings({ documents: corpus.documents, facts: clustered.facts }, { llm: options.llmFindings });
   const db = getDb();
   await writeCorpus(db, corpus, clustered.entities, clustered.facts);
+  if (options.embed) await embedCorpus(db, corpus);
   await storeFindings(db, corpus.patient.id, corpus.revisionId, findings);
   const coverage = printCoverage(hints, clustered.facts);
   const perKind: Record<string, number> = {};

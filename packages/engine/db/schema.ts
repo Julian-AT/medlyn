@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  vector,
 } from "drizzle-orm/pg-core";
 
 export const corpusRevisions = pgTable("corpus_revisions", {
@@ -182,3 +183,37 @@ export const letters = pgTable("letters", {
   annotations: jsonb("annotations").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const segmentEmbeddings = pgTable(
+  "segment_embeddings",
+  {
+    segmentId: text("segment_id").primaryKey().references(() => segments.id, { onDelete: "cascade" }),
+    patientId: text("patient_id").notNull(),
+    model: text("model").notNull(),
+    dim: integer("dim").notNull(),
+    embedding: vector("embedding", { dimensions: 768 }).notNull(),
+  },
+  (t) => [
+    index("segment_embeddings_patient_idx").on(t.patientId),
+    index("segment_embeddings_cosine_idx").using("hnsw", t.embedding.op("vector_cosine_ops")),
+  ],
+);
+
+export const pageAssets = pgTable(
+  "page_assets",
+  {
+    id: text("id").primaryKey(),
+    patientId: text("patient_id").notNull(),
+    documentId: text("document_id").notNull().references(() => documents.id, { onDelete: "cascade" }),
+    page: integer("page").notNull(),
+    kind: text("kind").notNull(),
+    uri: text("uri").notNull(),
+    ocrText: text("ocr_text"),
+    bbox: jsonb("bbox").$type<Record<string, unknown> | number[]>(),
+    embedding: vector("embedding", { dimensions: 768 }),
+  },
+  (t) => [
+    index("page_assets_document_idx").on(t.patientId, t.documentId, t.page),
+    index("page_assets_cosine_idx").using("hnsw", t.embedding.op("vector_cosine_ops")),
+  ],
+);
