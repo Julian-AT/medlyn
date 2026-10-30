@@ -21,3 +21,6 @@ to `https://medlyn.health` and `https://app.medlyn.health`.
 
 See the [root README](../../README.md) for workspace setup and the
 [deployment guide](../../docs/deploy.md) for production configuration.
+
+We preserve the supplied landing design and assets. Measured challenge and research
+claims belong to the [root README](../../README.md) and its linked result files.

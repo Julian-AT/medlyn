@@ -16,11 +16,12 @@ Start with the [project README](../README.md) to run Medlyn and the
 | [Synthetic evaluation](../eval/synthetic/README.md) | Generated challenges, suite controls and separate scores                                |
 | [Synthetic corpus](../ml/synth/README.md)           | Generation, labels, materialisation, rewriting and PDF/scan fixtures                    |
 | [Verifier](../ml/verifier/README.md)                | Dataset/training/server commands; consult newer results for delivery state              |
-| [Verifier dataset](../ml/verifier/dataset.md)       | Splits, provenance, perturbations and label limitations                                 |
-| [Verifier results](../ml/verifier/results.md)       | Separate method comparisons; automated, not human gold                                  |
+| [Verifier dataset](../ml/verifier/DATASET.md)       | Splits, provenance, perturbations and label limitations                                 |
+| [Verifier results](../ml/verifier/RESULTS.md)       | Separate method comparisons; automated, not human gold                                  |
+| [Quantum research](../ml/quantum/README.md)         | Offline control, completed hardware block and research limitations                      |
+| [Challenge metrics](../METRICS.md)                  | Agent-reviewed primary API checks and repeat failures                                   |
 | [Paper](../paper/README.md)                         | Build, aggregate provenance and protected held-out handling                             |
 
 The PRD defines intended behavior. Decisions record approved changes; status
 records what has been measured. Older lane handoffs and design/SEO verification
-sections describe their own snapshots, not the final integrated build. Patient-app
-paths in older documents may still say `apps/app`; the final name is `apps/app`.
+sections describe their own snapshots, not the final integrated build. The patient app lives in `apps/app`; the public landing page lives in `apps/www`.

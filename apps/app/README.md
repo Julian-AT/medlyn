@@ -25,4 +25,6 @@ storage failures use memory for the current visit. Existing server chat rows are
 ignored. The app opens in light mode and remembers theme changes when storage is available.
 
 See the [root README](../../README.md) for setup and [deployment guide](../../docs/deploy.md)
-for production configuration.
+for production configuration. The public demo has no authentication; noindex headers
+are crawler controls. Challenge figures are agent-reviewed API checks in
+[METRICS.md](../../METRICS.md), not clinician or browser certification.
