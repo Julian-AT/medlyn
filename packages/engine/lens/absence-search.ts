@@ -1,9 +1,11 @@
 import { z } from "zod";
 import type { EvidenceWindow } from "../contracts.ts";
 import { structured } from "../llm/client.ts";
+import type { HybridHit } from "../search/hybrid.ts";
+import type { SearchOptions } from "../search/scope.ts";
 import { PATIENT_ID } from "../store.ts";
-import { type AbsenceOptions, locatedAbsenceHits } from "./absence.ts";
-import { searchAbsenceCandidates } from "./absence-retrieval.ts";
+import { type AbsenceCandidates, type AbsenceOptions, locatedAbsenceHits } from "./absence.ts";
+import { type AbsenceRetrieval, retrieveAbsenceCandidates } from "./absence-retrieval.ts";
 import { withModelSlot } from "./select.ts";
 
 type Search = NonNullable<AbsenceOptions["search"]>;
@@ -28,12 +30,16 @@ const Results = z.object({
 /** Shares one supplemental retrieval across simultaneous concepts in the same evidence window. */
 export function batchCandidateSearch(
   window: EvidenceWindow,
-  search = searchAbsenceCandidates,
+  search: (
+    query: string,
+    window: EvidenceWindow,
+    opts?: SearchOptions,
+  ) => Promise<HybridHit[] | AbsenceRetrieval> = retrieveAbsenceCandidates,
   patientId = PATIENT_ID,
 ) {
   let pending: {
     query: string;
-    resolve: (ids: string[]) => void;
+    resolve: (result: string[] | AbsenceCandidates) => void;
     reject: (error: unknown) => void;
   }[] = [];
   const flush = async () => {
@@ -41,14 +47,19 @@ export function batchCandidateSearch(
     pending = [];
     try {
       const query = [...new Set(jobs.map((job) => job.query))].join("\n");
-      const hits = await search(query, window, { k: Math.min(1000, 60 * jobs.length), patientId });
+      const result = await search(query, window, {
+        k: Math.min(1000, 60 * jobs.length),
+        patientId,
+      });
+      const hits = Array.isArray(result) ? result : result.hits;
       const ids = [...new Set(hits.map((hit) => hit.segmentId))];
-      for (const job of jobs) job.resolve(ids);
+      for (const job of jobs)
+        job.resolve(Array.isArray(result) ? ids : { segmentIds: ids, retrieval: result.retrieval });
     } catch (error) {
       for (const job of jobs) job.reject(error);
     }
   };
-  return (query: string): Promise<string[]> =>
+  return (query: string): Promise<string[] | AbsenceCandidates> =>
     new Promise((resolve, reject) => {
       if (!pending.length)
         queueMicrotask(() => {
