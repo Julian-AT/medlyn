@@ -1,0 +1,26 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=6mm and 8mm,block/.style={draw,rectangle,
+  minimum height=10mm,text width=37mm,align=center,font=\small},
+  flow/.style={-{Latex[length=2mm]},semithick}]
+\node[block] (claim) {Patient statement\\claim and cited identifiers};
+\node[block,below=of claim] (scope) {Verify identity\\patient, revision and window};
+\node[block,below=of scope] (kind) {Dispatch by claim kind};
+\node[block,below=of kind] (semantic) {Composed claim\\compare with source context};
+\node[block,left=of semantic] (template) {Template claim\\check fields and located spans};
+\node[block,right=of semantic] (absence) {Absence claim\\lexical and full-text checks};
+\node[block,below=of semantic] (verdict) {Support verdict\\retain evidence identity};
+\node[block,below=of verdict] (release) {Release supported text};
+\node[block,left=of verdict] (fallback) {Reject, use checked template\\or mark unavailable};
+\path[flow] (claim) edge (scope) (scope) edge (kind) (kind) edge (semantic)
+  (template) edge (verdict) (semantic) edge (verdict) (absence) edge (verdict)
+  (verdict) edge node[right,font=\footnotesize]{pass} (release)
+  (verdict) edge node[above,font=\footnotesize]{fail} (fallback);
+\draw[flow] (kind.west) -| (template.north);
+\draw[flow] (kind.east) -| (absence.north);
+\end{tikzpicture}
+\caption{Claim validation. A documentation gap requires successful checks across the
+whole eligible record. A timeout yields an unavailable result. Clinician annotations
+and fixed nonclinical boilerplate are typed separately from patient statements.}
+\label{fig:claims}
+\end{figure}
