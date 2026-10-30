@@ -11,11 +11,11 @@ import type {
   Need,
   Segment,
 } from "../contracts.ts";
+import { required } from "../required.ts";
 import { PATIENT_ID } from "../store.ts";
 import { missingFieldLabels } from "./fields.ts";
 import { type NeedSelection, withModelSlot } from "./select.ts";
 import { absenceClaim, renderLine, trendLines } from "./templates.ts";
-
 export type RenderContext = {
   patientId?: string;
   validatedLines?: Map<string, Promise<ClaimLine>>;
@@ -24,8 +24,10 @@ export type RenderContext = {
   segments: Segment[];
   findings: Finding[];
 };
-export type RenderedCard = { card: Card; headline: Promise<Claim | undefined> };
-
+export type RenderedCard = {
+  card: Card;
+  headline: Promise<Claim | undefined>;
+};
 export function cardFindings(facts: Fact[], segmentIds: string[], findings: Finding[]): Finding[] {
   const ids = new Set(facts.map((fact) => fact.id));
   const segments = new Set([...facts.map((fact) => fact.segmentId), ...segmentIds]);
@@ -36,7 +38,6 @@ export function cardFindings(facts: Fact[], segmentIds: string[], findings: Find
     ),
   );
 }
-
 export async function renderCard(
   need: Need,
   selection: NeedSelection,
@@ -113,7 +114,6 @@ export async function renderCard(
       : Promise.resolve(undefined);
   return { card, headline };
 }
-
 async function checkedLines(
   lines: ClaimLine[],
   ctx: Parameters<typeof validateClaim>[1],
@@ -129,9 +129,8 @@ async function checkedLines(
       checked.then((claims) => claims[index]),
     );
   }
-  return Promise.all(lines.map((line) => cache.get(line.validation.key)!));
+  return Promise.all(lines.map((line) => required(cache.get(line.validation.key))));
 }
-
 async function validateHeadline(
   selection: NeedSelection,
   ctx: Parameters<typeof validateClaim>[1],

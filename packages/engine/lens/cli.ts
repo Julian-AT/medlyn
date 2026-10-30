@@ -10,7 +10,10 @@ export function parseArgs(args: string[]) {
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     if (arg === "--") continue;
-    if (arg === "--no-cache") { noCache = true; continue; }
+    if (arg === "--no-cache") {
+      noCache = true;
+      continue;
+    }
     if (arg === "--chip" || arg === "--as-of") {
       const value = args[++index];
       if (!value || value.startsWith("--")) throw new Error(`Missing value for ${arg}`);
@@ -22,9 +25,11 @@ export function parseArgs(args: string[]) {
     text.push(arg);
   }
   const chip = CHIPS.find((entry) => entry.id === chipId);
-  if (chipId && !chip) throw new Error(`Unknown chip ${chipId}; choose ${CHIPS.map((entry) => entry.id).join(", ")}`);
+  if (chipId && !chip)
+    throw new Error(`Unknown chip ${chipId}; choose ${CHIPS.map((entry) => entry.id).join(", ")}`);
   const input = text.join(" ").trim() || chip?.text;
-  if (!input) throw new Error("Usage: pnpm lens <situation> [--chip id] [--no-cache] [--as-of YYYY-MM-DD]");
+  if (!input)
+    throw new Error("Usage: pnpm lens <situation> [--chip id] [--no-cache] [--as-of YYYY-MM-DD]");
   return { text: input, chipId, noCache, ...(asOf ? { asOf } : {}) };
 }
 

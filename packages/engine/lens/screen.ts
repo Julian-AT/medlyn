@@ -8,8 +8,8 @@ import {
   type Section,
   type Segment,
 } from "../contracts.ts";
+import { required } from "../required.ts";
 import { PATIENT_ID } from "../store.ts";
-
 export function patientView(segments: Segment[], patientId = PATIENT_ID): Patient {
   for (const segment of segments) {
     const match = segment.text.match(
@@ -30,24 +30,19 @@ export function patientView(segments: Segment[], patientId = PATIENT_ID): Patien
   }
   throw new Error("Patient birth date has no located eligible source");
 }
-
 function patientName(prefix: string): string {
-  const name = prefix
-    .split(/\n|:/)
-    .at(-1)!
+  const name = required(prefix.split(/\n|:/).at(-1))
     .trim()
     .replace(/^(?:Frau|Herr|Patient(?:in)?|Name)\s+/i, "")
     .replace(/[,;·\s]+$/, "");
   if (!name || name.length > 100) throw new Error("Patient name has no located eligible source");
   return name;
 }
-
 function patientSex(segments: Segment[]): Patient["sex"] {
   const female = segments.some((source) => /\b(Frau|weiblich|female)\b/i.test(source.text));
   const male = segments.some((source) => /\b(Herr|männlich|male)\b/i.test(source.text));
   return female === male ? "X" : female ? "F" : "M";
 }
-
 export function openQuestions(sections: Section[], findings: Finding[]): OpenQuestion[] {
   return [
     ...findings.map(
@@ -76,7 +71,6 @@ export function openQuestions(sections: Section[], findings: Finding[]): OpenQue
     ),
   ];
 }
-
 export function screenEvents(screen: Screen): LensEvent[] {
   const headlines: LensEvent[] = [];
   const sections = screen.sections.map((section) => ({
@@ -106,7 +100,6 @@ export function screenEvents(screen: Screen): LensEvent[] {
     { type: "done", timings: screen.timings },
   ];
 }
-
 export function screenFromEvents(events: LensEvent[]): Screen {
   const situation = events.find((event) => event.type === "situation");
   const findings = events.find((event) => event.type === "findings");

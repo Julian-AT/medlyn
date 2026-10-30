@@ -9,9 +9,9 @@ import type {
   Section,
   Situation,
 } from "../contracts.ts";
+import { required } from "../required.ts";
 
 const supported = { key: "mock", support: "supported" } as const;
-
 function line(
   id: string,
   text: string,
@@ -31,7 +31,6 @@ function line(
     temporalStatus,
   };
 }
-
 function card(fields: Partial<Card> & Pick<Card, "id" | "needId" | "title" | "why">): Card {
   return {
     cardType: "facts",
@@ -44,7 +43,6 @@ function card(fields: Partial<Card> & Pick<Card, "id" | "needId" | "title" | "wh
     ...fields,
   };
 }
-
 const patient: Patient = {
   id: "patient-0000-0001",
   displayName: "Anna Musterfrau",
@@ -53,7 +51,6 @@ const patient: Patient = {
   birthDateQuote: "geb. 15.03.1959",
   birthDateSegmentId: null,
 };
-
 const situation: Situation = {
   role: "Anaesthetist",
   task: "Pre-operative anaesthesia check",
@@ -64,7 +61,6 @@ const situation: Situation = {
   profileId: "anaesthesia_preop",
   tier: 1,
 };
-
 const window: EvidenceWindow = {
   asOf: "2016-04-15",
   eligibleDocumentIds: [
@@ -79,7 +75,6 @@ const window: EvidenceWindow = {
   ],
   corpusRevision: "mock",
 };
-
 const sections: Section[] = [
   {
     id: "procedure",
@@ -143,7 +138,12 @@ const sections: Section[] = [
         title: "Ejection fraction",
         why: "Cardiac reserve for induction and fluid management",
         lines: [
-          line("ef", "LVEF 60%, normal systolic function · Echocardiography, Jun 2015", "12340012", "done"),
+          line(
+            "ef",
+            "LVEF 60%, normal systolic function · Echocardiography, Jun 2015",
+            "12340012",
+            "done",
+          ),
         ],
       }),
       card({
@@ -174,7 +174,12 @@ const sections: Section[] = [
         why: "Haemodynamic stability; ARBs are often held on the day of surgery",
         cardType: "trend",
         lines: [
-          line("candesartan-2015", "Candesartan (Blopress) 16 mg, 1-0-½ · Jun 2015", "12340012", "stated"),
+          line(
+            "candesartan-2015",
+            "Candesartan (Blopress) 16 mg, 1-0-½ · Jun 2015",
+            "12340012",
+            "stated",
+          ),
           line(
             "candesartan-2016",
             "Candesartan (Blopress) 16 mg, 1-0-1 · Discharge medication, 15 Apr 2016",
@@ -196,9 +201,24 @@ const sections: Section[] = [
         why: "Perioperative glucose control; GLP-1 agonists delay gastric emptying",
         cardType: "medication_list",
         lines: [
-          line("metformin", "Metformin (Glucophage) 1000 mg, 1-1-1 · Discharge medication, 15 Apr 2016", "12340018", "ongoing"),
-          line("pioglitazone", "Pioglitazone (Actos) 30 mg, 0-1-0 · Discharge medication, 15 Apr 2016", "12340018", "ongoing"),
-          line("exenatide", "Exenatide (Byetta) 5 µg s.c., 1-0-1 · Discharge medication, 15 Apr 2016", "12340018", "ongoing"),
+          line(
+            "metformin",
+            "Metformin (Glucophage) 1000 mg, 1-1-1 · Discharge medication, 15 Apr 2016",
+            "12340018",
+            "ongoing",
+          ),
+          line(
+            "pioglitazone",
+            "Pioglitazone (Actos) 30 mg, 0-1-0 · Discharge medication, 15 Apr 2016",
+            "12340018",
+            "ongoing",
+          ),
+          line(
+            "exenatide",
+            "Exenatide (Byetta) 5 µg s.c., 1-0-1 · Discharge medication, 15 Apr 2016",
+            "12340018",
+            "ongoing",
+          ),
         ],
       }),
       card({
@@ -237,8 +257,18 @@ const sections: Section[] = [
         conflict: "contradicted",
         findingIds: ["finding-c1"],
         lines: [
-          line("carotid-right", "Internal carotid stenosis about 60%, right · Duplex findings, Jun 2015", "12340012", "done"),
-          line("carotid-left", "Internal carotid stenosis max. 60%, left · Overall assessment, Jun 2015", "12340012", "done"),
+          line(
+            "carotid-right",
+            "Internal carotid stenosis about 60%, right · Duplex findings, Jun 2015",
+            "12340012",
+            "done",
+          ),
+          line(
+            "carotid-left",
+            "Internal carotid stenosis max. 60%, left · Overall assessment, Jun 2015",
+            "12340012",
+            "done",
+          ),
         ],
       }),
     ],
@@ -257,7 +287,6 @@ const sections: Section[] = [
     ],
   },
 ];
-
 const efHeadline: Claim = {
   id: "claim-ef-headline",
   kind: "composed",
@@ -267,7 +296,6 @@ const efHeadline: Claim = {
   author: "machine",
   validation: supported,
 };
-
 const findings: Finding[] = [
   {
     id: "finding-c1",
@@ -300,11 +328,12 @@ const findings: Finding[] = [
     ],
   },
 ];
-
 const sectionById = new Map(sections.map((s) => [s.id, s]));
-
 /** Sections arrive in completion order, not screen order; the UI places them by `sectionTitles`. */
-const timeline: { atMs: number; event: LensEvent }[] = [
+const timeline: {
+  atMs: number;
+  event: LensEvent;
+}[] = [
   {
     atMs: 40,
     event: {
@@ -329,7 +358,7 @@ const timeline: { atMs: number; event: LensEvent }[] = [
     ] as const
   ).map(([atMs, id]) => ({
     atMs,
-    event: { type: "section", section: sectionById.get(id)! } satisfies LensEvent,
+    event: { type: "section", section: required(sectionById.get(id)) } satisfies LensEvent,
   })),
   { atMs: 3250, event: { type: "headline", cardId: "card-ef", headline: efHeadline } },
   {
@@ -339,8 +368,19 @@ const timeline: { atMs: number; event: LensEvent }[] = [
       critical: ["card-allergies", "card-antithrombotics"],
       findings,
       openQuestions: [
-        { id: "oq-c1", kind: "contradiction", title: "Carotid stenosis side documented inconsistently", findingId: "finding-c1" },
-        { id: "oq-kidney", kind: "missing", title: "Kidney function not documented", cardId: "card-kidney", needId: "kidney_function" },
+        {
+          id: "oq-c1",
+          kind: "contradiction",
+          title: "Carotid stenosis side documented inconsistently",
+          findingId: "finding-c1",
+        },
+        {
+          id: "oq-kidney",
+          kind: "missing",
+          title: "Kidney function not documented",
+          cardId: "card-kidney",
+          needId: "kidney_function",
+        },
       ],
     },
   },
@@ -352,9 +392,7 @@ const timeline: { atMs: number; event: LensEvent }[] = [
     },
   },
 ];
-
 export const mockLensEvents: LensEvent[] = timeline.map((t) => t.event);
-
 /** Replays situation 1 with realistic cold-path timing; `speed` > 1 replays faster. */
 export async function* mockLensStream(speed = 1): AsyncGenerator<LensEvent> {
   let elapsed = 0;

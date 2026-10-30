@@ -10,14 +10,20 @@ import {
   type Need,
 } from "../contracts.ts";
 import { formatDate } from "../dates.ts";
-
-export type ClaimCtx = { patientId: string; window: EvidenceWindow };
-type Searched = { eligible: number; total: number; asOf: string };
+import { required } from "../required.ts";
+export type ClaimCtx = {
+  patientId: string;
+  window: EvidenceWindow;
+};
+type Searched = {
+  eligible: number;
+  total: number;
+  asOf: string;
+};
 const stringAttr = (fact: Fact, key: string): string | null => {
   const value = fact.attrs[key];
   return typeof value === "string" || typeof value === "number" ? String(value) : null;
 };
-
 export function medicationSchedule(
   schedule: [string, string, string, string] | null,
   scheduleText: string | null,
@@ -27,7 +33,6 @@ export function medicationSchedule(
     .map((dose) => dose.trim().replace(/1\/2/g, "½"))
     .join("-");
 }
-
 /** Adds source metadata to request-local copies so rendering and validation agree. */
 export function withDocumentTitles(
   facts: Fact[],
@@ -39,7 +44,6 @@ export function withDocumentTitles(
     return title ? { ...fact, attrs: { ...fact.attrs, sourceTitle: title } } : fact;
   });
 }
-
 export function factLineText(fact: Fact): string {
   let text = fact.labelEn;
   let source = stringAttr(fact, "sourceTitle") ?? stringAttr(fact, "sourceLabel") ?? "Document";
@@ -109,7 +113,6 @@ export function factLineText(fact: Fact): string {
     text += `; due ${formatDate(fact.dueDate, fact.dueDate.length <= 7 ? null : fact.datePrecision)}`;
   return `${text} · ${source}${source.includes(date) ? "" : `, ${date}`}`;
 }
-
 function line(text: string, facts: Fact[], ctx: ClaimCtx): ClaimLine {
   const key = cacheKey({
     ...ctx.window,
@@ -137,11 +140,9 @@ function line(text: string, facts: Fact[], ctx: ClaimCtx): ClaimLine {
     asOf: ctx.window.asOf,
   };
 }
-
 export function renderLine(fact: Fact, ctx: ClaimCtx): ClaimLine {
   return line(factLineText(fact), [fact], ctx);
 }
-
 function weight(fact: Fact): number | null {
   if (fact.kind !== "measurement" || !/\b(weight|gewicht|körpergewicht)\b/iu.test(fact.labelEn))
     return null;
@@ -157,7 +158,6 @@ function weight(fact: Fact): number | null {
   const number = Number(String(value).replace(",", "."));
   return Number.isFinite(number) && number > 0 ? number : null;
 }
-
 export function trendLines(facts: Fact[], ctx: ClaimCtx): ClaimLine[] {
   const ordered = [...facts].sort(
     (a, b) =>
@@ -175,13 +175,12 @@ export function trendLines(facts: Fact[], ctx: ClaimCtx): ClaimLine[] {
     (first.eventDate ?? first.docDate) === (last.eventDate ?? last.docDate)
   )
     return lines;
-  const delta = Math.round((weight(last)! - weight(first)!) * 1000) / 1000;
+  const delta = Math.round((required(weight(last)) - required(weight(first))) * 1000) / 1000;
   const formatted = `${delta < 0 ? "−" : delta > 0 ? "+" : ""}${Math.abs(delta)}`;
   const text = `${formatted} kg, ${formatDate(first.eventDate ?? first.docDate, "month")} → ${formatDate(last.eventDate ?? last.docDate, "month")}`;
   lines.push(line(text, [first, last], ctx));
   return lines;
 }
-
 export function absenceClaim(need: Need, searched: Searched, ctx: ClaimCtx): Claim {
   const text =
     "afterDocumentDate" in need

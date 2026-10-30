@@ -1,4 +1,5 @@
 import type { Profile, Situation } from "../../contracts.ts";
+import { required } from "../../required.ts";
 
 const section = (id: string, title: string, ...needIds: string[]) => ({ id, title, needIds });
 export const CRITICAL_NEED_IDS = ["allergies", "antithrombotics"];
@@ -342,7 +343,6 @@ export const PROFILES: Profile[] = [
     ],
   },
 ];
-
 const fold = (text: string) => text.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
 function matchLength(text: string, keyword: string): number {
   const escaped = fold(keyword).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -355,9 +355,8 @@ function matchLength(text: string, keyword: string): number {
     ? keyword.length
     : 0;
 }
-
 export function matchProfile(role: string, task: string): Profile | null {
-  const followups = PROFILES.find((profile) => profile.id === "open_followups")!;
+  const followups = required(PROFILES.find((profile) => profile.id === "open_followups"));
   const fromStay = /discharg|hospital|\bstay\b|inpatient|entlass|stationär/i.test(task);
   if (fromStay && followups.matches.some((word) => matchLength(task, word))) return followups;
   const ranked = PROFILES.map((profile) => ({
@@ -368,7 +367,6 @@ export function matchProfile(role: string, task: string): Profile | null {
   })).sort((a, b) => b.score - a.score);
   return ranked[0]?.score ? ranked[0].profile : null;
 }
-
 export const CHIPS: {
   id: string;
   label: string;
