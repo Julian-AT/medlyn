@@ -48,8 +48,8 @@ export function FactTable({
   if (!rows.length) return <CategoryEmpty />;
   return (
     <>
-      <Card className="gap-5 rounded-2xl border py-5 shadow-none ring-0">
-        <CardHeader>
+      <Card className="gap-5 rounded-none border-0 bg-transparent py-0 shadow-none ring-0">
+        <CardHeader className="px-0">
           <CardTitle className="font-semibold tracking-tight">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
           <CardAction>
@@ -59,9 +59,9 @@ export function FactTable({
           </CardAction>
         </CardHeader>
         <FactToolbar query={query} filter={filter} onQuery={setQuery} onFilter={setFilter} />
-        <CardContent className="[&>[data-slot=table-container]]:max-h-[36rem]">
+        <CardContent className="px-0 [&>[data-slot=table-container]]:max-h-[36rem] [&_[data-slot=table-row]]:border-gray-alpha-100">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-card">
+            <TableHeader className="sticky top-0 z-10 bg-muted [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-head]]:text-muted-foreground">
               <TableRow>
                 <TableHead>Documented fact</TableHead>
                 <TableHead>Date</TableHead>
