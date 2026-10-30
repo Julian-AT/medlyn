@@ -21,7 +21,13 @@ export function citedRuns(text: string, claims: CitationClaim[]): CitedRun[] {
     runs.push({
       start: next.index,
       text: next.claim.text,
-      segmentIds: [...new Set(next.claim.segmentIds)],
+      segmentIds: [
+        ...new Set(
+          claims
+            .filter((claim) => claim.text === next.claim.text)
+            .flatMap((claim) => claim.segmentIds),
+        ),
+      ],
     });
     cursor = next.index + next.claim.text.length;
   }

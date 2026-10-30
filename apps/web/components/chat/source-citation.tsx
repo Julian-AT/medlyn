@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDate } from "@medlyn/engine/dates";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   InlineCitation,
   InlineCitationCard,
@@ -12,24 +12,50 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCardTrigger } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { canOpenCitation } from "./citation-interaction";
 
 export function SourceCitation({ segmentId, index }: { segmentId: string; index: number }) {
   const [open, setOpen] = useState(false);
+  const pointer = useRef<{ x: number; y: number } | null>(null);
   const { passage, error, retry } = useSourcePassage(open ? segmentId : null);
   return (
-    <InlineCitation>
-      <InlineCitationCard open={open} onOpenChange={setOpen}>
+    <InlineCitation className="select-none align-super leading-none">
+      <InlineCitationCard
+        openDelay={300}
+        closeDelay={120}
+        open={open}
+        onOpenChange={(value) => {
+          if (!value || window.getSelection()?.isCollapsed !== false) setOpen(value);
+        }}
+      >
         <HoverCardTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
-            className="mx-0.5 inline-flex h-5 min-w-5 rounded-md px-1 align-baseline text-[11px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="mx-0.5 inline-flex h-4 min-w-4 select-none rounded-full bg-muted px-1 text-[10px]/none font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             aria-label={`Open source ${index + 1}`}
-            onClick={() =>
-              window.dispatchEvent(new CustomEvent("medlyn:show-source", { detail: { segmentId } }))
-            }
+            onPointerDown={(event) => {
+              pointer.current = { x: event.clientX, y: event.clientY };
+            }}
+            onPointerCancel={() => {
+              pointer.current = null;
+            }}
+            onClick={(event) => {
+              const activate = canOpenCitation({
+                keyboard: event.detail === 0,
+                hasSelection: window.getSelection()?.isCollapsed === false,
+                start: pointer.current,
+                end: { x: event.clientX, y: event.clientY },
+              });
+              pointer.current = null;
+              if (!activate) return;
+              setOpen(false);
+              window.dispatchEvent(
+                new CustomEvent("medlyn:show-source", { detail: { segmentId } }),
+              );
+            }}
           >
-            [{index + 1}]
+            {index + 1}
           </Button>
         </HoverCardTrigger>
         <InlineCitationCardBody className="w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-border shadow-sm">

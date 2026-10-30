@@ -33,4 +33,12 @@ describe("validated citation placement", () => {
     expect(citedRuns("Text", [{ text: "", segmentIds: ["source"] }])[0].segmentIds).toEqual([]);
     expect(citedRuns("", [])).toEqual([]);
   });
+  it("retains every source when identical checked claims cite different passages", () => {
+    const runs = citedRuns("Checked sentence.", [
+      { text: "Checked sentence.", segmentIds: ["source-a"] },
+      { text: "Checked sentence.", segmentIds: ["source-b", "source-a"] },
+    ]);
+    expect(runs[0].segmentIds).toEqual(["source-a", "source-b"]);
+    expect(runs.map((run) => run.text).join("")).toBe("Checked sentence.");
+  });
 });
