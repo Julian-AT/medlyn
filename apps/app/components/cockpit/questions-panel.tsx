@@ -48,6 +48,10 @@ export function QuestionsPanel({
             key={question.id}
             question={question}
             finding={screen?.findings.find((item) => item.id === question.findingId)}
+            card={screen?.sections
+              .flatMap((section) => section.cards)
+              .find((card) => card.id === question.cardId)}
+            window={screen?.window}
             author={
               entries.findLast((entry) => entry.targetId === (question.findingId ?? question.id))
                 ?.author

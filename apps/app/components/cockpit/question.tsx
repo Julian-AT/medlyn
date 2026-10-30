@@ -1,7 +1,12 @@
 "use client";
 import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Finding, OpenQuestion } from "@medlyn/engine/contracts";
+import type {
+  Card as ClinicalCard,
+  EvidenceWindow,
+  Finding,
+  OpenQuestion,
+} from "@medlyn/engine/contracts";
 import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,17 +18,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { GapCoverage } from "./gap-coverage";
+import { investigationContext } from "./investigation-context";
 import { ReviewControls, type ReviewHandler, reviewLabel } from "./review-controls";
 export function Question({
   question,
   finding,
   author,
+  card,
+  window: evidenceWindow,
   onCompare,
   onReview,
 }: {
   question: OpenQuestion;
   finding?: Finding;
   author?: string;
+  card?: ClinicalCard;
+  window?: EvidenceWindow;
   onCompare: (id: string) => void;
   onReview: ReviewHandler;
 }) {
@@ -53,6 +64,13 @@ export function Question({
           </CardDescription>
         )}
       </CardHeader>
+      {card?.lines
+        .filter((line) => line.kind === "absence" && line.validation.support === "supported")
+        .map((line) => (
+          <CardDescription key={line.id} className="text-xs">
+            {line.text}
+          </CardDescription>
+        ))}
       <CardContent className="flex flex-wrap gap-2 p-0">
         <Button
           className="h-8 rounded-control"
@@ -61,7 +79,10 @@ export function Question({
           onClick={() =>
             window.dispatchEvent(
               new CustomEvent("medlyn:investigate", {
-                detail: { question, finding },
+                detail: {
+                  question: { ...question, title: investigationContext(question, finding, card) },
+                  finding,
+                },
               }),
             )
           }
@@ -74,6 +95,7 @@ export function Question({
             data-icon="inline-end"
           />
         </Button>
+        {card && evidenceWindow && <GapCoverage card={card} window={evidenceWindow} />}
         {finding && (
           <Button
             className="h-8 rounded-control"
@@ -101,6 +123,10 @@ export function Question({
           targetId={finding?.id ?? question.id}
           onReview={onReview}
           allowDismiss
+          allowCorrect={Boolean(finding?.passages.some((passage) => passage.factId))}
+          correctionTargets={finding?.passages.flatMap((passage) =>
+            passage.factId ? [{ id: passage.factId, label: passage.claimEn }] : [],
+          )}
         />
       </CardFooter>
     </Card>

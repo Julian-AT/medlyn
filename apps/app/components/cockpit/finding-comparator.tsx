@@ -77,6 +77,10 @@ export function FindingComparator({
           targetType="finding"
           onReview={onReview}
           allowDismiss
+          allowCorrect={finding.passages.some((passage) => passage.factId)}
+          correctionTargets={finding.passages.flatMap((passage) =>
+            passage.factId ? [{ id: passage.factId, label: passage.claimEn }] : [],
+          )}
         />
       </CardFooter>
     </Card>
