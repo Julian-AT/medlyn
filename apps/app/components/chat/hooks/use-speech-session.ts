@@ -25,7 +25,7 @@ export type SpeechBrowser = {
   webkitSpeechRecognition?: SpeechConstructor;
 };
 
-/** Each session owns its events and timers, including events arriving after stop. */
+/** Own recognition and restart timers so cancelled sessions cannot publish late events. */
 export function createSpeechSession(
   Constructor: SpeechConstructor,
   language: string,
@@ -61,8 +61,8 @@ export function createSpeechSession(
     instance?.abort();
     if (error !== "aborted") callbacks.error(error);
   }
-  function end() {
-    if (!recognition) return;
+  function finish() {
+    if (state.phase === "idle") return;
     detach();
     const transcript = state.transcript.trim();
     dispatch({ type: "end" });
@@ -70,56 +70,69 @@ export function createSpeechSession(
     else callbacks.error("no-speech");
   }
   function stop() {
-    if (!recognition || state.phase === "stopping") return;
-    clearTimeout(timer);
+    if (state.phase === "idle" || state.phase === "stopping") return;
     dispatch({ type: "stop" });
+    clearTimeout(timer);
+    const instance = recognition;
+    if (!instance) return finish();
     try {
-      recognition.stop();
-      // Some engines omit onend when stopped while permission is still pending.
-      if (recognition)
+      instance.stop();
+      // Permission-pending engines may omit onend after stop().
+      if (recognition === instance)
         timer = setTimeout(() => {
-          const instance = recognition;
-          end();
-          instance?.abort();
+          finish();
+          instance.abort();
         }, 1500);
-    } catch {
-      const instance = recognition;
-      end();
-      instance?.abort();
+    } catch (error) {
+      console.warn("speech_stop_failed", error instanceof Error ? error.name : "Unknown");
+      finish();
+      instance.abort();
     }
   }
-  function start() {
-    if (recognition) return;
-    dispatch({ type: "start" });
+  function listen() {
+    let receivedText = false;
     try {
       const instance = new Constructor();
       recognition = instance;
       instance.lang = language;
-      instance.continuous = false;
+      instance.continuous = true;
       instance.interimResults = true;
       instance.onstart = () => {
         if (recognition !== instance) return;
+        if (state.phase === "stopping") {
+          try {
+            instance.stop();
+          } catch (error) {
+            console.warn("speech_stop_failed", error instanceof Error ? error.name : "Unknown");
+            finish();
+            instance.abort();
+          }
+          return;
+        }
         dispatch({ type: "listening" });
-        if (state.phase === "listening") timer = setTimeout(stop, 8000);
+        timer = setTimeout(stop, 10_000);
       };
       instance.onresult = (event) => {
         if (recognition !== instance) return;
         const transcript = Array.from(event.results)
-          .map((result) => result[0].transcript)
+          .map((result) => result[0]?.transcript ?? "")
           .join(" ")
           .trim();
+        receivedText = Boolean(transcript);
+        if (transcript && state.phase !== "stopping") clearTimeout(timer);
         dispatch({ type: "result", transcript });
-        callbacks.interim(transcript);
-        if (state.phase !== "stopping") {
-          clearTimeout(timer);
-          timer = setTimeout(stop, 2500);
-        }
+        callbacks.interim(state.transcript);
       };
       instance.onerror = ({ error }) => {
         if (recognition === instance) fail(error);
       };
       instance.onend = () => {
-        if (recognition === instance) end();
+        if (recognition !== instance) return;
+        if (state.phase !== "listening" || !receivedText) return finish();
+        detach();
+        dispatch({ type: "restart" });
+        // Safari can end despite continuous=true; wait for its previous session to release.
+        timer = setTimeout(listen, 150);
       };
       instance.start();
     } catch (error) {
@@ -127,6 +140,11 @@ export function createSpeechSession(
         error instanceof Error && error.name === "NotAllowedError" ? "not-allowed" : "start-failed",
       );
     }
+  }
+  function start() {
+    if (state.phase !== "idle") return;
+    dispatch({ type: "start" });
+    listen();
   }
   function cancel() {
     const instance = detach();
