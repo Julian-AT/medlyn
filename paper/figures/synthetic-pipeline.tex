@@ -1,0 +1,24 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=6mm and 9mm,block/.style={draw,rectangle,
+  minimum height=10mm,text width=44mm,align=center,font=\small},
+  flow/.style={-{Latex[length=2mm]},semithick}]
+\node[block] (history) {Seeded patient history\\events and documentation plan};
+\node[block,below=of history] (split) {Assign patient and family split\\hold out styles and mutations};
+\node[block,below=of split] (render) {Render German documents\\apply controlled mutations};
+\node[block,below=of render] (rewrite) {Optional prose rewrite\\retain original on check failure};
+\node[block,below=of rewrite] (check) {Check final rendered text\\values, spans and mutation ledger};
+\node[block,below=of check] (labels) {Code-checked labels\\not human gold};
+\node[block,right=of render] (formats) {PDF and scan fixtures\\page and box provenance};
+\node[block,right=of check] (gold) {Independent human review\\separate gold subset};
+\node[block,right=of labels] (eval) {Separate evaluation tracks\\retrieval, pipeline and verifier};
+\path[flow] (history) edge (split) (split) edge (render) (render) edge (rewrite)
+  (rewrite) edge (check) (check) edge (labels) (render) edge (formats)
+  (check) edge (gold) (labels) edge (eval);
+\path[flow,dashed] (gold) edge (eval);
+\end{tikzpicture}
+\caption{Synthetic data construction. Labels depend on what the final documents state,
+including deliberate omissions. The human review branch is a separate requirement;
+we do not infer that it is complete from successful code checks.}
+\label{fig:synthetic}
+\end{figure}
