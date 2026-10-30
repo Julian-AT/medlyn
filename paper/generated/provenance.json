@@ -2,11 +2,11 @@
   "sources": [
     {
       "path": "paper/protocol.json",
-      "sha256": "a3e848f881cd2cdf8cc325621014fda2243aec41d11637d09ce6727b2ff2c943"
+      "sha256": "157cc6270053883161b978f96a79b9af1ec1c0bdd61362b956e4b73201f3c719"
     },
     {
       "path": "eval/output/results.json",
-      "sha256": "ed3536b9810b32905a3864c6ab53d16270fbb21523f138eb0701fc0abf826344"
+      "sha256": "ff7cc3269740ba2a28c77da7c5dd9e80abee4e989e56bef03397ee8a8ece5cf8"
     },
     {
       "path": "eval/output/regression.json",
@@ -14,7 +14,7 @@
     },
     {
       "path": "eval/output/playwright.json",
-      "sha256": "fcfab6b6cb5226ae6533015319a14f91900e5404dbd4dafd61715c004af1463e"
+      "sha256": "0c269d1bbbcebead43e096d268b8c4adb7bb9f3e876465b3c79cca0eb394e97c"
     },
     {
       "path": ".agents/reports/ingest-llm.md",
@@ -22,30 +22,45 @@
     },
     {
       "path": "ml/data/synth-v1/manifest.json",
-      "sha256": "0230ddb3ffc0eef3381840c2057cf84fc18bcae15a7d1265934314a785ceb9a1"
+      "sha256": "29dafc9f0ce37dfec12bd4ab1b1c87e8211aacf23c01900634b237a97296201d"
     },
     {
       "path": "ml/verifier/results.json",
-      "sha256": "7fbdab007bfe09b26fdaf131a3631001539b2189dedfc8946636950f39105cc3"
+      "sha256": "c32c2ea69934dc05f5ba88a86d2a7c0e487da8479b2d5012e4568c7be763a862"
     },
     {
       "path": "ml/data/sample/manifest.json",
-      "sha256": "6bc0d1befc3770634697d687ac9b43f470ffc215ff7d6c747bbf657ed0f6d93c"
+      "sha256": "11d56f71238a1ab0064620b0706123d920d7e9b01e44edeb741ae66e87d76bdd"
     },
     {
       "path": "ml/verifier/datasets/manifest.json",
-      "sha256": "f7895ce8c6e4c0187fb88df96ac9977fdb653d2b8f51eb7dc24adcbe0831e048"
+      "sha256": "98be57a2f52b53315a247014bdc6593b73b3fc2e57066faebe8451adf960d75a"
     },
     {
       "path": "eval/output/synthetic.json",
-      "sha256": "d8120bfa7c11883a3164df283064a5af8a323fc26a1837a6af301d8382a01cc9"
+      "sha256": "a5345d9006305e63f3a0409c7b4ecdc19fa5ba17b03347dc094e7f5ab0a079bf"
     }
   ],
   "warnings": [
-    "Standalone regression differs from results.json; using the complete result bundle without merging runs.",
     "Held-out results not opened: pass --include-heldout only after the H+7 review.",
-    "Ingestion counts use the prior lane summary when JSON is absent; no new ingest was run."
+    "Ingestion counts use the prior lane summary when JSON is absent; no new ingest was run.",
+    "Manuscript measurements require human approval tied to all current source hashes."
   ],
   "heldout_included": false,
-  "status": "automated; requires human review"
+  "status": "automated; manuscript values require human review",
+  "publishedMetrics": [
+    "RegressionTarget",
+    "SituationCount",
+    "HeldoutTarget",
+    "SynthTarget",
+    "ChallengeMinimum",
+    "FirstCardTarget",
+    "ColdTarget",
+    "CachedTarget",
+    "ChallengeLimit",
+    "RetrievalSmallK",
+    "RetrievalLargeK",
+    "SequenceLimit",
+    "TrainingMinuteCap"
+  ]
 }

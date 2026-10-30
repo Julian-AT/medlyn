@@ -1,21 +1,257 @@
 {
   "checked": "2026-10-30",
-  "method": "Web search followed by primary publication pages or official repositories",
+  "method": "Individual web searches, primary publication pages and official repositories; no secondary-source research claims.",
   "references": {
-    "factsr": "https://arxiv.org/abs/2505.10360",
-    "hao": "https://arxiv.org/abs/2509.06602",
-    "langextract": "https://github.com/google/langextract",
-    "nhs": "https://arxiv.org/abs/2606.26879",
-    "inconsistency": "https://arxiv.org/abs/2607.22954",
-    "negex": "https://www.dbmi.pitt.edu/wp-content/uploads/2022/10/A-simple-algorithm-for-identifying-negated-findings-and-diseases-in-discharge-summaries.pdf",
-    "cotik": "https://aclanthology.org/W16-5113/",
-    "pynegex": "https://github.com/DFKI-NLP/pynegex",
-    "rrf": "https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf",
-    "bm25": "https://www.ccs.neu.edu/home/vip/teach/IRcourse/IR_surveys/robertson_foundations.pdf",
-    "lora": "https://arxiv.org/abs/2106.09685",
-    "qlora": "https://arxiv.org/abs/2305.14314",
-    "mlx": "https://github.com/ml-explore/mlx",
-    "pgvector": "https://github.com/pgvector/pgvector",
-    "gemini": "https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2"
+    "factsr": {
+      "searchQuery": "FactsR safer method healthcare documentation 2505.10360",
+      "primaryUrl": "https://arxiv.org/abs/2505.10360",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "hao": {
+      "searchQuery": "TBFact healthcare agent orchestrator molecular tumor boards 2509.06602",
+      "primaryUrl": "https://arxiv.org/abs/2509.06602",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "langextract": {
+      "searchQuery": "LangExtract google github citation",
+      "primaryUrl": "https://github.com/google/langextract",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX.",
+      "note": "Official software citation, concept DOI 10.5281/zenodo.17015089; no claim to an installed release version.",
+      "metadataUrl": "https://raw.githubusercontent.com/google/langextract/main/CITATION.cff"
+    },
+    "nhs": {
+      "searchQuery": "Pipeline Generating Longitudinal Synthetic Clinical Notes 2606.26879",
+      "primaryUrl": "https://arxiv.org/abs/2606.26879",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "inconsistency": {
+      "searchQuery": "Toward Automated Detection Documentation Inconsistencies Electronic Health Records 2607.22954",
+      "primaryUrl": "https://arxiv.org/abs/2607.22954",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "negex": {
+      "searchQuery": "NegEx simple algorithm identifying negated findings diseases 2001",
+      "primaryUrl": "https://pubmed.ncbi.nlm.nih.gov/12123149/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "cotik": {
+      "searchQuery": "Negation Detection Clinical Reports Written German Cotik 2016",
+      "primaryUrl": "https://aclanthology.org/W16-5113/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "rrf": {
+      "searchQuery": "reciprocal rank fusion Cormack Clarke Buettcher 2009",
+      "primaryUrl": "https://cormack.uwaterloo.ca/cormack/cormacksigir09-rrf.pdf",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "bm25": {
+      "searchQuery": "BM25 Robertson Zaragoza probabilistic relevance framework 2009",
+      "primaryUrl": "https://www.nowpublishers.com/article/Details/INR-019",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "lora": {
+      "searchQuery": "LoRA low rank adaptation Hu 2106.09685",
+      "primaryUrl": "https://arxiv.org/abs/2106.09685",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "qlora": {
+      "searchQuery": "QLoRA efficient finetuning quantized LLMs Dettmers 2305.14314",
+      "primaryUrl": "https://arxiv.org/abs/2305.14314",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "mlx": {
+      "searchQuery": "site:github.com/ml-explore/mlx MLX array framework Apple silicon",
+      "primaryUrl": "https://github.com/ml-explore/mlx",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX.",
+      "note": "Software citation, not an empirical paper.",
+      "metadataUrl": "https://raw.githubusercontent.com/ml-explore/mlx/main/README.md"
+    },
+    "pgvector": {
+      "searchQuery": "pgvector github official",
+      "primaryUrl": "https://github.com/pgvector/pgvector",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX.",
+      "note": "Software citation, access year; no software performance claim."
+    },
+    "gemini": {
+      "searchQuery": "Gemini Embedding 2 Google official model",
+      "primaryUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "alce": {
+      "searchQuery": "ALCE enabling large language models generate text citations Gao 2023",
+      "primaryUrl": "https://aclanthology.org/2023.emnlp-main.398/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "rarr": {
+      "searchQuery": "RARR researching revising what language models say Gao 2023",
+      "primaryUrl": "https://aclanthology.org/2023.acl-long.910/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "factscore": {
+      "searchQuery": "FActScore fine grained atomic evaluation factual precision Min 2023",
+      "primaryUrl": "https://aclanthology.org/2023.emnlp-main.741/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "summac": {
+      "searchQuery": "SummaC revisiting NLI consistency evaluation Laban 2022",
+      "primaryUrl": "https://aclanthology.org/2022.tacl-1.10/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "alignscore": {
+      "searchQuery": "AlignScore evaluating factual consistency unified alignment function 2023",
+      "primaryUrl": "https://aclanthology.org/2023.acl-long.634/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "minicheck": {
+      "searchQuery": "MiniCheck efficient fact checking grounding LLMs 2024",
+      "primaryUrl": "https://aclanthology.org/2024.emnlp-main.499/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "dpr": {
+      "searchQuery": "Dense passage retrieval open domain question answering Karpukhin 2020",
+      "primaryUrl": "https://aclanthology.org/2020.emnlp-main.550/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "maynez": {
+      "searchQuery": "Faithfulness and Factuality Abstractive Summarization Maynez 2020",
+      "primaryUrl": "https://aclanthology.org/2020.acl-main.173/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "frank": {
+      "searchQuery": "FRANK benchmark factuality metrics summarization Pagnoni 2021",
+      "primaryUrl": "https://aclanthology.org/2021.naacl-main.383/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "famesumm": {
+      "searchQuery": "site:aclanthology.org FaMeSumm 2023.emnlp-main.673",
+      "primaryUrl": "https://aclanthology.org/2023.emnlp-main.673/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "context": {
+      "searchQuery": "site:pubmed.ncbi.nlm.nih.gov ConText Harkema Dowling Thornblade Chapman 2009",
+      "primaryUrl": "https://pubmed.ncbi.nlm.nih.gov/19435614/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "synthea": {
+      "searchQuery": "Synthea An approach method generating realistic synthetic patients Walonoski 2018 25 3 230",
+      "primaryUrl": "https://pubmed.ncbi.nlm.nih.gov/29025144/",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "asclepius": {
+      "searchQuery": "Asclepius clinical language models synthetic clinical notes 2023",
+      "primaryUrl": "https://arxiv.org/abs/2309.00237",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "rag": {
+      "searchQuery": "Retrieval augmented generation knowledge intensive NLP Lewis 2020",
+      "primaryUrl": "https://arxiv.org/abs/2005.11401",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "qwen": {
+      "searchQuery": "Qwen3 technical report arxiv 2505.09388",
+      "primaryUrl": "https://arxiv.org/abs/2505.09388",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "attention": {
+      "searchQuery": "site:arxiv.org Attention Is All You Need 1706.03762",
+      "primaryUrl": "https://arxiv.org/abs/1706.03762",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "adams": {
+      "searchQuery": "site:proceedings.mlr.press/v219/adams23a author",
+      "primaryUrl": "https://proceedings.mlr.press/v219/adams23a.html",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "vanveen": {
+      "searchQuery": "clinical note summaries physician performance Van Veen 2024",
+      "primaryUrl": "https://www.nature.com/articles/s41591-024-02855-5",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX.",
+      "metadataUrl": "https://pubmed.ncbi.nlm.nih.gov/38413730/"
+    },
+    "guo": {
+      "searchQuery": "On calibration modern neural networks Guo 2017",
+      "primaryUrl": "https://proceedings.mlr.press/v70/guo17a.html",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "datasheets": {
+      "searchQuery": "site:arxiv.org Datasheets for Datasets Gebru 1803.09010",
+      "primaryUrl": "https://arxiv.org/abs/1803.09010",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    },
+    "modelcards": {
+      "searchQuery": "Model Cards for Model Reporting Mitchell 2019",
+      "primaryUrl": "https://arxiv.org/abs/1810.03993",
+      "checked": "2026-10-30",
+      "verifiedFields": ["title", "authors", "year", "publication or repository identity"],
+      "evidence": "Primary publication metadata or official repository; ACL entries use publisher BibTeX."
+    }
   }
 }
