@@ -27,7 +27,12 @@ export function SourcesListPopover({
       title={`${unique.length} ${unique.length === 1 ? "source" : "sources"}`}
       trigger={
         trigger ?? (
-          <Button type="button" variant="outline" size="sm" className="min-h-10 rounded-full">
+          <Button
+            type="button"
+            variant="outline"
+            size="xs"
+            className="h-5 rounded-full px-2 text-xs font-medium"
+          >
             {unique.length} {unique.length === 1 ? "source" : "sources"}
           </Button>
         )
