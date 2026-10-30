@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { writeValidatedStream } from "../../../../apps/app/app/api/chat/validated-stream.ts";
-import { evidenceWindow } from "../../store.ts";
 import type { AgentEvidence } from "../tools.ts";
 
 type Stream = Parameters<typeof writeValidatedStream>[0];
 type Writer = Parameters<typeof writeValidatedStream>[1];
 type Chunk = Parameters<Writer["write"]>[0];
 
-async function run(parts: Record<string, unknown>[]) {
+async function run(
+  parts: Record<string, unknown>[] | AsyncIterable<Record<string, unknown>>,
+  signal?: AbortSignal,
+  knownClaimIds: string[] = [],
+) {
   const chunks: Chunk[] = [];
   const writer: Writer = {
     write: (part) => {
@@ -27,11 +30,23 @@ async function run(parts: Record<string, unknown>[]) {
   async function* stream() {
     yield* parts;
   }
-  await writeValidatedStream(stream() as Stream, writer, evidence, await evidenceWindow(), []);
+  await writeValidatedStream(
+    stream() as Stream,
+    writer,
+    evidence,
+    {
+      asOf: "2026-01-01",
+      corpusRevision: "synthetic-rev",
+      eligibleDocumentIds: [],
+    },
+    knownClaimIds,
+    "synthetic-patient",
+    signal,
+  );
   return chunks;
 }
 
-describe.skipIf(!process.env.DATABASE_URL)("validated chat stream", () => {
+describe("validated chat stream", () => {
   it("never forwards unsupported model text or reasoning across steps", async () => {
     const chunks = await run([
       { type: "start-step" },
@@ -101,5 +116,70 @@ describe.skipIf(!process.env.DATABASE_URL)("validated chat stream", () => {
       },
     ]);
     expect(chunks.some((chunk) => chunk.type === "tool-input-available")).toBe(false);
+  });
+  it("finishes a visual answer without validating an untrusted recap", async () => {
+    const chunks = await run([
+      { type: "tool-call", toolCallId: "lens", toolName: "open_lens", input: {} },
+      { type: "tool-result", toolCallId: "lens", toolName: "open_lens", output: { sections: [] } },
+      { type: "text-delta", text: "Untrusted clinical recap [invented]." },
+      { type: "finish-step" },
+    ]);
+    expect(chunks).toContainEqual({ type: "data-response-status", data: { status: "view" } });
+    expect(JSON.stringify(chunks)).not.toContain("Untrusted clinical recap");
+    expect(chunks.some((chunk) => chunk.type === "text-delta")).toBe(false);
+  });
+
+  it("settles unfinished tools and emits a safe fallback at end of stream", async () => {
+    const chunks = await run([
+      { type: "tool-call", toolCallId: "unfinished", toolName: "open_lens", input: {} },
+    ]);
+    expect(chunks).toContainEqual({
+      type: "tool-output-error",
+      toolCallId: "unfinished",
+      errorText: "Couldn't complete this check. Try again.",
+    });
+    expect(JSON.stringify(chunks)).toContain("Couldn't produce a supported answer");
+  });
+
+  it("settles an already aborted stream without leaking the abort reason", async () => {
+    const controller = new AbortController();
+    controller.abort(new Error("private provider error"));
+    const chunks = await run([], controller.signal);
+    expect(JSON.stringify(chunks)).toContain("Couldn't produce a supported answer");
+    expect(JSON.stringify(chunks)).not.toContain("private provider error");
+  });
+
+  it("ends a stalled tool even when its iterator ignores cancellation", async () => {
+    const controller = new AbortController();
+    async function* stalled() {
+      yield { type: "tool-call", toolCallId: "stalled", toolName: "open_lens", input: {} };
+      controller.abort(new Error("deadline"));
+      await new Promise<never>(() => undefined);
+    }
+    const chunks = await run(stalled(), controller.signal);
+    expect(chunks).toContainEqual({
+      type: "tool-output-error",
+      toolCallId: "stalled",
+      errorText: "Couldn't complete this check. Try again.",
+    });
+    expect(JSON.stringify(chunks)).toContain("Couldn't produce a supported answer");
+  });
+
+  it("preserves valid client actions that do not return a server result", async () => {
+    const chunks = await run(
+      [
+        {
+          type: "tool-call",
+          toolCallId: "letter",
+          toolName: "add_to_letter",
+          input: { claimIds: ["synthetic-claim"] },
+        },
+      ],
+      undefined,
+      ["synthetic-claim"],
+    );
+    expect(chunks.some((chunk) => chunk.type === "tool-input-available")).toBe(true);
+    expect(chunks.some((chunk) => chunk.type === "tool-output-error")).toBe(false);
+    expect(JSON.stringify(chunks)).not.toContain("Couldn't produce a supported answer");
   });
 });
