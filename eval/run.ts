@@ -9,6 +9,7 @@ import { answeringCardIds } from "./assertions/rubrics.ts";
 import { heldoutTests, regressionTests } from "./cases.ts";
 import { evalRoot, loadRegression, outputRoot } from "./data.ts";
 import MedlynProvider, { type Capture } from "./provider.ts";
+import { parseSuite } from "./synthetic/suite.ts";
 
 process.env.PROMPTFOO_DISABLE_TELEMETRY = "1";
 process.env.PROMPTFOO_DISABLE_UPDATE = "1";
@@ -157,7 +158,14 @@ async function run(): Promise<void> {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  run().catch(async (error) => {
+  (async () => {
+    const suite = parseSuite(process.argv.slice(2));
+    if (suite === "real" || suite === "all") await run();
+    if (suite === "synthetic" || suite === "all") {
+      const { runSynthetic } = await import("./synthetic/run.ts");
+      if (!(await runSynthetic())) process.exitCode = 1;
+    }
+  })().catch(async (error) => {
     await mkdir(outputRoot, { recursive: true });
     const message = error instanceof Error ? error.message : String(error);
     await save("run-error.json", { message });
