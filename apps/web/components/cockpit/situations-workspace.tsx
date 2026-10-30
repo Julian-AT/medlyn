@@ -15,7 +15,7 @@ import { SituationInput } from "./situation-input";
 export function SituationsWorkspace({ chip, text }: { chip?: string; text?: string }) {
   const { patient } = useActivePatient();
   const lens = useLens();
-  const { setScreen, reviews } = useWorkspace();
+  const { setScreen, reviews, sessionId } = useWorkspace();
   const { screen } = reviews;
   const [tab, setTab] = useState("evidence");
   const [segmentId, setSegmentId] = useState<string | null>(null);
@@ -35,6 +35,17 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
     else if (profile && (!firstRequest || profile.id !== CHIPS[0].id))
       void lens.run(profile.text, profile.id, false, session);
   }, [chip, text, lens.run, patient.id]);
+  useEffect(() => {
+    if (!sessionId || lens.loading || !lens.state.screen) return;
+    try {
+      sessionStorage.setItem(
+        `medlyn:last-lens:${patient.id}:${sessionId}`,
+        JSON.stringify(lens.state.screen),
+      );
+    } catch (error) {
+      console.warn("recent_lens_unavailable", error instanceof Error ? error.name : "Unknown");
+    }
+  }, [sessionId, lens.loading, lens.state.screen, patient.id]);
   function openSource(id: string) {
     setSegmentId(id);
     setFindingId(null);
