@@ -8,6 +8,7 @@
   --font-heading: var(--font-inter);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --tracking-tight: -0.025em;
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-success: var(--success);
@@ -92,12 +93,12 @@
   --chart-5: #c34453;
   --radius: 0.625rem;
   --sidebar: #fafafa;
-  --sidebar-foreground: #6f6f6f;
+  --sidebar-foreground: rgb(0 0 0 / 53%);
   --sidebar-primary: #171717;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eeeeee;
+  --sidebar-accent: rgb(0 0 0 / 4.3%);
   --sidebar-accent-foreground: #171717;
-  --sidebar-border: #ededed;
+  --sidebar-border: rgb(0 0 0 / 7.5%);
   --sidebar-ring: #171717;
   --sidebar-width: 16rem;
   --elevation-2xs: 0 1px 1px rgb(0 0 0 / 4%);
@@ -159,10 +160,16 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-sm text-foreground antialiased;
+    @apply bg-background text-sm/5 font-normal text-foreground antialiased;
   }
   html {
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  [data-slot="card-title"] {
+    @apply font-heading font-semibold tracking-tight;
   }
 }
 @media print {
