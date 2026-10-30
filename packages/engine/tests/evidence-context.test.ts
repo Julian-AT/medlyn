@@ -3,8 +3,26 @@ import type { DocumentView } from "../contracts.ts";
 import { passageContext } from "../evidence/passage.ts";
 
 const document: DocumentView = {
-  document: { id: "doc", patientId: "p", revisionId: "r", title: "Synthetic", titleEn: "Synthetic", docType: "test", docDate: "2020-01-01", department: "Test" },
-  segments: Array.from({ length: 7 }, (_, i) => ({ id: `doc-s${i}`, documentId: "doc", kind: "sentence", section: null, start: i * 10, end: i * 10 + 4, text: `Row${i}`, textEn: `English${i}` })),
+  document: {
+    id: "doc",
+    patientId: "p",
+    revisionId: "r",
+    title: "Synthetic",
+    titleEn: "Synthetic",
+    docType: "test",
+    docDate: "2020-01-01",
+    department: "Test",
+  },
+  segments: Array.from({ length: 7 }, (_, i) => ({
+    id: `doc-s${i}`,
+    documentId: "doc",
+    kind: "sentence",
+    section: null,
+    start: i * 10,
+    end: i * 10 + 4,
+    text: `Row${i}`,
+    textEn: `English${i}`,
+  })),
 };
 
 describe("passage context", () => {

@@ -1,19 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { computeFindings } from "../findings/index.ts";
 import { adjudicate } from "../findings/adjudicate.ts";
+import { computeFindings } from "../findings/index.ts";
 import { findingId } from "../findings/passages.ts";
 import { bmiInterval } from "../findings/rules/bmi.ts";
 import type { CorpusInputDocument } from "../findings/types.ts";
 import { segment } from "../ingest/segment.ts";
 
 function document(normText: string, id = "synthetic"): CorpusInputDocument {
-  return { rawText: normText, offsetMap: Array.from({ length: normText.length + 1 }, (_, i) => i),
-    doc: { id, patientId: "test-patient", revisionId: "test-revision", title: "Synthetic",
-    titleEn: "Synthetic", docDate: "2025-06-01", docType: "test", department: "test" }, normText,
-  segments: segment(normText).map((s) => ({ ...s, id: `${id}-s${s.ordinal}`, documentId: id, textEn: null })) };
+  return {
+    rawText: normText,
+    offsetMap: Array.from({ length: normText.length + 1 }, (_, i) => i),
+    doc: {
+      id,
+      patientId: "test-patient",
+      revisionId: "test-revision",
+      title: "Synthetic",
+      titleEn: "Synthetic",
+      docDate: "2025-06-01",
+      docType: "test",
+      department: "test",
+    },
+    normText,
+    segments: segment(normText).map((s) => ({
+      ...s,
+      id: `${id}-s${s.ordinal}`,
+      documentId: id,
+      textEn: null,
+    })),
+  };
 }
 
-const run = (documents: CorpusInputDocument[]) => computeFindings({ documents, facts: [] }, { llm: false });
+const run = (documents: CorpusInputDocument[]) =>
+  computeFindings({ documents, facts: [] }, { llm: false });
 
 describe("findings rules", () => {
   it("returns no findings for an empty corpus", async () => {
@@ -42,13 +60,23 @@ describe("findings rules", () => {
   });
 
   it("does not combine measurements across documents or distant visits", async () => {
-    expect(await run([document("Height: 182 cm", "a"), document("Weight: 83 kg\nBMI: 31.2", "b")])).toEqual([]);
-    expect(await run([document(`Height: 182 cm\n${"Unrelated visit. ".repeat(30)}\nWeight: 83 kg\nBMI: 31.2`)])).toEqual([]);
+    expect(
+      await run([document("Height: 182 cm", "a"), document("Weight: 83 kg\nBMI: 31.2", "b")]),
+    ).toEqual([]);
+    expect(
+      await run([
+        document(`Height: 182 cm\n${"Unrelated visit. ".repeat(30)}\nWeight: 83 kg\nBMI: 31.2`),
+      ]),
+    ).toEqual([]);
   });
 
   it("does not infer contradictions from medication, weight or allergy changes", async () => {
-    expect(await run([document("Weight: 81 kg\nTreatment: medicine A twice daily\nAllergy: rash", "a"),
-      document("Weight: 74 kg\nTreatment: medicine A once daily\nAllergy: rash and nausea", "b")])).toEqual([]);
+    expect(
+      await run([
+        document("Weight: 81 kg\nTreatment: medicine A twice daily\nAllergy: rash", "a"),
+        document("Weight: 74 kg\nTreatment: medicine A once daily\nAllergy: rash and nausea", "b"),
+      ]),
+    ).toEqual([]);
   });
 
   it("does not link case numbers merely because they differ", async () => {
@@ -56,15 +84,21 @@ describe("findings rules", () => {
   });
 
   it("keeps a restated discharge typo deterministic and segment-contained", async () => {
-    const findings = await run([document("Entlassen am 06/06/20255\nAm 06.06.2025 nach Hause entlassen.")]);
+    const findings = await run([
+      document("Entlassen am 06/06/20255\nAm 06.06.2025 nach Hause entlassen."),
+    ]);
     expect(findings).toHaveLength(1);
     expect(findings[0].category).toBe("restated_date");
     expect(findings[0].severity).toBe("low");
   });
 
   it("does not invent a biopsy link from dates alone", async () => {
-    expect(await run([document("Entnahmedatum: 04.06.2025", "a"),
-      document("Ultraschalluntersuchung Brust vom 05.06.2025\nultraschallgezielte Biopsie", "b")])).toEqual([]);
+    expect(
+      await run([
+        document("Entnahmedatum: 04.06.2025", "a"),
+        document("Ultraschalluntersuchung Brust vom 05.06.2025\nultraschallgezielte Biopsie", "b"),
+      ]),
+    ).toEqual([]);
   });
 
   it("dismisses an unadjudicated candidate when the configured model is unavailable", async () => {
@@ -83,8 +117,15 @@ describe("findings rules", () => {
   });
 
   it("makes ids independent of passage ordering", () => {
-    const passages = [1, 2].map((i) => ({ segmentId: `s${i}`, documentId: "test", factId: null,
-      quote: "Synthetic", start: i * 10, end: i * 10 + 9, claimEn: "Synthetic" }));
+    const passages = [1, 2].map((i) => ({
+      segmentId: `s${i}`,
+      documentId: "test",
+      factId: null,
+      quote: "Synthetic",
+      start: i * 10,
+      end: i * 10 + 9,
+      claimEn: "Synthetic",
+    }));
     expect(findingId("test", passages)).toBe(findingId("test", passages.reverse()));
     expect(findingId("other", passages)).not.toBe(findingId("test", passages));
   });
