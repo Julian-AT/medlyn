@@ -1,14 +1,21 @@
 import { sql } from "drizzle-orm";
 import type { EvidenceWindow } from "../contracts.ts";
 import { getDb } from "../db/client.ts";
-import { assertWindowCurrent, loadSegments, loadFacts, PATIENT_ID } from "../store.ts";
+import { assertWindowCurrent, loadFacts, loadSegments, PATIENT_ID } from "../store.ts";
 import { rankBm25 } from "./lexical.ts";
-import { filterWindowHits, resultLimit, searchScope, type ScopedHit, type SearchOptions } from "./scope.ts";
+import {
+  filterWindowHits,
+  resultLimit,
+  type ScopedHit,
+  type SearchOptions,
+  searchScope,
+} from "./scope.ts";
 
 let paradeAvailable: Promise<boolean> | undefined;
 
 async function hasParadeDb(): Promise<boolean> {
-  paradeAvailable ??= getDb().execute(sql`select 1 from pg_extension where extname = 'pg_search'`)
+  paradeAvailable ??= getDb()
+    .execute(sql`select 1 from pg_extension where extname = 'pg_search'`)
     .then((result) => {
       const available = result.rows.length > 0;
       if (!available) {
@@ -18,8 +25,12 @@ async function hasParadeDb(): Promise<boolean> {
       }
       return available;
     });
-  try { return await paradeAvailable; }
-  catch (error) { paradeAvailable = undefined; throw error; }
+  try {
+    return await paradeAvailable;
+  } catch (error) {
+    paradeAvailable = undefined;
+    throw error;
+  }
 }
 
 /** Escape user syntax by admitting only letter/number tokens into field-qualified OR clauses. */
@@ -34,13 +45,17 @@ export async function bm25Search(query: string, window: EvidenceWindow, opts: Se
   if (!parsed || !window.eligibleDocumentIds.length) return [];
   const patientId = opts.patientId ?? PATIENT_ID;
   await assertWindowCurrent(window, patientId);
-  if (!await hasParadeDb()) {
+  if (!(await hasParadeDb())) {
     const [segments, facts] = await Promise.all([
       loadSegments(window, patientId),
       opts.kinds?.length ? loadFacts(window, opts.kinds, patientId) : undefined,
     ]);
     const allowed = facts ? new Set(facts.map((fact) => fact.segmentId)) : null;
-    const hits = rankBm25(query, segments.filter((segment) => !allowed || allowed.has(segment.id)), limit);
+    const hits = rankBm25(
+      query,
+      segments.filter((segment) => !allowed || allowed.has(segment.id)),
+      limit,
+    );
     await assertWindowCurrent(window, patientId);
     return hits;
   }

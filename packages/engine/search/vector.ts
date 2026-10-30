@@ -2,10 +2,20 @@ import { sql } from "drizzle-orm";
 import type { EvidenceWindow } from "../contracts.ts";
 import { getDb } from "../db/client.ts";
 import { assertWindowCurrent, PATIENT_ID } from "../store.ts";
-import { embed, EMBEDDING_DIM, EMBEDDING_MODEL } from "./embed.ts";
-import { filterWindowHits, resultLimit, searchScope, type ScopedHit, type SearchOptions } from "./scope.ts";
+import { EMBEDDING_DIM, EMBEDDING_MODEL, embed } from "./embed.ts";
+import {
+  filterWindowHits,
+  resultLimit,
+  type ScopedHit,
+  type SearchOptions,
+  searchScope,
+} from "./scope.ts";
 
-export async function vectorSearch(query: string, window: EvidenceWindow, opts: SearchOptions = {}) {
+export async function vectorSearch(
+  query: string,
+  window: EvidenceWindow,
+  opts: SearchOptions = {},
+) {
   const limit = resultLimit(opts.k);
   if (!query.trim() || !window.eligibleDocumentIds.length || !process.env.GEMINI_API_KEY) return [];
   const patientId = opts.patientId ?? PATIENT_ID;

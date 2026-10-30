@@ -6,7 +6,8 @@ import { evidenceWindow, loadDocuments, loadSegments, PATIENT_ID } from "../stor
 export async function backfillEmbeddings(patientId = PATIENT_ID) {
   const window = await evidenceWindow(undefined, patientId);
   const [documents, segments] = await Promise.all([
-    loadDocuments(window, patientId), loadSegments(window, patientId),
+    loadDocuments(window, patientId),
+    loadSegments(window, patientId),
   ]);
   return embedCorpus(getDb(), {
     patient: { id: patientId },

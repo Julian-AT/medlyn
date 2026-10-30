@@ -50,9 +50,10 @@ export function embeddingContent(input: EmbeddingInput, task: EmbeddingTask) {
   const parts = typeof input === "string" ? [{ text: input }] : input.parts;
   if (parts.some((part) => !("text" in part))) return { parts };
   const text = parts.map((part) => ("text" in part ? part.text : "")).join("\n");
-  const formatted = task === "RETRIEVAL_QUERY"
-    ? `task: search result | query: ${text}`
-    : `title: ${typeof input === "string" ? "none" : input.title ?? "none"} | text: ${text}`;
+  const formatted =
+    task === "RETRIEVAL_QUERY"
+      ? `task: search result | query: ${text}`
+      : `title: ${typeof input === "string" ? "none" : (input.title ?? "none")} | text: ${text}`;
   return { parts: [{ text: formatted }] };
 }
 
@@ -67,73 +68,93 @@ export async function embed(
     return null;
   }
   if (!inputs.length) return [];
-  const requestLimit = opts.requestsPerMinute ?? Number(process.env.GEMINI_EMBED_REQUESTS_PER_MINUTE ?? 80);
-  if (!Number.isSafeInteger(requestLimit) || requestLimit < 1) throw new Error("Invalid embedding request budget");
-  if (opts.batchSize !== undefined && (!Number.isSafeInteger(opts.batchSize) || opts.batchSize < 1)) {
+  const requestLimit =
+    opts.requestsPerMinute ?? Number(process.env.GEMINI_EMBED_REQUESTS_PER_MINUTE ?? 80);
+  if (!Number.isSafeInteger(requestLimit) || requestLimit < 1)
+    throw new Error("Invalid embedding request budget");
+  if (
+    opts.batchSize !== undefined &&
+    (!Number.isSafeInteger(opts.batchSize) || opts.batchSize < 1)
+  ) {
     throw new Error("Invalid embedding batch size");
   }
-  if (opts.concurrency !== undefined && (!Number.isSafeInteger(opts.concurrency) || opts.concurrency < 1)) {
+  if (
+    opts.concurrency !== undefined &&
+    (!Number.isSafeInteger(opts.concurrency) || opts.concurrency < 1)
+  ) {
     throw new Error("Invalid embedding concurrency");
   }
   const batchSize = Math.max(1, Math.min(100, requestLimit, opts.batchSize ?? 32));
   const concurrency = Math.max(1, Math.min(8, Math.floor(opts.concurrency ?? 3)));
   const batches = Array.from({ length: Math.ceil(inputs.length / batchSize) }, (_, i) =>
-    inputs.slice(i * batchSize, (i + 1) * batchSize));
+    inputs.slice(i * batchSize, (i + 1) * batchSize),
+  );
   const output: number[][][] = new Array(batches.length);
   let cursor = 0;
-  await Promise.all(Array.from({ length: Math.min(concurrency, batches.length) }, async () => {
-    while (cursor < batches.length) {
-      const index = cursor++;
-      const requests = batches[index].map((input) => ({
-        model: `models/${EMBEDDING_MODEL}`,
-        content: embeddingContent(input, opts.task ?? "RETRIEVAL_DOCUMENT"),
-        outputDimensionality: EMBEDDING_DIM,
-      }));
-      for (let attempt = 0; ; attempt++) {
-        try {
-          await reserveBatch(
-            requests.length,
-            requestLimit,
-            opts.task === "RETRIEVAL_QUERY" ? (opts.timeoutMs ?? 4000) : Infinity,
-          );
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:batchEmbedContents`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-              body: JSON.stringify({ requests }),
-              signal: AbortSignal.timeout(opts.timeoutMs ?? 15_000),
-            },
-          );
-          if (!response.ok) {
-            if (response.status !== 429 && response.status < 500) {
-              throw new PermanentError(`Gemini embedding HTTP ${response.status}`);
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, batches.length) }, async () => {
+      while (cursor < batches.length) {
+        const index = cursor++;
+        const requests = batches[index].map((input) => ({
+          model: `models/${EMBEDDING_MODEL}`,
+          content: embeddingContent(input, opts.task ?? "RETRIEVAL_DOCUMENT"),
+          outputDimensionality: EMBEDDING_DIM,
+        }));
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await reserveBatch(
+              requests.length,
+              requestLimit,
+              opts.task === "RETRIEVAL_QUERY" ? (opts.timeoutMs ?? 4000) : Infinity,
+            );
+            const response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:batchEmbedContents`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+                body: JSON.stringify({ requests }),
+                signal: AbortSignal.timeout(opts.timeoutMs ?? 15_000),
+              },
+            );
+            if (!response.ok) {
+              if (response.status !== 429 && response.status < 500) {
+                throw new PermanentError(`Gemini embedding HTTP ${response.status}`);
+              }
+              const body = (await response.json()) as {
+                error?: { details?: { retryDelay?: string }[] };
+              };
+              const retryDelay = body.error?.details?.find(
+                (detail) => detail.retryDelay,
+              )?.retryDelay;
+              const header = Number(response.headers.get("retry-after") ?? 0);
+              const retryMs = retryDelay ? Number.parseFloat(retryDelay) * 1000 : header * 1000;
+              const error = new RetryableError(`Gemini embedding HTTP ${response.status}`);
+              error.retryAfterMs = Number.isFinite(retryMs) ? Math.max(0, retryMs) : 0;
+              throw error;
             }
-            const body = await response.json() as { error?: { details?: { retryDelay?: string }[] } };
-            const retryDelay = body.error?.details?.find((detail) => detail.retryDelay)?.retryDelay;
-            const header = Number(response.headers.get("retry-after") ?? 0);
-            const retryMs = retryDelay ? Number.parseFloat(retryDelay) * 1000 : header * 1000;
-            const error = new RetryableError(`Gemini embedding HTTP ${response.status}`);
-            error.retryAfterMs = Number.isFinite(retryMs) ? Math.max(0, retryMs) : 0;
-            throw error;
+            const result = (await response.json()) as { embeddings?: { values: number[] }[] };
+            if (result.embeddings?.length !== requests.length)
+              throw new Error("Embedding count mismatch");
+            output[index] = result.embeddings.map(({ values }) => normaliseEmbedding(values));
+            break;
+          } catch (error) {
+            if (error instanceof PermanentError || attempt >= (opts.retries ?? 2)) throw error;
+            await delay(
+              Math.max(
+                1000 * 2 ** attempt,
+                error instanceof RetryableError ? error.retryAfterMs : 0,
+              ),
+            );
           }
-          const result = await response.json() as { embeddings?: { values: number[] }[] };
-          if (result.embeddings?.length !== requests.length) throw new Error("Embedding count mismatch");
-          output[index] = result.embeddings.map(({ values }) => normaliseEmbedding(values));
-          break;
-        } catch (error) {
-          if (error instanceof PermanentError || attempt >= (opts.retries ?? 2)) throw error;
-          await delay(Math.max(
-            1000 * 2 ** attempt,
-            error instanceof RetryableError ? error.retryAfterMs : 0,
-          ));
         }
       }
-    }
-  }));
+    }),
+  );
   return output.flat();
 }
 
 class PermanentError extends Error {}
 
-class RetryableError extends Error { retryAfterMs = 0; }
+class RetryableError extends Error {
+  retryAfterMs = 0;
+}

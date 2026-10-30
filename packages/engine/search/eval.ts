@@ -1,12 +1,16 @@
 import type { EvidenceWindow, FactKind, Segment } from "../contracts.ts";
+import { required } from "../required.ts";
 import { loadSegments, PATIENT_ID } from "../store.ts";
 import { bm25Search } from "./bm25.ts";
 import { hybridSearch } from "./hybrid.ts";
-import { vectorSearch } from "./vector.ts";
 import { resultLimit } from "./scope.ts";
-
+import { vectorSearch } from "./vector.ts";
 export type RetrievalMode = "bm25" | "vector" | "hybrid";
-export type RelevantSpan = { documentId: string; start: number; end: number };
+export type RelevantSpan = {
+  documentId: string;
+  start: number;
+  end: number;
+};
 export type RetrievalCase = {
   id: string;
   query: string;
@@ -23,13 +27,22 @@ export type RetrievalMetrics = {
   skipped: number;
   k: number;
 };
-
 export function relevantSegments(spans: RelevantSpan[], segments: Segment[]): string[] {
-  return [...new Set(segments.filter((segment) => spans.some((span) =>
-    span.documentId === segment.documentId && span.start < segment.end && span.end > segment.start,
-  )).map((segment) => segment.id))];
+  return [
+    ...new Set(
+      segments
+        .filter((segment) =>
+          spans.some(
+            (span) =>
+              span.documentId === segment.documentId &&
+              span.start < segment.end &&
+              span.end > segment.start,
+          ),
+        )
+        .map((segment) => segment.id),
+    ),
+  ];
 }
-
 export function scoreRetrieval(ranked: string[], relevant: string[], k = 20) {
   resultLimit(k);
   const wanted = new Set(relevant);
@@ -41,7 +54,6 @@ export function scoreRetrieval(ranked: string[], relevant: string[], k = 20) {
     mrr: first < 0 ? 0 : 1 / (first + 1),
   };
 }
-
 /** Macro recall@k and truncated MRR; cases without eligible relevance labels are skipped. */
 export async function evaluateRetrieval(cases: RetrievalCase[], mode: RetrievalMode, k = 20) {
   resultLimit(k);
@@ -52,13 +64,24 @@ export async function evaluateRetrieval(cases: RetrievalCase[], mode: RetrievalM
     const patientId = entry.patientId ?? PATIENT_ID;
     const segments = await loadSegments(entry.window, patientId);
     const allowed = new Set(segments.map((segment) => segment.id));
-    const relevant = [...new Set([
-      ...entry.relevantSegmentIds ?? [],
-      ...relevantSegments(entry.relevantSpans ?? [], segments),
-    ])].filter((id) => allowed.has(id));
-    if (!relevant.length) { metrics.skipped++; continue; }
+    const relevant = [
+      ...new Set([
+        ...(entry.relevantSegmentIds ?? []),
+        ...relevantSegments(entry.relevantSpans ?? [], segments),
+      ]),
+    ].filter((id) => allowed.has(id));
+    if (!relevant.length) {
+      metrics.skipped++;
+      continue;
+    }
     const hits = await search(entry.query, entry.window, { k, kinds: entry.kinds, patientId });
-    const score = scoreRetrieval(hits.map((hit) => hit.segmentId), relevant, k)!;
+    const score = required(
+      scoreRetrieval(
+        hits.map((hit) => hit.segmentId),
+        relevant,
+        k,
+      ),
+    );
     metrics.evaluated++;
     metrics.recallAtK += score.recallAtK;
     metrics.mrr += score.mrr;

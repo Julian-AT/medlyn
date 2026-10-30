@@ -6,17 +6,27 @@ import { vectorSearch } from "./vector.ts";
 
 export type HybridHit = SearchHit & { bm25Rank: number | null; vectorRank: number | null };
 
-export function reciprocalRankFusion(bm25: SearchHit[], vector: SearchHit[], constant = 60): HybridHit[] {
+export function reciprocalRankFusion(
+  bm25: SearchHit[],
+  vector: SearchHit[],
+  constant = 60,
+): HybridHit[] {
   if (!Number.isFinite(constant) || constant < 0) throw new Error("Invalid RRF constant");
   const hits = new Map<string, HybridHit>();
-  for (const [list, rankKey] of [[bm25, "bm25Rank"], [vector, "vectorRank"]] as const) {
+  for (const [list, rankKey] of [
+    [bm25, "bm25Rank"],
+    [vector, "vectorRank"],
+  ] as const) {
     const seen = new Set<string>();
     for (const hit of list) {
       if (seen.has(hit.segmentId)) continue;
       seen.add(hit.segmentId);
       const rank = seen.size;
       const fused = hits.get(hit.segmentId) ?? {
-        ...hit, score: 0, bm25Rank: null, vectorRank: null,
+        ...hit,
+        score: 0,
+        bm25Rank: null,
+        vectorRank: null,
       };
       if (fused.documentId !== hit.documentId) throw new Error("Inconsistent segment document");
       fused.score += 1 / (constant + rank);
@@ -24,7 +34,9 @@ export function reciprocalRankFusion(bm25: SearchHit[], vector: SearchHit[], con
       hits.set(hit.segmentId, fused);
     }
   }
-  return [...hits.values()].sort((a, b) => b.score - a.score || a.segmentId.localeCompare(b.segmentId));
+  return [...hits.values()].sort(
+    (a, b) => b.score - a.score || a.segmentId.localeCompare(b.segmentId),
+  );
 }
 
 export async function hybridSearch(
@@ -40,7 +52,9 @@ export async function hybridSearch(
   const [bm25, vector] = await Promise.all([
     bm25Search(query, window, candidates),
     vectorSearch(query, window, candidates).catch((error: unknown) => {
-      console.warn("vector_search_unavailable", { reason: error instanceof Error ? error.message : "Embedding failed" });
+      console.warn("vector_search_unavailable", {
+        reason: error instanceof Error ? error.message : "Embedding failed",
+      });
       return [];
     }),
   ]);
