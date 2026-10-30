@@ -30,12 +30,17 @@ export function locatedAbsenceHits(
   matches: { segmentId: string; quote: string }[],
   segments: Segment[],
 ): string[] {
-  for (const match of matches) {
+  return matches.map((match) => {
     const source = segments.find((segment) => segment.id === match.segmentId);
-    if (!match.quote.trim() || !source || !source.text.includes(match.quote))
+    if (!match.quote.trim() || !source)
       throw new Error("Absence search returned an unlocated passage");
-  }
-  return matches.map((match) => match.segmentId);
+    if (source.text.includes(match.quote)) return source.id;
+    const located = segments.filter(
+      (segment) => segment.documentId === source.documentId && segment.text.includes(match.quote),
+    );
+    if (located.length !== 1) throw new Error("Absence search returned an unlocated passage");
+    return located[0].id;
+  });
 }
 
 function fold(text: string): string {
