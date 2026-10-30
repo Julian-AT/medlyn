@@ -7,7 +7,7 @@ import { type Artifact, parseArtifact } from "../artifact-state";
 export function useArtifact() {
   const params = useSearchParams();
   const artifact = parseArtifact(params.get("artifact"), params.get("artifactSegment"));
-  const [width, setWidth] = useState(45);
+  const [width, setWidth] = useState<number | null>(null);
   const select = useCallback((next: Artifact | null) => {
     const url = new URL(window.location.href);
     url.searchParams.delete("artifactSegment");
@@ -18,12 +18,14 @@ export function useArtifact() {
     window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }, []);
   useEffect(() => {
+    let initialWidth = 45;
     try {
       const saved = Number(localStorage.getItem("medlyn:artifact-width"));
-      if (saved >= 30 && saved <= 65) setWidth(saved);
+      if (saved >= 30 && saved <= 65) initialWidth = saved;
     } catch (error) {
       console.warn("artifact_width_unavailable", error instanceof Error ? error.name : "Unknown");
     }
+    setWidth(initialWidth);
     const open = (event: Event) => {
       const detail = (event as CustomEvent<Artifact>).detail;
       const next = detail && parseArtifact(`${detail.kind}:${detail.id}`, detail.segmentId);
