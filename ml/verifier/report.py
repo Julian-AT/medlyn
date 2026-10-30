@@ -37,7 +37,7 @@ def write_markdown(report, path):
         "Macro-F1 averages all three labels, including absent classes. Inspect class supports.",
         "Bootstrap resamples patients; a single-patient set uses claim resampling conditional on that patient, not population uncertainty.",
         "Confidence coverage and reliability bins are in results.json. Missing GPT confidence is unavailable, not zero ECE.",
-        "Failures have automatic tags and remain pending human annotation. Text-bearing exports stay in ignored runs/.",
+        "Failures have automatic tags and are not independently annotated. Text-bearing exports stay in ignored runs/.",
     ]
     if report.get("v2TrainingStatus"):
         lines += [

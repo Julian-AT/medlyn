@@ -75,13 +75,13 @@ def export_errors(rows, predictions, path):
                     if row["prediction"] not in LABELS
                     else f"{row['label']}_as_{row['prediction']}",
                     "mutationFamily": row["mutation"],
-                    "reviewStatus": "pending human annotation",
+                    "reviewStatus": "not independently annotated",
                 },
             }
             for row in failures[:30]
         ),
     )
-    return {"exported": min(30, len(failures)), "reviewStatus": "pending human annotation"}
+    return {"exported": min(30, len(failures)), "reviewStatus": "not independently annotated"}
 
 
 def cached_proxy(rows, path, budget, cache_sources=()):

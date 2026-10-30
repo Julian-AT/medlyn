@@ -9291,67 +9291,67 @@
     "test": {
       "rules_only": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora_raw": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "proxy_fast": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "cascade": {
         "exported": 13,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       }
     },
     "rewritten": {
       "rules_only": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora_raw": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "proxy_fast": {
         "exported": 27,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "cascade": {
         "exported": 18,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       }
     },
     "real-gold": {
       "rules_only": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora_raw": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "local_qlora": {
         "exported": 30,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "proxy_fast": {
         "exported": 2,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       },
       "cascade": {
         "exported": 8,
-        "reviewStatus": "pending human annotation"
+        "reviewStatus": "not independently annotated"
       }
     }
   }

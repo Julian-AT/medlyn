@@ -25,14 +25,15 @@ Machine-measured research results. Rule labels are not human gold.
 Macro-F1 averages all three labels, including absent classes. Inspect class supports.
 Bootstrap resamples patients; a single-patient set uses claim resampling conditional on that patient, not population uncertainty.
 Confidence coverage and reliability bins are in results.json. Missing GPT confidence is unavailable, not zero ECE.
-Failures have automatic tags and remain pending human annotation. Text-bearing exports stay in ignored runs/.
+Failures have automatic tags and are not independently annotated. Text-bearing exports stay in ignored runs/.
 
-| Set                                                                                                         | Projected GPT calls saved | Share saved | Accuracy delta vs GPT |
-| ----------------------------------------------------------------------------------------------------------- | ------------------------: | ----------: | --------------------: |
-| Offline replay collects both predictions; live application call savings require the regression integration. |
-| test                                                                                                        |                       165 |       0.550 |                 0.057 |
-| rewritten                                                                                                   |                       171 |       0.570 |                 0.030 |
-| real-gold                                                                                                   |                        38 |       0.380 |                -0.060 |
+Offline replay collects both predictions; live savings require regression integration.
+
+| Set       | Projected GPT calls saved | Share saved | Accuracy delta vs GPT |
+| --------- | ------------------------: | ----------: | --------------------: |
+| test      |                       165 |       0.550 |                 0.057 |
+| rewritten |                       171 |       0.570 |                 0.030 |
+| real-gold |                        38 |       0.380 |                -0.060 |
 
 Proxy tariffs and missing historical usage stay null; local energy cost is unmeasured.
 No real-regression or deployment-promotion result is implied.
