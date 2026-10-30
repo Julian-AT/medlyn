@@ -3,8 +3,9 @@ import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
 import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { PageHeading } from "@/components/categories/page-heading";
+import { PageShell } from "@/components/categories/page-shell";
 import { useWorkspace } from "@/components/shell/workspace-provider";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useLens } from "@/hooks/use-lens";
 import { EvidenceWorkspace } from "./evidence-workspace";
 import { LensCanvas } from "./lens-canvas";
@@ -48,38 +49,36 @@ export function SituationsWorkspace({ chip, text }: { chip?: string; text?: stri
   }
   return (
     <MotionConfig reducedMotion="user">
-      <Card className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-6xl px-4 py-6 shadow-none ring-0 md:px-8">
-        <CardContent className="flex flex-col gap-8 px-0">
-          <PageHeading
-            title="Situations"
-            description="Choose your clinical task. Read the relevant facts with their evidence attached."
+      <PageShell>
+        <PageHeading
+          title="Situations"
+          description="Choose your clinical task. Read the relevant facts with their evidence attached."
+        />
+        <SituationInput recent={lens.recent} activeChip={lens.activeChip} onRun={run} />
+        <LensHeader screen={screen} mock={lens.mock} loading={lens.loading} />
+        <Card className="grid min-w-0 gap-8 rounded-none bg-transparent py-0 shadow-none ring-0 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <LensCanvas
+            screen={screen}
+            state={lens.state}
+            loading={lens.loading}
+            annotations={reviews.annotations}
+            onSource={openSource}
+            onFinding={openFinding}
+            onRetry={lens.retry}
+            onReview={reviews.onReview}
           />
-          <SituationInput recent={lens.recent} activeChip={lens.activeChip} onRun={run} />
-          <LensHeader screen={screen} mock={lens.mock} loading={lens.loading} />
-          <Card className="grid min-w-0 gap-8 rounded-none bg-transparent py-0 shadow-none ring-0 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-            <LensCanvas
-              screen={screen}
-              state={lens.state}
-              loading={lens.loading}
-              annotations={reviews.annotations}
-              onSource={openSource}
-              onFinding={openFinding}
-              onRetry={lens.retry}
-              onReview={reviews.onReview}
-            />
-            <EvidenceWorkspace
-              lens={lens}
-              reviews={reviews}
-              tab={tab}
-              onTab={setTab}
-              segmentId={segmentId}
-              findingId={findingId}
-              onSource={openSource}
-              onCompare={openFinding}
-            />
-          </Card>
-        </CardContent>
-      </Card>
+          <EvidenceWorkspace
+            lens={lens}
+            reviews={reviews}
+            tab={tab}
+            onTab={setTab}
+            segmentId={segmentId}
+            findingId={findingId}
+            onSource={openSource}
+            onCompare={openFinding}
+          />
+        </Card>
+      </PageShell>
     </MotionConfig>
   );
 }
