@@ -1,19 +1,19 @@
 "use client";
 
+import { SparklesIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
+import { ArtifactOpenButton } from "@/components/artifacts/artifact-open-button";
+import type { Artifact } from "@/components/artifacts/artifact-state";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { displayDates } from "./display-dates";
 
 export type ToolProps<Output, Input = unknown> = {
   state: string;
+  toolCallId?: string;
+  expanded?: boolean;
   input?: Input;
   output?: Output;
   errorText?: string;
@@ -23,6 +23,7 @@ type Props = ToolProps<unknown> & {
   title: string;
   description?: string;
   action?: ReactNode;
+  artifact?: Artifact;
   children: ReactNode;
 };
 
@@ -33,6 +34,8 @@ export function ToolFrame({
   title,
   description,
   action,
+  artifact,
+  expanded,
   children,
 }: Props) {
   if (state === "output-error" || state === "output-denied") {
@@ -46,15 +49,27 @@ export function ToolFrame({
   return (
     <Card
       size="sm"
-      className="min-w-0 gap-5 rounded-2xl border shadow-none ring-0 [--card-spacing:--spacing(5)]"
+      className="w-full min-w-0 gap-5 rounded-2xl border-0 bg-muted/40 shadow-none ring-0 [--card-spacing:--spacing(5)]"
     >
-      <CardHeader>
-        <CardTitle className="text-base font-semibold tracking-tight">{title}</CardTitle>
+      <CardHeader className="grid-cols-[auto_1fr] items-center gap-x-3">
+        <CardContent
+          aria-hidden="true"
+          className={`row-span-2 flex size-9 items-center justify-center rounded-xl p-0 ${title.includes("letter") ? "bg-[image:var(--gradient-3)]" : title.includes("clarify") ? "bg-[image:var(--gradient-4)]" : "bg-[image:var(--gradient-2)]"}`}
+        >
+          <HugeiconsIcon icon={SparklesIcon} size={18} strokeWidth={2} />
+        </CardContent>
+        <CardTitle className="text-sm font-semibold tracking-tight">
+          {displayDates(title)}
+        </CardTitle>
         {description ? (
-          <CardDescription className="text-xs leading-relaxed">{description}</CardDescription>
+          <CardDescription className="col-start-2 text-xs/relaxed">
+            {displayDates(description)}
+          </CardDescription>
         ) : null}
-        {action && state === "output-available" ? <CardAction>{action}</CardAction> : null}
       </CardHeader>
+      {action && state === "output-available" ? (
+        <CardContent className="-mt-2 flex flex-wrap items-center gap-2">{action}</CardContent>
+      ) : null}
       <CardContent className="flex min-w-0 flex-col gap-4 text-sm">
         {state === "output-available" && output ? (
           children
@@ -70,6 +85,11 @@ export function ToolFrame({
           </CardContent>
         )}
       </CardContent>
+      {artifact && !expanded && state === "output-available" && (
+        <CardContent className="-mt-2">
+          <ArtifactOpenButton artifact={artifact} />
+        </CardContent>
+      )}
     </Card>
   );
 }
