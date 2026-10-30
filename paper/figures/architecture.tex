@@ -1,27 +1,53 @@
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
-\begin{tikzpicture}[node distance=6mm and 10mm,block/.style={draw,rectangle,
-  minimum height=10mm,text width=40mm,align=center,font=\small},
-  flow/.style={-{Latex[length=2mm]},semithick}]
-\node[block] (docs) {Documents\\text, PDF or scan};
-\node[block,above=of docs] (extract) {Normalise and segment\\extract and locate facts};
-\node[block,above=of extract] (store) {Immutable evidence store\\patient and revision};
-\node[block,right=of docs] (task) {Clinician situation\\role, task and as-of date};
-\node[block,above=of task] (window) {Shared evidence window\\eligible documents};
-\node[block,above=of window] (retrieve) {Retrieve evidence\\lexical and vector candidates};
-\node[block,above=of retrieve] (select) {Select fact identifiers\\render registered templates};
-\node[block,above=of select] (validate) {Shared claim boundary\\location and support checks};
-\node[block,above=of validate] (output) {Cards, chat and letters\\validated text for speech};
-\node[block,left=of validate] (compose) {Composed claims\\headlines and answers};
-\node[block,left=of output] (review) {Append-only reviews\\presentation overlay};
-\path[flow] (docs) edge (extract) (extract) edge (store)
-  (task) edge (window) (window) edge (retrieve)
-  (retrieve) edge (select) (select) edge (validate) (validate) edge (output)
-  (store) edge (retrieve) (compose) edge (validate);
-\path[flow,dashed] (review) edge (output);
+\begin{tikzpicture}[med diagram]
+\node[med io] (documents) at (0,-.95) {Documents};
+\node[med code] (normalise) at (0,0) {Normalise};
+\node[med code] (segment) at (0,1.15) {Segment};
+\node[med model] (extract) at (0,2.3) {Extract};
+\node[med check] (locate) at (0,3.45) {Locate\\Quote};
+\node[med check] (semantic) at (0,4.6) {Semantic\\Check};
+\node[med data] (embed) at (0,5.85) {Embed};
+\node[med store] (store) at (0,7.6) {Evidence\\Store};
+\node[med io] at (0,9.15) {Ingestion};
+
+\node[med io] (situation) at (6.2,-.95) {Clinician situation};
+\node[med model] (parse) at (6.2,0) {Situation\\Parse};
+\node[med code] (window) at (6.2,1.15) {Evidence\\Window};
+\node[med code,text width=17mm] (bm25) at (5.05,2.55) {BM25};
+\node[med data,text width=17mm] (dense) at (7.35,2.55) {Dense};
+\node[med merge] (rrf) at (6.2,3.5) {$\oplus$};
+\node[med note] at (6.2,3.08) {RRF};
+\node[med model] (select) at (6.2,5.15) {Select\\Facts};
+\node[med code] (render) at (6.2,6.35) {Render\\Templates};
+\node[med check] (boundary) at (6.2,7.6) {Claim\\Boundary};
+\node[med io] (outputs) at (6.2,8.55) {Cards / Chat / Letter};
+\node[med io] at (6.2,9.15) {Live lens};
+
+\begin{scope}[on background layer]
+  \node[med stack,fit=(extract)(locate)(semantic)] (ingeststack) {};
+  \node[med stack,fit=(bm25)(dense)(rrf),inner ysep=5mm] (retrieval) {};
+  \node[med stack,fit=(select)(render)] (sections) {};
+\end{scope}
+\node[med note,left=2mm of ingeststack,rotate=90,anchor=south] {per segment};
+\node[med note,right=2mm of sections,rotate=90,anchor=north] {per section};
+\node[med note,right=2mm of retrieval] {Hybrid\\Retrieval};
+
+\path[med flow] (documents) edge (normalise) (normalise) edge (segment)
+  (segment) edge (extract) (extract) edge (locate) (locate) edge (semantic)
+  (semantic) edge (embed) (embed) edge (store)
+  (situation) edge (parse) (parse) edge (window)
+  (rrf) edge (select) (select) edge (render)
+  (render) edge (boundary) (boundary) edge (outputs);
+\draw[med wire] (window.north) to (6.2,1.95);
+\draw[med flow] (6.2,1.95) -| (bm25.south);
+\draw[med flow] (6.2,1.95) -| (dense.south);
+\draw[med flow] (bm25.north) |- (rrf.west);
+\draw[med flow] (dense.north) |- (rrf.east);
+\draw[med flow] (store.east) to (2.65,7.6) |- (window.west);
 \end{tikzpicture}
-\caption{The Medlyn architecture. We store located evidence before live selection.
-Every output path crosses the claim boundary. Reviews change presentation through a
-separate ledger; they do not replace source evidence.}
+\caption{Ingestion and live lens construction. Orange denotes model calls, blue code,
+yellow checks, pink data or embeddings, and green storage throughout. Grey groups
+repeated or composite operations; $\oplus$ denotes RRF. Outputs cross the claim boundary.}
 \label{fig:architecture}
 \end{figure}
