@@ -36,7 +36,7 @@ export function ChatComposer({
   return (
     <PromptInput
       maxFiles={0}
-      className="[&>[data-slot=input-group]]:min-h-14 [&>[data-slot=input-group]]:items-end [&>[data-slot=input-group]]:rounded-3xl [&>[data-slot=input-group]]:border-border/50 [&>[data-slot=input-group]]:bg-gray-alpha-100 [&>[data-slot=input-group]]:shadow-none"
+      className="[&>[data-slot=input-group]]:min-h-12 [&>[data-slot=input-group]]:items-end [&>[data-slot=input-group]]:rounded-[26px] [&>[data-slot=input-group]]:border-border/50 [&>[data-slot=input-group]]:bg-background [&>[data-slot=input-group]]:shadow-none"
       onSubmit={async () => {
         if (busy || !text.trim()) return;
         const question = text.trim();
@@ -52,21 +52,21 @@ export function ChatComposer({
       <PromptInputTextarea
         aria-label={`Ask about ${patient.displayName}`}
         placeholder={`Ask about ${patient.displayName.split(" ")[0]}’s care…`}
-        className="max-h-40 min-h-13 px-5 py-3.5 text-base/6 md:text-sm/6"
+        className="max-h-40 min-h-12 px-4 py-3 text-base/6 md:text-sm/6"
         rows={1}
         value={text}
         maxLength={6000}
         disabled={busy}
         onChange={(event) => setText(event.target.value)}
       />
-      <InputGroupAddon align="inline-end" className="gap-1 self-end p-2">
+      <InputGroupAddon align="inline-end" className="gap-1 self-end p-1.5">
         {voice.supported && (
           <Tooltip>
             <TooltipTrigger asChild>
               <PromptInputButton
                 aria-label={voice.listening ? "Stop listening" : "Dictate question"}
                 aria-pressed={voice.listening}
-                className="size-9 rounded-full text-muted-foreground hover:bg-accent hover:text-foreground aria-pressed:bg-accent aria-pressed:text-foreground"
+                className="size-8 rounded-full text-muted-foreground hover:bg-accent hover:text-foreground aria-pressed:bg-accent aria-pressed:text-foreground"
                 disabled={busy}
                 onClick={voice.listening ? voice.stop : voice.start}
               >
@@ -84,7 +84,7 @@ export function ChatComposer({
         )}
         <PromptInputSubmit
           aria-label={busy ? "Stop response" : "Send question"}
-          className="size-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+          className="size-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
           status={status}
           disabled={busy ? !onStop : !text.trim()}
           type={busy ? "button" : "submit"}
