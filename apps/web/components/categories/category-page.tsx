@@ -6,7 +6,10 @@ import { categories } from "./category-config";
 import { CategoryEmpty } from "./category-empty";
 import { LabTrends, MedicationView } from "./clinical-views";
 import { FactTable } from "./fact-table";
+import { diagnosisGroups, GroupedClinicalList } from "./grouped-clinical-list";
 import { ImagingFindings } from "./imaging-findings";
+import { ImagingStudies } from "./imaging-studies";
+import { OncologySummary } from "./oncology-summary";
 import { PageHeading } from "./page-heading";
 import { PageShell } from "./page-shell.tsx";
 import { patientData } from "./patient-data";
@@ -54,7 +57,18 @@ export async function CategoryPage({ category }: { category: string }) {
       ) : (
         <>
           {category === "labs" && <LabTrends data={data} rows={rows} />}
-          {rows.length ? (
+          {category === "oncology" && rows.length > 0 && <OncologySummary rows={rows} />}
+          {rows.length && category === "imaging" ? (
+            <ImagingStudies data={data} rows={rows} />
+          ) : rows.length && ["diagnoses", "procedures", "allergies", "labs"].includes(category) ? (
+            <GroupedClinicalList
+              groups={
+                category === "diagnoses"
+                  ? diagnosisGroups(rows)
+                  : [{ title: category === "labs" ? "Measurements & history" : config.title, rows }]
+              }
+            />
+          ) : rows.length ? (
             <FactTable
               title={config.title}
               description={`Evidence available as of ${formatDate(data.window.asOf)}`}
