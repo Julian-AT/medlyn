@@ -1,0 +1,123 @@
+{
+  "generatorVersion": "1.0.0",
+  "seed": 20261030,
+  "patientStart": 0,
+  "nPatients": 20,
+  "counts": {
+    "facts": 969,
+    "documents": 190,
+    "mutations": 11,
+    "contradictions": 11,
+    "distractors": 96,
+    "gaps": 74,
+    "mutatedPatients": 5,
+    "patients": 20
+  },
+  "splits": {
+    "train": 16,
+    "val": 2,
+    "test": 2
+  },
+  "families": {
+    "consultation:oncology_treatment": 2,
+    "narrative:renal_review": 2,
+    "compact:cardiac_followup": 1,
+    "problem_list:vascular_workup": 1,
+    "narrative:cardiac_followup": 2,
+    "compact:oncology_treatment": 1,
+    "compact:primary_care_transfer": 2,
+    "dictated:oncology_surveillance": 1,
+    "problem_list:metabolic_review": 1,
+    "compact:metabolic_review": 1,
+    "consultation:renal_review": 1,
+    "narrative:oncology_treatment": 1,
+    "problem_list:cardiac_followup": 1,
+    "narrative:metabolic_review": 1,
+    "compact:renal_review": 1,
+    "dictated:geriatric_transition": 1
+  },
+  "mutationCounts": {
+    "schedule_change": 3,
+    "bmi_mismatch": 2,
+    "side_flip": 2,
+    "date_shift": 2,
+    "dose_change": 2
+  },
+  "bytes": 733414,
+  "generationSeconds": 0.085,
+  "workers": 1,
+  "shardSize": 1000,
+  "indexLineBase": 0,
+  "offsetUnit": "UTF-16 code units",
+  "templateInventory": [
+    "narrative",
+    "compact",
+    "problem_list",
+    "consultation",
+    "dictated",
+    "structured"
+  ],
+  "scenarioInventory": [
+    "metabolic_review",
+    "vascular_workup",
+    "cardiac_followup",
+    "renal_review",
+    "oncology_treatment",
+    "pulmonary_review",
+    "rheumatology_review",
+    "primary_care_transfer",
+    "oncology_surveillance",
+    "geriatric_transition"
+  ],
+  "mutationInventory": [
+    "side_flip",
+    "dose_change",
+    "date_shift",
+    "bmi_mismatch",
+    "schedule_change",
+    "assertion_flip",
+    "date_typo"
+  ],
+  "heldOutStyles": [
+    "dictated",
+    "structured"
+  ],
+  "heldOutMutationTypes": [
+    "assertion_flip",
+    "date_typo"
+  ],
+  "heldOutScenarios": [
+    "oncology_surveillance",
+    "geriatric_transition"
+  ],
+  "labelTier": "intended_code_checked",
+  "labelValidation": {
+    "failures": 0,
+    "checks": [
+      "exact_normalised_spans",
+      "checked_tokens",
+      "ordered_schedules",
+      "plan_presence",
+      "mutation_passages",
+      "gap_coverage"
+    ]
+  },
+  "independentSemanticReview": false,
+  "humanGoldReview": false,
+  "rewrittenPatients": 4,
+  "rewriteValidation": {
+    "documentsRewritten": 38,
+    "documentsRejected": 2,
+    "patientsAttempted": 4,
+    "requestErrors": 0
+  },
+  "segmentCompatibility": "Dose-mutation prose uses oral so facts fit one engine segment.",
+  "identityVersion": "engine-content-hash-v1",
+  "identityMigrationSeconds": 0.02,
+  "engineValidation": {
+    "facts": 969,
+    "engineLocated": 969,
+    "failures": 0,
+    "allSegmentIdsChecked": true
+  }
+}
