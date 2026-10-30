@@ -16,28 +16,28 @@ import { Timeline } from "./timeline";
 export type UiToolPart = ToolUIPart<InferUITools<ReturnType<typeof uiTools>>>;
 export type UiToolName = keyof UiToolOutputs;
 
-export function renderToolPart(part: UiToolPart | ToolUIPart): ReactNode {
+export function renderToolPart(part: UiToolPart | ToolUIPart, expanded = false): ReactNode {
   // The server validates each output against the tool's schema before streaming it.
   const typed = part as UiToolPart;
   switch (typed.type) {
     case "tool-open_lens":
-      return <LensCards {...typed} />;
+      return <LensCards {...typed} expanded={expanded} />;
     case "tool-show_patient_summary":
-      return <PatientSummary {...typed} />;
+      return <PatientSummary {...typed} expanded={expanded} />;
     case "tool-show_medications":
-      return <MedicationTable {...typed} />;
+      return <MedicationTable {...typed} expanded={expanded} />;
     case "tool-show_lab_trend":
-      return <LabTrend {...typed} />;
+      return <LabTrend {...typed} expanded={expanded} />;
     case "tool-show_timeline":
-      return <Timeline {...typed} />;
+      return <Timeline {...typed} expanded={expanded} />;
     case "tool-show_findings":
-      return <FindingsCompare {...typed} />;
+      return <FindingsCompare {...typed} expanded={expanded} />;
     case "tool-show_passage":
-      return <PassageCard {...typed} />;
+      return <PassageCard {...typed} expanded={expanded} />;
     case "tool-check_documented":
-      return <GapCard {...typed} />;
+      return <GapCard {...typed} expanded={expanded} />;
     case "tool-draft_letter":
-      return <LetterPreview {...typed} />;
+      return <LetterPreview {...typed} expanded={expanded} />;
     default:
       return null;
   }
