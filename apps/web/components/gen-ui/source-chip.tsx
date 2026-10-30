@@ -28,11 +28,11 @@ export function SourceChip({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-6 max-w-full gap-1 rounded-md px-1 text-[11px] font-normal text-muted-foreground shadow-none hover:text-foreground"
+              className="rounded-full h-6 max-w-full gap-1 rounded-md px-1 text-[11px] font-normal text-muted-foreground shadow-none hover:text-foreground"
               aria-label={`Open source ${segmentId}`}
               onClick={() => showSource(segmentId)}
             >
-              <HugeiconsIcon icon={File02Icon} strokeWidth={1.75} aria-hidden="true" />
+              <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
               {label}
             </Button>
           </HoverCardTrigger>

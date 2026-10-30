@@ -59,7 +59,7 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
         </CardContent>
       ) : null}
       {props.expanded && (
-        <Button asChild variant="outline" size="sm" className="shadow-none">
+        <Button asChild variant="outline" size="sm" className="rounded-full shadow-none">
           <a href={`/letter?${query}`}>Open GP letter</a>
         </Button>
       )}
