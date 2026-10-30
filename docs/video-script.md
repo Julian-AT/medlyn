@@ -1,62 +1,47 @@
 # Medlyn: two-minute video
 
-One continuous screen recording with you on camera, spoken fast (about 165 words per minute, roughly 330 words). The skeleton video `docs/video/skeleton.mp4` shows every segment with its time window, what to show and a countdown.
+One continuous screen recording with you on camera, spoken fast (about 165 words per minute). Rehearse against `docs/video/skeleton.mp4`; the countdown turns red with three seconds left. Every number below comes from `METRICS.md`, `ml/verifier/results.json`, `ml/quantum/results.json` and the synthetic manifest.
 
-Numbers in `[brackets]` come from `METRICS.md`, `ml/verifier/results.json` and `ml/quantum/results.json` on recording day. Never say a number that is not in those files.
-
-## Segments
-
-| #   | Time         | Seconds | Show                                                                      | Words |
-| --- | ------------ | ------- | ------------------------------------------------------------------------- | ----- |
-| 1   | 0:00 to 0:07 | 7       | You on camera, then Home                                                  | ~20   |
-| 2   | 0:07 to 0:27 | 20      | Chat: anaesthetist question, streamed tool cards, source popup DE/EN      | ~55   |
-| 3   | 0:27 to 0:44 | 17      | Situations › Emergency: C1 comparator, "Not documented · 8 of 8"          | ~47   |
-| 4   | 0:44 to 0:54 | 10      | Paper, Figure 1                                                           | ~28   |
-| 5   | 0:54 to 1:06 | 12      | Paper or app: hybrid retrieval, absence check, contradiction adjudication | ~33   |
-| 6   | 1:06 to 1:24 | 18      | Hugging Face model card and dataset, benchmark table                      | ~50   |
-| 7   | 1:24 to 1:39 | 15      | Quantum card, paper quantum figure                                        | ~41   |
-| 8   | 1:39 to 1:50 | 11      | Research › Evaluation metrics                                             | ~28   |
-| 9   | 1:50 to 2:00 | 10      | End card: what does not work yet, URL                                     | ~28   |
+| #   | Time         | Show                                                      |
+| --- | ------------ | --------------------------------------------------------- |
+| 1   | 0:00 to 0:07 | You on camera, then app.medlyn.health                     |
+| 2   | 0:07 to 0:27 | Chat: anaesthetist question, streamed cards, source popup |
+| 3   | 0:27 to 0:44 | Situations › Emergency: carotid comparator, kidney gap    |
+| 4   | 0:44 to 0:56 | Paper Figure 1, then the hybrid retrieval line            |
+| 5   | 0:56 to 1:16 | Hugging Face dataset and model, results table             |
+| 6   | 1:16 to 1:36 | Quantum card, ibm_marrakesh job, paper quantum figure     |
+| 7   | 1:36 to 1:50 | Research › Evaluation metrics                             |
+| 8   | 1:50 to 2:00 | End card: not there yet, medlyn.health                    |
 
 ## Script
 
-**1. Intro (0:00 to 0:07)**
-"Medlyn turns eight German clinical documents into a task-specific view, where every single line is traceable to a located quote."
+**1. Hook (0:00 to 0:07)**
+"Eight German clinical documents, one patient, three minutes before surgery. Medlyn turns that into a task view where every line points to its exact source."
 
 **2. Chat (0:07 to 0:27)**
 Type: "I'm the anaesthetist, pre-op check before her quadrantectomy on 16 May."
-"I state role and task. The agent calls typed tools over the fact graph and streams generative UI: antithrombotics, the contrast allergy, ejection fraction. Each line carries character offsets into its source segment, so one click shows the original German sentence and its translation."
+"I state role and task. The agent calls typed tools over a graph of 425 located facts and streams generative UI: aspirin 100 milligrams, the contrast allergy, ejection fraction 60 percent. Every line carries character offsets into its source, so one click shows the German sentence and the translation."
 
 **3. Situations (0:27 to 0:44)**
-Emergency situation, carotid badge, kidney gap.
-"Switch the task and the lens re-plans from a needs catalog. The carotid stenosis side contradicts itself inside one letter, adjudicated with both passages. And kidney function is not documented: that needs a full absence check across all eight eligible documents, never just a missed search."
+"Switch the task and the screen re-plans. The carotid stenosis side contradicts itself inside one letter, adjudicated with both passages. Kidney function is not documented, and that claim is only made after a full check of all eight documents."
 
-**4. Architecture (0:44 to 0:54)**
-Paper, Figure 1.
-"The architecture is two towers. Ingestion extracts atomic facts and keeps one only if its quote is located in the text. The live lens never lets the model write facts: it selects fact IDs, templates render."
+**4. Architecture (0:44 to 0:56)**
+"Two towers. Ingestion keeps a fact only if its quote is located in the text. At query time the model never writes facts: it selects fact IDs, templates render, and one claim validator gates chat, cards, speech and the GP letter. Retrieval fuses BM25 with Gemini embeddings."
 
-**5. Engine details (0:54 to 1:06)**
-Paper Section 3 or the app.
-"Retrieval is hybrid: BM25 plus Gemini embeddings, fused with reciprocal rank fusion. And every output channel, cards, chat, speech and the GP letter, passes one shared claim validator."
+**5. Own model (0:56 to 1:16)**
+"To train our own verifier we generated one hundred thousand synthetic patients: nine hundred thousand documents, four point eight million labelled facts, sixty thousand planted contradictions. We fine-tuned Qwen3 with QLoRA in MLX on a MacBook. In a cascade it answers first and calls GPT only when unsure: forty-seven percent fewer GPT calls for under four points of accuracy. Dataset and model are on Hugging Face."
 
-**6. Own model (1:06 to 1:24)**
-Hugging Face model card, dataset page, benchmark table.
-"For our own model we generated one hundred thousand synthetic patients, four point eight million labelled facts, with controlled mutations as negatives. We fine-tuned Qwen3 with QLoRA in MLX on a MacBook as a claim verifier: macro F1 [x] versus [y] zero-shot, and it cuts [z] percent of GPT calls in a cascade. Open on Hugging Face."
+**6. Quantum (1:16 to 1:36)**
+"And we went quantum. An eight-qubit ZZ feature-map kernel and QAOA for evidence selection, built in Qiskit, and run on IBM's one-hundred-fifty-six-qubit Marrakesh processor: one hundred thirty-six circuits, fifty-three seconds of QPU time. In simulation it matches a classical SVM. On hardware, circuit depth of seven hundred sixty drowns the signal in noise. Measured, not hyped."
 
-**7. Quantum (1:24 to 1:39)**
-Quantum card, paper quantum figure.
-"As a research track we built an eight-qubit ZZ feature-map quantum kernel and QAOA for evidence selection in Qiskit, and executed the kernel on IBM's one-hundred-fifty-six-qubit Marrakesh processor. Result: on par with classical baselines, no advantage at this scale."
+**7. Metrics (1:36 to 1:50)**
+"On the five challenge situations: fifteen of fifteen answers, one hundred percent traceable, zero invented facts, five contradictions and zero false alarms. Cached screens load in a quarter of a second."
 
-**8. Metrics (1:39 to 1:50)**
-Research › Evaluation.
-"On the five challenge situations: [15] of 15 answers, [100] percent traceability, [0] invented facts, all [5] contradictions with zero false alarms, slowest screen [x] seconds."
-
-**9. What does not work yet (1:50 to 2:00)**
-End card.
-"Not there yet: cold typed situations are slower than our target, PDF extraction misses facts, and the verifier is synthetic-trained. Live at medlyn.health."
+**8. Not there yet (1:50 to 2:00)**
+"Not there yet: cold typed situations take up to ten seconds, and our verifier still trails GPT on real text. Medlyn is live at medlyn.health."
 
 ## Before recording
 
-- Deployed app at app.medlyn.health in a 1440 × 900 window, cache warmed, review layer reset.
-- Tabs open in advance: app, Hugging Face model, Hugging Face dataset, paper PDF at Figure 1.
-- Rehearse once against `docs/video/skeleton.mp4`; the countdown turns red with three seconds left.
+- app.medlyn.health in a 1440 × 900 window, light theme, cache warmed, review layer reset, fresh chat.
+- Tabs ready: app, Hugging Face dataset and model, paper PDF at Figure 1, Research › Evaluation.
+- Use the Emergency chip for segment 3 (cached, instant). Type the anaesthetist prompt for segment 2.
