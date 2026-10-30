@@ -1,0 +1,162 @@
+"""Authored vocabulary; no challenge prose is used by the generator."""
+
+STYLES = ("narrative", "compact", "problem_list", "consultation", "dictated", "structured")
+HELD_STYLES = STYLES[-2:]
+SCENARIOS = (
+    "metabolic_review",
+    "vascular_workup",
+    "cardiac_followup",
+    "renal_review",
+    "oncology_treatment",
+    "pulmonary_review",
+    "rheumatology_review",
+    "primary_care_transfer",
+    "oncology_surveillance",
+    "geriatric_transition",
+)
+MUTATIONS = (
+    "side_flip",
+    "dose_change",
+    "date_shift",
+    "bmi_mismatch",
+    "schedule_change",
+    "assertion_flip",
+    "date_typo",
+)
+HELD_MUTATIONS = ("assertion_flip", "date_typo")
+CONDITIONS = {
+    "diabetes": ("Diabetes mellitus Typ 2", "Type 2 diabetes"),
+    "hypertension": ("Arterielle Hypertonie", "Arterial hypertension"),
+    "cad": ("Koronare Herzkrankheit", "Coronary artery disease"),
+    "carotid": ("Atherosklerose der Karotiden", "Carotid atherosclerosis"),
+    "af": ("Paroxysmales Vorhofflimmern", "Paroxysmal atrial fibrillation"),
+    "ckd": ("Chronische Niereninsuffizienz", "Chronic kidney disease"),
+    "copd": ("Chronisch obstruktive Lungenerkrankung", "Chronic obstructive pulmonary disease"),
+    "sle": ("Systemischer Lupus erythematodes", "Systemic lupus erythematosus"),
+    "osteoporosis": ("Osteoporose", "Osteoporosis"),
+    "gerd": ("Gastroösophageale Refluxkrankheit", "Gastroesophageal reflux disease"),
+    "dyslipidemia": ("Dyslipidämie", "Dyslipidemia"),
+    "breast": ("Invasives Mammakarzinom", "Invasive breast carcinoma"),
+    "colon": ("Adenokarzinom des Kolons", "Colon adenocarcinoma"),
+    "lung": ("Adenokarzinom der Lunge", "Lung adenocarcinoma"),
+}
+# generic, brand, ATC, strength, route, schedule, additional instruction
+MEDICATIONS = {
+    "diabetes": (
+        "Metformin",
+        "Glucophage",
+        "A10BA02",
+        "500 mg",
+        "p.o.",
+        ["1", "0", "1", "0"],
+        "zu den Mahlzeiten",
+    ),
+    "hypertension": (
+        "Candesartan",
+        "Atacand",
+        "C09CA06",
+        "8 mg",
+        "p.o.",
+        ["1", "0", "1/2", "0"],
+        "",
+    ),
+    "cad": (
+        "Acetylsalicylsäure",
+        "Thrombo ASS",
+        "B01AC06",
+        "100 mg",
+        "p.o.",
+        ["1", "0", "0", "0"],
+        "",
+    ),
+    "af": ("Apixaban", "Eliquis", "B01AF02", "5 mg", "p.o.", ["1", "0", "1", "0"], ""),
+    "copd": (
+        "Tiotropium",
+        "Spiriva",
+        "R03BB04",
+        "18 µg",
+        "inhalativ",
+        ["1", "0", "0", "0"],
+        "Inhalationskapsel",
+    ),
+    "sle": (
+        "Hydroxychloroquin",
+        "Plaquenil",
+        "P01BA02",
+        "200 mg",
+        "p.o.",
+        ["1", "0", "0", "0"],
+        "",
+    ),
+    "osteoporosis": (
+        "Alendronsäure",
+        "Fosamax",
+        "M05BA04",
+        "70 mg",
+        "p.o.",
+        ["1", "0", "0", "0"],
+        "nur montags; wöchentlich",
+    ),
+    "gerd": (
+        "Pantoprazol",
+        "Pantoloc",
+        "A02BC02",
+        "20 mg",
+        "p.o.",
+        ["1", "0", "0", "0"],
+        "vor dem Frühstück",
+    ),
+    "dyslipidemia": (
+        "Atorvastatin",
+        "Sortis",
+        "C10AA05",
+        "20 mg",
+        "p.o.",
+        ["0", "0", "1", "0"],
+        "",
+    ),
+    "insulin": (
+        "Insulin glargin",
+        "Lantus",
+        "A10AE04",
+        "100 IE/ml",
+        "s.c.",
+        ["0", "0", "0", "12"],
+        "Einheit IE",
+    ),
+}
+DOC_TYPES = {
+    "internal": ("Internistischer Entlassungsbericht", "Entlassungsbrief", "Innere Medizin"),
+    "oncology": ("Onkologischer Entlassungsbericht", "Entlassungsbrief", "Onkologie"),
+    "outpatient": ("Ambulante Verlaufskontrolle", "Ambulanzbrief", "Innere Medizin"),
+    "duplex": ("Gefäßsonografischer Befund", "Duplex", "Angiologie"),
+    "radiology": ("Radiologischer Verlaufsbefund", "Radiologie", "Radiologie"),
+    "holter": ("Langzeit-EKG Auswertung", "Holter", "Kardiologie"),
+    "bp": ("Ambulante Blutdruckmessung", "24h-Blutdruck", "Kardiologie"),
+    "eye": ("Augenärztliche Mitbeurteilung", "Konsil", "Augenheilkunde"),
+    "histology": ("Gewebeuntersuchung", "Histologie", "Pathologie"),
+    "board": ("Interdisziplinäre Fallbesprechung", "Tumorboard", "Onkologie"),
+}
+INTROS = (
+    "Der folgende Bericht fasst die Befunde dieses Behandlungstermins zusammen.",
+    "Kurzbefund zum unten angeführten Kontakt; Angaben aus eigener Untersuchung.",
+    "Problembezogene Übersicht mit getrennten Befund- und Planungseinträgen.",
+    "Die Zuweisung erfolgte zur fachärztlichen Einschätzung des bisherigen Verlaufs.",
+    "Verlaufsdiktat: die erhobenen Ergebnisse wurden mit der behandelten Person besprochen.",
+    "Dokumentation nach Fachbereich und Untersuchungsdatum gegliedert.",
+)
+DIAGNOSES = (
+    "Als Begleiterkrankung ist {condition} erfasst.",
+    "Diagnosenliste: {condition}.",
+    "Bekannte Erkrankung: {condition}.",
+    "Im vorliegenden Verlauf besteht {condition}.",
+)
+GAP_CONCEPTS = {
+    "urine_albumin": "Urine albumin measurement",
+    "foot_exam": "Diabetic foot examination",
+    "family_history": "Family history",
+    "kidney_function": "Renal laboratory function",
+    "hba1c": "Glycated haemoglobin",
+    "lipids": "Lipid measurements",
+    "eye_findings": "Ophthalmic examination",
+}
