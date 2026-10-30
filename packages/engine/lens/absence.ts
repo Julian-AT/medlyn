@@ -1,12 +1,13 @@
 import { z } from "zod";
 import type { AbsenceResult, Document, EvidenceWindow, Segment } from "../contracts.ts";
 import { structured } from "../llm/client.ts";
-import { hybridSearch } from "../search/hybrid.ts";
-import { documentCount, loadDocuments, loadSegments } from "../store.ts";
+import { documentCount, loadDocuments, loadSegments, PATIENT_ID } from "../store.ts";
+import { searchAbsenceCandidates } from "./absence-retrieval.ts";
 import { withModelSlot } from "./select.ts";
 
 type FullDocument = Document & { normText: string };
 export type AbsenceOptions = {
+  patientId?: string;
   documents?: FullDocument[];
   segments?: Segment[];
   total?: number;
@@ -67,9 +68,9 @@ export async function checkDocumented(
   try {
     const work = async (): Promise<AbsenceResult> => {
       const [documents, segments, total] = await Promise.all([
-        opts.documents ?? loadDocuments(window),
-        opts.segments ?? loadSegments(window),
-        opts.total ?? documentCount(),
+        opts.documents ?? loadDocuments(window, opts.patientId ?? PATIENT_ID),
+        opts.segments ?? loadSegments(window, opts.patientId ?? PATIENT_ID),
+        opts.total ?? documentCount(opts.patientId ?? PATIENT_ID),
       ]);
       searched.total = total;
       const eligible = new Set(window.eligibleDocumentIds);
@@ -78,7 +79,12 @@ export async function checkDocumented(
       if (
         docs.length !== eligible.size ||
         new Set(docs.map((doc) => doc.id)).size !== eligible.size ||
-        docs.some((doc) => !doc.normText.trim()) ||
+        docs.some(
+          (doc) =>
+            !doc.normText.trim() ||
+            doc.revisionId !== window.corpusRevision ||
+            doc.patientId !== (opts.patientId ?? docs[0]?.patientId),
+        ) ||
         total < eligible.size
       )
         throw new Error("Incomplete document search corpus");
@@ -122,9 +128,10 @@ export async function checkDocumented(
           ? []
           : opts.candidateSearch
             ? opts.candidateSearch(terms.join(" "))
-            : hybridSearch(terms.join(" "), window, { k: 60 }).then((hits) =>
-                hits.map((hit) => hit.segmentId),
-              ),
+            : searchAbsenceCandidates(terms.join(" "), window, {
+                k: 60,
+                patientId: opts.patientId ?? PATIENT_ID,
+              }).then((hits) => hits.map((hit) => hit.segmentId)),
         fullText,
       ]);
       const candidateIds = new Set(candidates);
