@@ -1,78 +1,173 @@
 # Architecture
 
-Medlyn's Part A build covers one synthetic patient: situation-specific cards, source inspection, investigation, review and a GP follow-up letter. Multi-patient worklists, FHIR, PDF/scan ingestion and production deployment belong to the product direction and are outside this build. Synthetic-data research and verifier training are separate; no self-hosted inference service is integrated.
+Medlyn turns a clinician's task into source-linked patient facts. The patient app
+is chat-first, with generative clinical views and a dedicated Situations cockpit.
+A separate public landing page carries product information. Part A demonstrates
+one challenge patient; A+ adds isolated synthetic corpora, multimodal ingestion,
+retrieval and verifier research. These are prototype capabilities, not production
+clinical validation. See [status](status.md) for measured coverage and open gates.
 
-This guide describes code present in the shared tree, not a verified deployment. The [README](../README.md) contains the architecture diagram, setup commands, service configuration and direct dependency licences. End-to-end claims and submission metrics require separate live validation.
+## Applications and modules
 
-## Ingestion and evidence storage
+| Module                     | Boundary                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `apps/www`                 | Public Next.js landing page, root domain, port 3001; no patient-data metadata                                |
+| `apps/app`                 | Next.js patient app/API, app subdomain, port 3000; chat, patient categories, Situations, reviews and letters |
+| Engine ingest/findings     | Local corpus → located facts, translations, entities and adjudicated findings                                |
+| Engine store/search        | Shared patient/revision/window reads, BM25, pgvector and fusion                                              |
+| Engine lens/claims         | Need planning, fact selection, absence checks, templates and shared output gate                              |
+| Engine agent/review/letter | Investigation tools, validated chat history, review overlay and GP draft                                     |
+| Evaluation/research        | Separate real, synthetic, retrieval and verifier reports; generated paper aggregates                         |
 
-The loader reads local patient metadata, the document manifest and document JSON at runtime. A corpus revision is derived from the input content. Normalisation decodes entities and line breaks while preserving a map back to raw offsets. Segmentation produces sentences, headings, list items and medication table rows with offsets into normalised text.
+Paths use the final `apps/app` / `@medlyn/app` names. The integration sweep renames
+the earlier `apps/web` / `@medlyn/web` tree. [Decisions](decisions.md) records this
+and the migration from the assistant-ui dock to AI SDK v7 with AI Elements.
 
-Medication tables use a deterministic parser. Model extraction and recall recover structured facts from the source documents; pre-extracted challenge concepts serve as coverage hints, not authoritative evidence. Facts must pass quote location and sensitive-value checks. Semantic validation and German negation rules retain support, assertion and temporal distinctions. Translation supplies English source views alongside German passages. Entity clustering links related facts.
+```mermaid
+flowchart TD
+  Local[Local documents and PDF scans] --> Ingest[Extract text, normalise, segment]
+  Ingest --> Locate[Extract facts, locate quotes, check support]
+  Locate --> Store[(Neon evidence and findings)]
+  Store --> Window[Shared patient, revision and evidence window]
+  Window --> Lens[Plan, select, full absence check, templates]
+  Window --> Tools[Investigation and generative UI tools]
+  Window --> Letter[GP letter]
+  Lens --> Claims[Shared claim boundary]
+  Tools --> Claims
+  Letter --> Claims
+  Claims --> App[Cards, chat, sources, letter and validated speech]
+  Review[Append-only reviews] -. display overlay .-> App
+  Public[Public landing page] --> App
+```
 
-Finding rules cover laterality, event dates and arithmetic consistency; a model sweep proposes additional candidates. Adjudication distinguishes contradictions, requests for clarification and dismissed candidates. Each retained finding carries at least two located passages. A later medication list or small measurement change is not by itself a contradiction.
+## Ingestion and publication
 
-Drizzle accesses Neon over the serverless HTTP driver. Storage separates:
+Runtime loading resolves the corpus from the root `MEDLYN_DATA_PATH`. A revision
+hash identifies its input. Normalisation decodes entities and line breaks while
+keeping raw-offset mapping. Segments preserve UTF-16 offsets into normalised text,
+including medication rows, headings and sentences. Document IDs derive from
+filenames; segment IDs combine document ID and ordinal; fact IDs derive from
+stable content hashes.
 
-| Records | Purpose |
-| --- | --- |
-| Corpus revisions, documents and segments | Input identity, original and normalised text, offset mapping, source dates and English translations. |
-| Entities and facts | Structured evidence, provenance, content hashes, validation version and support state. |
-| Findings and finding passages | Adjudicated outcomes and every supporting passage; dismissed candidates are retained off screen. |
-| Validations and lens cache | Claim verdicts and reusable machine screens. |
-| Reviews and letters | Append-only session review decisions, saved letter claims and clinician annotations. |
+A deterministic medication parser and reasoning-model extraction/recall produce
+facts. Location checks find quotes and check sensitive numbers, dates, doses,
+sides and ordered schedules. Semantic support, German negation flags, translation
+and entity clustering retain assertion and temporal distinctions. Challenge
+concept hints support coverage repair, never independent evidence.
 
-Document IDs come from filenames. Segment IDs combine document ID and ordinal. Fact IDs derive from content hashes. Ingestion owns evidence writes; live paths read that evidence and write only their validation, screen, review or letter records.
+Finding rules and model proposals identify candidates; qualifying same-event
+conflicts and clarification items are adjudicated. Display narratives cross the
+shared claim boundary. Dismissed candidates stay off screen; medication changes
+between lists are trends. Evidence writes belong to ingest. The current runner
+writes corpus then findings separately: atomic publication of both remains an
+[open integration item](status.md#integration-and-submission-work).
 
-## One window for every live path
+PDFs use embedded text when available; scans use vision extraction. Text offsets
+map to page boxes. Ordinary extraction/location/semantic checks still apply.
+Page vectors only retrieve; images cannot prove facts or absence. Local temporary
+page URIs need authenticated asset serving and durable storage for deployment.
+Strict PDF/JSON fact agreement remains below the PRD's 95% target.
 
-The store creates an evidence window containing the as-of date, eligible document IDs and corpus revision. Eligibility means the document date is on or before the as-of date; the default is the latest source document date. Event dates do not independently make a future document eligible.
+## Storage and the one evidence window
 
-The lens, absence check, agent and letter reuse that set. A finding is eligible only when every passage belongs to an eligible document. Search counts distinguish eligible documents from the full corpus. Availability, assertion, temporal status, completeness, conflict and review remain separate contract fields.
+Drizzle accesses Neon over HTTP. Tables separate revisions, documents, segments,
+entities, facts, findings/passages, validations, lens cache, reviews, letters and
+chats/messages. Segment vectors and page assets retain retrieval/provenance data.
+The frozen Zod screen contract governs storage and UI; it is not derived from SQL.
 
-## Live lens and screen contract
+Only the store defines eligibility: document date on or before the requested
+as-of date; default to the latest document date. Planned future events remain
+visible when an eligible document records them, labelled with their temporal
+status. Every live path reuses the patient, revision and eligible document set.
+Findings require all passages to be eligible. Reads check current revision before
+and after access and fail closed on stale windows. A request-local load shares
+sources without creating another eligibility rule.
 
-A situation chip maps directly to a profile. Free text is parsed by the fast model. Profiles group a fixed catalog of needs into sections; an unfamiliar role invokes a model planner that may choose only catalog IDs. Code adds critical and concern-specific needs.
+Gemini Embedding 2 supplies 768-dimensional text/page vectors. Reciprocal rank
+fusion combines vector rankings and BM25. The configured Neon host rejects
+`pg_search`, so BM25 runs in process over eligible segments. Vector queries rank
+the filtered set exactly; provisioned HNSW indexes do not imply that this query
+uses approximate search. Per-process embedding pacing does not coordinate quota
+across concurrent jobs. Follow the [search guide](../packages/engine/search/README.md)
+for extension/index setup and embedding backfill.
 
-Each section's selection call receives eligible facts of relevant kinds rather than a top-k vector retrieval. Calls run in parallel with bounded model concurrency. Responses contain fact IDs, completeness and an optional headline. The engine rejects selections outside the need's eligible candidates. Templates write the card lines and preserve source-list dates, certainty and whether an event was planned, recommended or performed.
+## Lens and absence proof
 
-When nothing is selected, absence checking searches German/English synonyms and sends the full normalised eligible documents to the fast model. Both searches must complete; an empty result permits a validated absence claim. A hit can trigger another selection pass. Missing inputs, invalid returned IDs, model errors and timeouts produce `unavailable`, never `not_documented`.
+Chips map directly to configured profiles and skip parsing. Typed tasks parse role,
+concerns and an explicit cutoff; unfamiliar roles invoke a planner limited to the
+need catalog. Per-section selection receives all eligible facts of relevant kinds
+and runs in parallel. It returns fact IDs, completeness and an optional headline.
+Code rejects ineligible IDs and renders approved templates and missing-field labels.
 
-The lens endpoint emits newline-delimited JSON using the shared Zod contract: `situation` with section titles, completed `section` events, optional validated `headline` events, `findings`, then `done` with timings. Errors use an explicit event. Source routes return the cited segment, neighbouring context or the document for the evidence panel.
+Empty selections trigger synonym-expanded retrieval, exhaustive lexical scans of
+original/translated eligible segments and a full-document LLM pass. Vector search
+is supplemental: quota, configuration, coverage or deadline failures record
+`lexical_fallback`. BM25/lexical or full-text failure returns `unavailable`.
+Only a complete successful absence check can support `not_documented`; positive
+matches need located passages and may trigger reselection. Top-k emptiness alone
+is never an absence proof.
 
-The current web route also supports an explicit mock mode and automatically replays a labelled mock if live setup fails before streaming. It exposes the mode in `X-Medlyn-Mode`; live evaluation refuses mock fallback. A populated cockpit alone therefore does not demonstrate live ingestion or retrieval.
+The lens route emits NDJSON: situation/section titles, completed sections, validated
+headlines, findings and done timings, or explicit errors. It supports a labelled
+mock mode and can replay mock output on setup failure before streaming. The
+`X-Medlyn-Mode` header exposes this; live evaluation rejects mock fallback.
 
-The budget is first card below 1.5 seconds, complete cold screen below 5 seconds and cache replay below 1 second. These are provisional targets. The measured proxy floor of roughly 1.25 seconds per call makes serial parse-and-select expensive; chips bypass parsing and the live stream exposes section titles before cards. Unknown roles can add a planning call. Full absence checks can exceed the target and must still report failures honestly.
+The full validation cache identity includes patient, revision, evidence window,
+validator version, normalised text, fact IDs/content hashes and segment IDs. Lens
+identity adds engine version and situation. Unavailable screens are not cached;
+review overlays apply after retrieval. Timing targets are <5 s cold and <1 s
+cached, and remain unmet consistently. Full chat orchestration adds tool-loop and
+answer-validation latency beyond the lens-only measurement.
 
-## Shared claim boundary
+## Claim boundary and chat
 
-Screen lines, optional headlines, agent statements, speech and letter sentences use the same claim validator. A claim identifies its text, kind, author, fact IDs, segment IDs and validation result.
+Every patient statement crosses the same gate: template lines must match checked
+facts; composed claims need sensitive-token and contextual semantic checks;
+absence claims need matching successful full-window proofs. Unsupported output is
+withheld. Fixed nonclinical boilerplate is explicitly exempt, and unsupported
+clinician prose remains a labelled annotation. Finding narratives are validated
+at publication/read time; visual tool results recheck location and supported lines.
 
-- Template claims must match registered renderings of their cited facts and inherit evidence support.
-- Composed claims must cite eligible evidence, pass sensitive-token checks and receive a semantic support verdict against source passages and context.
-- Absence claims need a matching completed full-window search result, including topic, date and document count.
-- Fixed nonclinical boilerplate is explicitly exempt. Clinician annotations remain separate from verified patient facts.
+`/api/chat` uses AI SDK v7 for a bounded tool loop. AI Elements provides transcript
+structure; shadcn primitives render clinical views. Nine registered tools cover
+lens, patient summary, medications, lab trends, timeline, findings, passage,
+documentation check and letter draft. Server-side patient/window checks constrain
+their evidence. Model prose is buffered and gated before release; raw model
+reasoning is not displayed. Canonical persisted history supplies validated message
+parts rather than trusting client-supplied assistant/tool evidence.
 
-Unsupported output is withheld. A rejected headline leaves the checked template lines; the agent buffers generated text before releasing validated claims. Letter edits are revalidated, and unsupported edits become clinician annotations rather than replacement machine facts.
+Chat tables are patient-scoped, but this does not establish complete multi-patient
+product support. Active-patient UI/API threading is undergoing integration; older
+engine UI tools retain default-patient restrictions. Research pages are publication
+slots rather than verified cohort dashboards. Patient switching, engine isolation
+and synthetic evaluation require their own acceptance checks.
 
-Cache identity includes patient, corpus revision, the full evidence window, validator version, normalised text, cited fact IDs and content hashes, and segment IDs. Lens caching additionally includes engine identity and the parsed situation. Screens with unavailable cards are not cached. Reviews are applied after machine output retrieval.
+Speech uses signed receipts for validated text before fish.audio TTS, with browser
+speech synthesis as fallback. Feature-detected browser recognition sends dictated
+text through the typed path; no proxy STT model is configured. Local verifier
+training and comparison are research outputs. Its HTTP client is not wired into
+the shared semantic gate, and its measured quality is below GPT; GPT stays default.
 
-## Investigation, speech and letters
+## Reviews, letters and deployment boundary
 
-Ask Medlyn uses AI SDK v7 through the OpenAI-compatible proxy, with assistant-ui in the browser. Its tools search facts, inspect passages, check documentation, list findings, build timelines and calculate from cited values. Source-display and letter actions refer to evidence or validated claims. Tool evidence is scoped to the same window; final answer claims pass the shared gate before entering the message stream.
+Reviews append session/target/hash decisions. Corrections are checked against the
+original evidence; unsupported edits remain annotations. Dismissal updates visible
+finding links/conflict badges without editing machine state. Reset appends a
+marker rather than deleting history. Changed hashes require re-review.
 
-The server signs validated speech text with a receipt, which the TTS route checks before forwarding text to fish.audio. Browser speech synthesis is a fallback for the same validated text. Browser speech recognition is feature-detected push-to-talk; its transcript enters the text path. No proxy transcription model is used.
+GP drafts use checked templates and validated sentence claims. A supplied lens key
+resolves the same stored evidence window; conflicting dates/revisions return 409.
+Review changes flag affected sentences without silently rewriting them. Printed
+citations and clinician-note separation preserve the evidence distinction.
 
-GP letters are assembled from evidence-backed sections and checked sentence by sentence. Follow-up completion uses the same absence mechanism. Saved letters retain claim and source identities; subsequent corrections, dismissed findings and changed sources flag affected sentences for review. Clinician-authored notes remain visibly distinct.
+The public site is indexable; patient metadata/routes use noindex/nofollow,
+disallow-all robots and response headers. These are crawler controls, not access
+control. Hosted demos need actual authentication/password protection;
+`DEMO_PASSWORD` alone is not implemented enforcement. Root `.env` serves engine
+scripts/the app; landing-page public origins must be exported before build.
 
-## Review overlay
-
-Accept, correct, dismiss and leave-open actions append ledger entries with author, session, target ID and target hash. Corrections are validated; unsupported proposals remain annotations. The overlay changes presentation without rewriting documents, facts or machine verdicts. A reset marker clears the effective session overlay while preserving the ledger. Changed target hashes require review again.
-
-## Evaluation and submission boundary
-
-The evaluation workspace loads the five challenge situations and expected answers at runtime. promptfoo checks visible answers, relevance and grounding; code checks citations, quote locations, availability states, composed claims and finding fixtures. Playwright checks that answers are visible and records cold/warm timing when the web server and browser are available. Evaluation uses an empty review layer.
-
-Twenty held-out situations are evaluated separately by generalisation tier after the H+7 gate. Do not tune against their results beforehand. Raw reports are evidence for human review; only checked numbers belong in submission metrics. Mock runs establish harness behavior and do not count as clinical results.
-
-Challenge documents, copied passages, local evaluation evidence, database dumps and secrets remain outside git. The pre-commit check enforces blocked paths and scans staged content against local document passages when available. The submission screenshot and final working/unsupported feature lists are supplied by the integrator.
+Evaluation uses an empty review layer and separate denominators for real regression,
+blind held-out, synthetic pipeline, retrieval and verifier tests. The current real
+runner schedules its blind worker; only run it after authorised H+7 review. Outputs
+can contain patient evidence and stay local. [Status](status.md) separates automated
+observations from human review and records browser, scale and publication gaps.
