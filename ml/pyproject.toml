@@ -3,6 +3,8 @@ name = "medlyn-ml"
 version = "0.1.0"
 requires-python = ">=3.12,<3.14"
 dependencies = [
+    "accelerate>=1.15.0",
+    "datasets>=5.1.0",
     "faker>=40.44.0",
     "mlx-lm>=0.32.2",
     "numpy>=2.5.4",
@@ -10,8 +12,17 @@ dependencies = [
     "pillow>=13.0.0",
     "pyarrow>=26.0.0",
     "pymupdf>=2.0",
+    "qiskit>=2.6.1",
+    "qiskit-aer>=0.18.2",
+    "qiskit-ibm-runtime>=0.51.0",
+    "qiskit-machine-learning>=0.9.1",
+    "qiskit-optimization>=0.7.0",
     "reportlab>=5.1.0",
+    "scikit-learn>=1.9.1",
+    "sentencepiece>=0.2.2",
+    "torch>=2.15.0",
     "tqdm>=4.70.1",
+    "transformers>=5.22.0",
 ]
 
 [tool.ruff]
