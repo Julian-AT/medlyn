@@ -1,98 +1,69 @@
 "use client";
-import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
-import { MotionConfig } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { PageHeading } from "@/components/categories/page-heading";
 import { PageShell } from "@/components/categories/page-shell";
 import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { useWorkspace } from "@/components/shell/workspace-provider";
-import { Card } from "@/components/ui/card";
 import { useLens } from "@/hooks/use-lens";
 import { EvidenceWorkspace } from "./evidence-workspace";
-import { LensCanvas } from "./lens-canvas";
+import { FindingDialog } from "./finding-dialog";
 import { LensHeader } from "./lens-header";
 import { SituationInput } from "./situation-input";
+
 export function SituationsWorkspace({ chip, text }: { chip?: string; text?: string }) {
   const { patient } = useActivePatient();
-  const lens = useLens();
-  const { setScreen, reviews, sessionId } = useWorkspace();
-  const { screen } = reviews;
-  const [tab, setTab] = useState("evidence");
-  const [segmentId, setSegmentId] = useState<string | null>(null);
+  const lens = useLens({ chipId: chip, text });
+  const { setScreen, reviews } = useWorkspace();
+  const [tab, setTab] = useState("facts");
   const [findingId, setFindingId] = useState<string | null>(null);
-  const requested = useRef("");
+  const screen = reviews.screen?.lensKey === lens.state.screen?.lensKey ? reviews.screen : null;
   useEffect(() => {
     setScreen(lens.state.screen);
   }, [lens.state.screen, setScreen]);
   useEffect(() => {
-    const key = JSON.stringify({ chip, text });
-    if (requested.current === key) return;
-    const firstRequest = requested.current === "";
-    requested.current = key;
-    const profile = CHIPS.find((item) => item.id === chip);
-    const session = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? undefined;
-    if (text?.trim()) void lens.run(text, undefined, false, session);
-    else if (profile && (!firstRequest || profile.id !== CHIPS[0].id))
-      void lens.run(profile.text, profile.id, false, session);
-  }, [chip, text, lens.run, patient.id]);
-  useEffect(() => {
-    if (!sessionId || lens.loading || !lens.state.screen) return;
+    if (!lens.sessionId || lens.loading || !lens.state.complete || !lens.state.screen) return;
     try {
       sessionStorage.setItem(
-        `medlyn:last-lens:${patient.id}:${sessionId}`,
+        `medlyn:last-lens:${patient.id}:${lens.sessionId}`,
         JSON.stringify(lens.state.screen),
       );
     } catch (error) {
       console.warn("recent_lens_unavailable", error instanceof Error ? error.name : "Unknown");
     }
-  }, [sessionId, lens.loading, lens.state.screen, patient.id]);
-  function openSource(id: string) {
-    setSegmentId(id);
-    setFindingId(null);
-    setTab("evidence");
-  }
-  function openFinding(id: string) {
-    setFindingId(id);
-    setTab("evidence");
-  }
+  }, [lens.sessionId, lens.loading, lens.state.complete, lens.state.screen, patient.id]);
   function run(value: string, chipId?: string) {
-    setSegmentId(null);
     setFindingId(null);
+    setTab("facts");
     void lens.run(value, chipId);
   }
   return (
-    <MotionConfig reducedMotion="user">
-      <PageShell>
-        <PageHeading
-          category="situations"
-          title="Situations"
-          description="Choose your clinical task. Read the relevant facts with their evidence attached."
-        />
-        <SituationInput recent={lens.recent} activeChip={lens.activeChip} onRun={run} />
-        <LensHeader screen={screen} mock={lens.mock} loading={lens.loading} />
-        <Card className="grid min-w-0 gap-8 rounded-none bg-transparent py-0 shadow-none ring-0 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <LensCanvas
-            screen={screen}
-            state={lens.state}
-            loading={lens.loading}
-            annotations={reviews.annotations}
-            onSource={openSource}
-            onFinding={openFinding}
-            onRetry={lens.retry}
-            onReview={reviews.onReview}
-          />
-          <EvidenceWorkspace
-            lens={lens}
-            reviews={reviews}
-            tab={tab}
-            onTab={setTab}
-            segmentId={segmentId}
-            findingId={findingId}
-            onSource={openSource}
-            onCompare={openFinding}
-          />
-        </Card>
-      </PageShell>
-    </MotionConfig>
+    <PageShell>
+      <PageHeading
+        category="situations"
+        title="Situations"
+        description="Your task, the relevant facts, and the sources behind them."
+      />
+      <SituationInput recent={lens.recent} activeChip={lens.activeChip} onRun={run} />
+      <LensHeader
+        screen={screen}
+        mock={lens.mock}
+        loading={lens.loading}
+        error={lens.state.error}
+      />
+      <EvidenceWorkspace
+        lens={lens}
+        reviews={reviews}
+        screen={screen}
+        tab={tab}
+        onTab={setTab}
+        onCompare={setFindingId}
+      />
+      <FindingDialog
+        finding={screen?.findings.find((finding) => finding.id === findingId) ?? null}
+        onClose={() => setFindingId(null)}
+        onReview={reviews.onReview}
+      />
+    </PageShell>
   );
 }
