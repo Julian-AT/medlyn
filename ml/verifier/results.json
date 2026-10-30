@@ -27,9 +27,40 @@
         "coverage": 1.0,
         "errors": 0,
         "latencyMs": {
-          "mean": 0.1228731776387172,
-          "p50": 0.053937499615130946,
-          "p95": 0.11612499656621367
+          "mean": 0.11973935624054219,
+          "p50": 0.07458349864464253,
+          "p95": 0.21904199820710346
+        }
+      },
+      "local_qlora": {
+        "n": 90,
+        "macroF1": 0.7544642857142857,
+        "classes": {
+          "supported": {
+            "precision": 0.6538461538461539,
+            "recall": 0.5666666666666667,
+            "f1": 0.6071428571428571,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 30
+          },
+          "contradicted": {
+            "precision": 0.6176470588235294,
+            "recall": 0.7,
+            "f1": 0.65625,
+            "support": 30
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 576.5759810446374,
+          "p50": 563.204375001078,
+          "p95": 697.6629589989898
         }
       },
       "proxy_fast": {
@@ -91,9 +122,40 @@
         "coverage": 1.0,
         "errors": 0,
         "latencyMs": {
-          "mean": 0.05716685700463131,
-          "p50": 0.049271002353634685,
-          "p95": 0.11612499656621367
+          "mean": 0.08488092862535268,
+          "p50": 0.07439600085490383,
+          "p95": 0.1625829972908832
+        }
+      },
+      "local_qlora": {
+        "n": 14,
+        "macroF1": 0.17543859649122806,
+        "classes": {
+          "supported": {
+            "precision": 0.0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "unsupported": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 1.0,
+            "recall": 0.35714285714285715,
+            "f1": 0.5263157894736842,
+            "support": 14
+          }
+        },
+        "coverage": 1.0,
+        "errors": 0,
+        "latencyMs": {
+          "mean": 573.1643422857035,
+          "p50": 568.4319584979676,
+          "p95": 689.4077090037172
         }
       },
       "proxy_fast": {
@@ -155,9 +217,40 @@
         "coverage": 1.0,
         "errors": 0,
         "latencyMs": {
-          "mean": 0.07782906638264346,
-          "p50": 0.06522900002892129,
-          "p95": 0.23312499979510903
+          "mean": 0.2084832662755313,
+          "p50": 0.09256200064555742,
+          "p95": 0.698957999702543
+        }
+      },
+      "local_qlora": {
+        "n": 30,
+        "macroF1": 0.2222222222222222,
+        "classes": {
+          "supported": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 30
+          },
+          "unsupported": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          },
+          "contradicted": {
+            "precision": 0.0,
+            "recall": 0,
+            "f1": 0,
+            "support": 0
+          }
+        },
+        "coverage": 0.9333333333333333,
+        "errors": 2,
+        "latencyMs": {
+          "mean": 520.022866732567,
+          "p50": 553.0305624961329,
+          "p95": 663.7531660016975
         }
       },
       "proxy_fast": {
@@ -186,30 +279,27 @@
         "coverage": 1.0,
         "errors": 0,
         "latencyMs": {
-          "mean": 1942.9288819002977,
+          "mean": 1893.985859733948,
           "p50": 1775.8306030045787,
           "p95": 2920.226707996335
         }
       }
     }
   },
-  "realPatientStatus": "38 eligible cached letter claims",
-  "localStatus": "unavailable: ImportError (No Metal device available)",
+  "realPatientStatus": "42 eligible cached letter claims",
+  "localStatus": "trained adapter",
   "evaluationIdentity": {
     "testSha256": "ca47fb282520be47d5826b44e7178ebb6b59de8e721cf77915b9adb0ab12f8b1",
-    "heldOutMutationTypes": [
-      "assertion_flip",
-      "date_typo"
-    ],
+    "heldOutMutationTypes": ["assertion_flip", "date_typo"],
     "seed": 37,
     "judgeIdentity": "a72c650c3176101fc5cdfee929e195dcfae08d835b271bcd2806552cfb730cab"
   },
   "cost": {
-    "proxyCalls": 0,
+    "proxyCalls": 7,
     "proxyConcurrency": 3,
     "currency": null,
     "note": "Proxy tariff unknown; no monetary cost invented",
-    "cachedProxyPredictions": 120
+    "cachedProxyPredictions": 113
   },
   "limitations": [
     "Synthetic labels are not human gold",
