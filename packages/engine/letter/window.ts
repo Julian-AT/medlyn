@@ -18,21 +18,34 @@ export async function resolveLetterWindow(
   deps: WindowDependencies = { getCache, evidenceWindow },
 ): Promise<EvidenceWindow> {
   const screen = req.lensKey ? await deps.getCache(req.lensKey) : null;
-  if (req.lensKey && (!screen || screen.lensKey !== req.lensKey || screen.patient.id !== PATIENT_ID)) {
+  if (
+    req.lensKey &&
+    (!screen || screen.lensKey !== req.lensKey || screen.patient.id !== PATIENT_ID)
+  ) {
     throw new LetterWindowConflict("Lens unavailable; reload the lens before generating a letter");
   }
   const cached = screen?.window;
-  if (cached && ((req.asOf && req.asOf !== cached.asOf) ||
-    (req.corpusRevision && req.corpusRevision !== cached.corpusRevision) ||
-    screen.situation.asOf !== cached.asOf)) {
+  if (
+    cached &&
+    ((req.asOf && req.asOf !== cached.asOf) ||
+      (req.corpusRevision && req.corpusRevision !== cached.corpusRevision) ||
+      screen.situation.asOf !== cached.asOf)
+  ) {
     throw new LetterWindowConflict("Letter request conflicts with the lens evidence window");
   }
   const window = await deps.evidenceWindow(cached?.asOf ?? req.asOf);
-  const sameIds = !cached || JSON.stringify([...cached.eligibleDocumentIds].sort()) ===
-    JSON.stringify([...window.eligibleDocumentIds].sort());
-  if ((req.corpusRevision && req.corpusRevision !== window.corpusRevision) ||
-    (cached && (cached.asOf !== window.asOf || cached.corpusRevision !== window.corpusRevision || !sameIds))) {
-    throw new LetterWindowConflict("Lens evidence window changed; reload the lens before generating a letter");
+  const sameIds =
+    !cached ||
+    JSON.stringify([...cached.eligibleDocumentIds].sort()) ===
+      JSON.stringify([...window.eligibleDocumentIds].sort());
+  if (
+    (req.corpusRevision && req.corpusRevision !== window.corpusRevision) ||
+    (cached &&
+      (cached.asOf !== window.asOf || cached.corpusRevision !== window.corpusRevision || !sameIds))
+  ) {
+    throw new LetterWindowConflict(
+      "Lens evidence window changed; reload the lens before generating a letter",
+    );
   }
   return window;
 }
