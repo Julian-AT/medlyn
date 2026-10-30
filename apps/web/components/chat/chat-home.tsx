@@ -4,14 +4,9 @@ import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
 import { useRouter } from "next/navigation";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { ChatComposer } from "@/components/chat/chat-composer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const SHORTCUTS = [
-  "Show her medications",
-  "Weight trend",
-  "Any contradictions?",
-  "Draft the GP letter",
-];
+import { ChatGreeting } from "@/components/chat/chat-greeting";
+import { ChatShortcuts } from "@/components/chat/chat-shortcuts";
+import { Card, CardContent, CardDescription } from "@/components/ui/card";
 
 export function ChatHome() {
   const router = useRouter();
@@ -21,33 +16,26 @@ export function ChatHome() {
     router.push(`/chat/${id}`);
   }
   return (
-    <Card className="mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-3xl justify-center bg-transparent ring-0">
-      <CardHeader className="gap-3 pb-7">
-        <CardDescription>Anna Musterfrau</CardDescription>
-        <CardTitle className="text-3xl font-medium">
-          What do you need for Anna Musterfrau?
-        </CardTitle>
-        <CardDescription>Ask a question. Every answer leads back to her documents.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+    <Card className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-3xl justify-center gap-8 overflow-visible bg-transparent px-4 py-10 shadow-none ring-0 sm:px-8 sm:py-16">
+      <ChatGreeting />
+      <CardContent className="flex min-w-0 flex-col gap-7 px-0">
         <ChatComposer onSubmit={(text) => start(text)} />
-        <Suggestions className="flex-wrap">
-          {SHORTCUTS.map((text) => (
-            <Suggestion key={text} suggestion={text} onClick={(value) => start(value)} />
-          ))}
-        </Suggestions>
-        <CardDescription>Start with a situation</CardDescription>
-        <Suggestions className="flex-wrap">
-          {CHIPS.map((chip) => (
-            <Suggestion
-              key={chip.id}
-              suggestion={chip.text}
-              onClick={(text) => start(text, chip.id)}
-            >
-              {chip.label}
-            </Suggestion>
-          ))}
-        </Suggestions>
+        <ChatShortcuts onSelect={start} />
+        <Card className="min-w-0 gap-3 rounded-none bg-transparent p-0 shadow-none ring-0">
+          <CardDescription className="text-xs font-medium">Start with a situation</CardDescription>
+          <Suggestions className="pb-3">
+            {CHIPS.map((chip) => (
+              <Suggestion
+                key={chip.id}
+                suggestion={chip.text}
+                onClick={(text) => start(text, chip.id)}
+                className="h-8 border-border bg-background font-medium shadow-none hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+              >
+                {chip.label}
+              </Suggestion>
+            ))}
+          </Suggestions>
+        </Card>
       </CardContent>
     </Card>
   );
