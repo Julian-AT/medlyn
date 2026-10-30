@@ -1,76 +1,62 @@
-# Medlyn: two-minute recording script
+# Medlyn: two-minute video
 
-For the recorder and editor. Deliver one video of at most 2:00, including the final
-15 seconds on limitations. Use this with the [submission checklist](submission/checklist.md)
-and [human-check sheet](submission/human-check.md). This is a recording plan, not
-evidence that the final integrated application has passed these steps.
+One continuous screen recording with you on camera. The skeleton video `docs/video/skeleton.mp4` shows every segment with its time window, what to show and a countdown, so you can rehearse against it. About 270 words in total at roughly 135 words per minute.
 
-## Shot list
+Numbers in `[brackets]` come from `METRICS.md` and `ml/verifier/results.json` on recording day. Never say a number that is not in those files.
 
-Timecodes are elapsed video time. Voice-over is plain English; quoted prompts are
-typed on screen. Keep the cold submission-to-complete interval continuous at normal
-speed. Cuts between destinations are fine, but label any omitted waiting time.
+## Segments
 
-| Time      | On-screen action                                                                                                                                                                                                                                                                                                  | Voice-over                                                                                                                                                                                                                                  |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0:00–0:06 | Home `/`. Show the selected demonstration patient and empty chat composer.                                                                                                                                                                                                                                        | “Medlyn gives a clinician the patient facts for the task, with evidence for each one.”                                                                                                                                                      |
-| 0:06–0:24 | Type: “I am the anaesthetist doing the pre-operative check before her quadrantectomy with IORT on 16 May 2016. Show the clinical view.” Submit into `/chat/[id]`. Show the generated clinical cards. Open the antithrombotic source popup, switch DE/EN, then close it.                                           | “I type my role and task. Medlyn opens a clinical view in chat. Medicines, allergies and heart function link to the original passage and its translation.”                                                                                  |
-| 0:24–0:42 | Open `/situations`, select **Emergency dizziness**. Use this as the prepared cold take. Show the changed cards, **Carotid stenosis and side** with C1 and its comparator. Show **Before contrast** and the kidney-function gap, including **Not documented · 8 of 8** coverage or its equivalent separate labels. | “A different task changes the view. The carotid side conflicts within the record. Kidney function is not documented after all eight eligible documents were checked.”                                                                       |
-| 0:42–0:49 | Select **Open follow-ups** first, then `/open-questions`. Point to the carotid ultrasound completion question. Keep contradictions and clarification requests visibly separate.                                                                                                                                   | “Open questions brings together conflicting findings and missing follow-up evidence.”                                                                                                                                                       |
-| 0:49–1:00 | Choose **Investigate** for carotid ultrasound completion. In chat, show the real tool progress and checked answer. Return to the question and choose **Leave open**.                                                                                                                                              | “Investigate checks the record. No recorded completion is different from saying the test never happened. I leave the question open.”                                                                                                        |
-| 1:00–1:14 | Open `/letter`, generate the GP follow-up draft. Show recommendations, completion status, the explicit C1 clarification request and a citation popup. Make one rehearsed unsupported factual edit; show it separated as a clinician note while the validated original remains.                                    | “The GP letter keeps its citations and asks for clarification. An unsupported edit becomes a labelled clinician note rather than a new patient fact.”                                                                                       |
-| 1:14–1:25 | Return to Home and type: “I am a dentist before a tooth extraction. Show the relevant clinical view.” Show the returned tier-3 view and its real source controls.                                                                                                                                                 | “A dentist is outside the configured profiles. The same evidence rules still apply to the generated view.”                                                                                                                                  |
-| 1:25–1:38 | Open **Research › Evaluation**, `/research/evaluation`. Show the actual saved regression result and latency, then the separately labelled synthetic, retrieval and verifier sections. Keep the human-check status visible.                                                                                        | “The latest engine regression reports fifteen of fifteen. Final screen review is still pending. Synthetic, retrieval and verifier experiments have separate results and denominators.”                                                      |
-| 1:38–1:45 | Scroll to **Quantum research experiment** on the same page. Keep the offline-control, human-check and hardware-status labels in frame.                                                                                                                                                                            | “The quantum card is an offline research control. It is not part of clinical decisions.”                                                                                                                                                    |
-| 1:45–2:00 | Hold a readable end card headed **What does not work yet** with three lines: “Cold speed target not met consistently”; “PDF/scan agreement and large-scale testing incomplete”; “Research validation pending; no quantum advantage shown”.                                                                        | “Cold runs still miss our speed target. PDF and scan extraction misses facts, and large-scale testing is incomplete. Research results need human review. The local verifier remains experimental, and no quantum advantage is established.” |
+| #   | Time         | Seconds | Show                                                                                | Say (word budget) |
+| --- | ------------ | ------- | ----------------------------------------------------------------------------------- | ----------------- |
+| 1   | 0:00 to 0:08 | 8       | You on camera, then the Home page                                                   | ~18 words         |
+| 2   | 0:08 to 0:28 | 20      | Chat: anaesthetist question, generated cards, source popup with German and English  | ~45 words         |
+| 3   | 0:28 to 0:45 | 17      | Situations › Emergency: carotid contradiction comparator, "Not documented · 8 of 8" | ~38 words         |
+| 4   | 0:45 to 0:55 | 10      | GP letter with citations, or Open questions → Investigate                           | ~22 words         |
+| 5   | 0:55 to 1:05 | 10      | Paper, zoomed on Figure 1 (architecture, claim boundary)                            | ~22 words         |
+| 6   | 1:05 to 1:22 | 17      | Hugging Face model card (results table), dataset page, paper benchmark table        | ~38 words         |
+| 7   | 1:22 to 1:37 | 15      | Research › Evaluation quantum card, paper quantum figure, ibm_marrakesh job         | ~32 words         |
+| 8   | 1:37 to 1:48 | 11      | Research › Evaluation: the five challenge metrics                                   | ~25 words         |
+| 9   | 1:48 to 2:00 | 12      | End card: what does not work yet, URL                                               | ~28 words         |
 
-## Recording checklist
+## Script
 
-- [ ] Freeze the integrated app version and Neon demo branch with the orchestrator.
-  Confirm the configured database is that branch. Do not switch or modify the shared
-  ingest database from this lane. Select `patient-0000-0001`, as of 15 Apr 2016.
-- [ ] Reset the active patient's review layer in `/reviews`; confirm no accepted,
-  corrected or dismissed overlay remains. Start a clean chat. A fresh browser tab
-  alone does not prove a clean review layer. Reset the rehearsal's **Leave open**
-  review after recording and before jury use.
-- [ ] Confirm real engine mode, eight eligible documents and no mock indicator.
-  Rehearse every source popup, DE/EN translation, comparator and full-document link.
-- [ ] After the final cache-version integration, have the orchestrator run `pnpm warm`.
-  All five lenses must warm successfully. Rehearse chat, investigation and letter.
-  Keep a new dentist prompt for the live take and confirm its returned tier is 3.
-- [ ] Prepare one genuinely cold emergency take with the orchestrator after warming
-  the other views. Confirm that request's completion reports `cached: false`; warm
-  cache-generation time is not a cached request. No cold-cache UI switch is assumed.
-  Keep a local request/timing record, never credentials in the video.
-- [ ] Choose **dark** for this take, or **light** if popup text is clearer. Keep one
-  theme throughout. Record a 1440px-wide browser window at 100% zoom, with readable
-  text and no horizontal clipping. Disable notifications and hide unrelated tabs.
-- [ ] Check `/open-questions` retains the completed follow-up lens and its gaps.
-  **Run a situation to check gaps** is not evidence of absence. If a check fails,
-  show **Couldn't check** honestly and fix or revise the take before submission.
-- [ ] Rehearse letter generation and the unsupported-edit example. Verify the
-  factual body keeps its validated sentence and attached evidence. Do not invent
-  patient details for the example or paste document prose into these instructions.
-- [ ] Confirm Research Evaluation uses the final coherent run. Its runtime source is
-  `eval/output/regression.json`; older bundles may still show 9/15. Do not overlay
-  15/15 onto older UI results or call automated scores human-checked. If the human
-  sheet and final metrics are signed off before recording, replace only the review
-  sentence with: “A reviewer checked all fifteen answers on the final screens.”
-- [ ] Confirm the quantum card is mounted and readable. Its component exists but
-  was not mounted in the page inspected for this handoff. Integration is required
-  before recording that shot. Keep it labelled research-only and use actual values.
-- [ ] Check narration fits each slot. If any operation overruns, rehearse again;
-  shorten navigation or prose, preserving the cold interval and 15-second ending.
-  Never imply that an edited wait is a measured load time.
-- [ ] Watch the exported file from start to end. Verify duration ≤120 seconds,
-  audible narration, legible captions, real sources and no secrets. Store footage
-  locally outside git. Submit through the challenge's chosen video channel, not
-  by committing challenge passages, screen captures or recordings to the repo.
+**1. Intro (0:00 to 0:08)**
+"This is Medlyn. It shows a clinician the patient facts for one task, and every fact links to its source."
 
-## Claims to keep out of the take
+**2. Chat (0:08 to 0:28)**
+Type: "I'm the anaesthetist, pre-op check before her quadrantectomy on 16 May."
+"I type my role and task. Medlyn answers with structured cards: the blood thinner, the contrast allergy, the heart function. Each line opens its source, the original German sentence with a translation."
 
-Do not claim human-checked 15/15 before the sheet is completed, 100k patients ingested,
-150 synthetic challenges executed, 95% PDF/scan agreement, consistent cold <5 seconds,
-or clinical/quantum advantage. The current evidence and outstanding gates are in
-[build status](status.md). A source popup proves only the inspected citation;
-traceability needs the screen-wide audit in the human-check sheet.
+**3. Situations (0:28 to 0:45)**
+Click the Emergency situation, open the carotid badge, point at the kidney gap.
+"A different task changes the view. Here the record contradicts itself on the side of the carotid stenosis, and kidney function is not documented after checking all eight documents."
+
+**4. Workflow (0:45 to 0:55)**
+Open the GP letter (or Investigate one open question).
+"From there I can investigate open questions and draft a GP letter where every sentence keeps its citation."
+
+**5. Architecture (0:55 to 1:05)**
+Paper, Figure 1.
+"Under the hood, the language model never writes facts. It selects located evidence, templates render it, and one validator checks every output."
+
+**6. Own model (1:05 to 1:22)**
+Hugging Face model card, dataset page, paper benchmark table.
+"We generated one hundred thousand synthetic patients with exact labels and trained our own claim verifier with QLoRA on a MacBook. It reaches macro F1 of [x] against [y] for the base model. Model and dataset are on Hugging Face."
+
+**7. Quantum (1:22 to 1:37)**
+Quantum card and figure.
+"As a research experiment we ran a quantum kernel and QAOA with Qiskit, including a run on IBM's 156-qubit Marrakesh processor. It matches the classical baseline; there is no quantum advantage at this scale."
+
+**8. Metrics (1:37 to 1:48)**
+Research › Evaluation.
+"On the five challenge situations: [15] of 15 answers, [100] percent traceable sources, [0] invented facts, [5] contradictions with no false alarms."
+
+**9. What does not work yet (1:48 to 2:00)**
+End card with three lines and aim.julianschmidt.cv.
+"What does not work yet: typed situations are still slower than we want, PDF extraction misses facts, and our verifier is trained on synthetic data only. Medlyn is live at aim.julianschmidt.cv."
+
+## Before recording
+
+- Use the deployed app at app.aim.julianschmidt.cv in a 1440 × 900 window, with the cache warmed and the review layer reset.
+- Open the tabs in advance: app, Hugging Face model, Hugging Face dataset, paper PDF at Figure 1.
+- Rehearse once against `docs/video/skeleton.mp4`.
