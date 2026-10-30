@@ -34,3 +34,18 @@ blob-report/
 .vscode/
 
 .agents/
+
+.venv/
+.cache/
+ml/.hf/
+ml/data/*
+!ml/data/sample/
+ml/verifier/adapters/
+ml/verifier/runs/
+paper/build/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
