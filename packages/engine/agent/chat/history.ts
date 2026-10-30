@@ -19,7 +19,7 @@ export async function recentChats(patientId = PATIENT_ID) {
     .from(chats)
     .where(eq(chats.patientId, patientId))
     .orderBy(desc(chats.updatedAt))
-    .limit(20);
+    .limit(200);
 }
 
 export async function loadChat(id: string, patientId = PATIENT_ID) {
