@@ -1,5 +1,6 @@
 "use client";
 
+import { activeReviews } from "@medlyn/engine/review/overlay";
 import Link from "next/link";
 import { useState } from "react";
 import { PageHeading } from "@/components/categories/page-heading";
@@ -19,8 +20,8 @@ const groups = [
   { kind: "missing", title: "Documentation gaps" },
 ] as const;
 
-export function PatientQuestionsPage() {
-  const data = usePatientQuestions();
+export function PatientQuestionsPage({ lensKey }: { lensKey?: string }) {
+  const data = usePatientQuestions(lensKey);
   const [findingId, setFindingId] = useState<string | null>(null);
   const finding = data.findings.find((item) => item.id === findingId);
   return (
@@ -64,6 +65,10 @@ export function PatientQuestionsPage() {
                     key={question.id}
                     question={question}
                     finding={data.findings.find((item) => item.id === question.findingId)}
+                    card={data.screen?.sections
+                      .flatMap((section) => section.cards)
+                      .find((card) => card.id === question.cardId)}
+                    window={data.window ?? undefined}
                     author={
                       data.entries.findLast(
                         (entry) => entry.targetId === (question.findingId ?? question.id),
@@ -105,7 +110,12 @@ export function PatientQuestionsPage() {
           </CardHeader>
           <CardContent className="space-y-2 p-0">
             {data.dismissed.map((item) => (
-              <CardDescription key={item.id}>{item.title}</CardDescription>
+              <CardDescription key={item.id}>
+                {item.title} ·{" "}
+                {activeReviews(data.entries)
+                  .findLast((entry) => entry.targetId === (item.findingId ?? item.id))
+                  ?.reason?.replaceAll("_", " ")}
+              </CardDescription>
             ))}
           </CardContent>
         </Card>
@@ -120,13 +130,7 @@ export function PatientQuestionsPage() {
           <DialogHeader>
             <DialogTitle>Compare evidence</DialogTitle>
           </DialogHeader>
-          {finding && (
-            <FindingComparator
-              finding={finding}
-              onSource={() => undefined}
-              onReview={data.onReview}
-            />
-          )}
+          {finding && <FindingComparator finding={finding} onReview={data.onReview} />}
         </DialogContent>
       </Dialog>
     </PageShell>
