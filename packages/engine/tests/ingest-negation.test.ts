@@ -35,7 +35,10 @@ describe("German NegEx review flag", () => {
     expect(negationFlag(passage, concept, "present")).toBe(false);
   });
 
-  it.each(["negated", "suspected", "historical"] as const)("does not flag assertion %s", (assertion) => {
-    expect(negationFlag("Kein Fieber heute.", "Fieber", assertion)).toBe(false);
-  });
+  it.each(["negated", "suspected", "historical"] as const)(
+    "does not flag assertion %s",
+    (assertion) => {
+      expect(negationFlag("Kein Fieber heute.", "Fieber", assertion)).toBe(false);
+    },
+  );
 });

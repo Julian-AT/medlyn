@@ -3,8 +3,16 @@ import type { Segment } from "../contracts.ts";
 import { locate } from "../ingest/locate.ts";
 
 function check(text: string, schedule: string[]) {
-  const source: Segment = { id: "s", documentId: "d", kind: "table_row", section: null,
-    text, textEn: null, start: 0, end: text.length };
+  const source: Segment = {
+    id: "s",
+    documentId: "d",
+    kind: "table_row",
+    section: null,
+    text,
+    textEn: null,
+    start: 0,
+    end: text.length,
+  };
   return locate(text, source, { attrs: { schedule } });
 }
 
@@ -21,7 +29,8 @@ describe("ordered medication schedule location", () => {
   });
 
   it.each(["1 0 ½ 0 ST", "1 ST 0 ST 1/2 ST 0 ST", "1-0-1/2-0", "1 | 0 | ½ | 0 Tabl."])(
-    "accepts supported fraction and unit formatting: %s", (row) => {
+    "accepts supported fraction and unit formatting: %s",
+    (row) => {
       expect(check(`Synthetic oral ${row}`, ["1", "0", "1/2", "0"]).ok).toBe(true);
     },
   );
@@ -33,8 +42,18 @@ describe("ordered medication schedule location", () => {
 
   it("retains number and unit associations", () => {
     const text = "Synthetic oral 9 mg 1 0 1 0 ST";
-    const source: Segment = { id: "s", documentId: "d", kind: "table_row", section: null,
-      text, textEn: null, start: 0, end: text.length };
-    expect(locate(text, source, { strength: "1 mg", schedule: ["1", "0", "1", "0"] }).ok).toBe(false);
+    const source: Segment = {
+      id: "s",
+      documentId: "d",
+      kind: "table_row",
+      section: null,
+      text,
+      textEn: null,
+      start: 0,
+      end: text.length,
+    };
+    expect(locate(text, source, { strength: "1 mg", schedule: ["1", "0", "1", "0"] }).ok).toBe(
+      false,
+    );
   });
 });
