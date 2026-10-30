@@ -6,7 +6,7 @@ import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 export function ChatGreeting() {
   const { patient } = useActivePatient();
   return (
-    <CardHeader className="justify-items-center gap-2.5 px-0 text-center">
+    <CardHeader className="justify-items-center gap-3 px-0 text-center">
       <CardTitle
         className="text-balance text-2xl/9 font-normal tracking-tight sm:text-[30px]/10"
         role="heading"

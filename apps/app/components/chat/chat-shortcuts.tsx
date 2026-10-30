@@ -63,11 +63,11 @@ const SITUATIONS = [
 export function ChatShortcuts({ onSelect }: { onSelect: (text: string, chipId?: string) => void }) {
   return (
     <CardContent
-      className="flex w-full flex-col items-center gap-2 px-0"
+      className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-0"
       aria-label="Shortcuts and clinical situations"
     >
       <CardContent
-        className="flex flex-wrap justify-center gap-2 px-0"
+        className="flex flex-wrap justify-center gap-3 px-0"
         role="group"
         aria-label="Quick actions"
       >
@@ -79,24 +79,26 @@ export function ChatShortcuts({ onSelect }: { onSelect: (text: string, chipId?: 
           />
         ))}
       </CardContent>
-      <CardContent
-        className="flex flex-wrap items-center justify-center gap-2 px-0"
-        role="group"
-        aria-label="Situations"
-      >
-        <CardDescription className="text-xs">Situations</CardDescription>
-        {SITUATIONS.map((situation) => {
-          const chip = CHIPS.find((entry) => entry.id === situation.id);
-          if (!chip) return null;
-          return (
-            <ShortcutTile
-              key={chip.id}
-              title={situation.title}
-              icon={situation.icon}
-              onClick={() => onSelect(chip.text, chip.id)}
-            />
-          );
-        })}
+      <CardContent className="flex w-full flex-col items-center gap-3 px-0">
+        <CardDescription className="text-xs">Start with a clinical situation</CardDescription>
+        <CardContent
+          className="flex flex-wrap justify-center gap-3 px-0"
+          role="group"
+          aria-label="Situations"
+        >
+          {SITUATIONS.map((situation) => {
+            const chip = CHIPS.find((entry) => entry.id === situation.id);
+            if (!chip) return null;
+            return (
+              <ShortcutTile
+                key={chip.id}
+                title={situation.title}
+                icon={situation.icon}
+                onClick={() => onSelect(chip.text, chip.id)}
+              />
+            );
+          })}
+        </CardContent>
       </CardContent>
     </CardContent>
   );
