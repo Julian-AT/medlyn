@@ -1025,7 +1025,7 @@ export const PromptInputSpeechButton = ({
       type="button"
       aria-label={voice.listening ? "Stop listening" : "Dictate question"}
       aria-pressed={voice.listening}
-      title={voice.listening ? "Listening… Click to stop" : "Dictate question"}
+      title={voice.listening ? "Finish dictation" : "Dictate question"}
       className={cn(
         "relative transition-all duration-200",
         voice.listening && "motion-safe:animate-pulse bg-accent text-accent-foreground",
@@ -1040,8 +1040,22 @@ export const PromptInputSpeechButton = ({
         }
       }}
     >
-      {children ?? <HugeiconsIcon icon={MicIcon} strokeWidth={2} className="size-4" />}
-      {voice.listening && <span role="status">Listening…</span>}
+      {children ?? (
+        <HugeiconsIcon
+          icon={voice.listening ? SquareIcon : MicIcon}
+          strokeWidth={2}
+          className="size-4"
+        />
+      )}
+      {voice.listening && (
+        <span role="status" aria-live="polite">
+          {voice.phase === "starting"
+            ? "Starting…"
+            : voice.phase === "stopping"
+              ? "Finishing…"
+              : "Listening…"}
+        </span>
+      )}
     </PromptInputButton>
   );
 };
