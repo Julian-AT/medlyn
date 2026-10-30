@@ -1,24 +1,40 @@
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
-\begin{tikzpicture}[node distance=6mm and 9mm,block/.style={draw,rectangle,
-  minimum height=10mm,text width=44mm,align=center,font=\small},
-  flow/.style={-{Latex[length=2mm]},semithick}]
-\node[block] (history) {Seeded patient history\\events and documentation plan};
-\node[block,below=of history] (split) {Assign patient and family split\\hold out styles and mutations};
-\node[block,below=of split] (render) {Render German documents\\apply controlled mutations};
-\node[block,below=of render] (rewrite) {Optional prose rewrite\\retain original on check failure};
-\node[block,below=of rewrite] (check) {Check final rendered text\\values, spans and mutation ledger};
-\node[block,below=of check] (labels) {Code-checked labels\\not human gold};
-\node[block,right=of render] (formats) {PDF and scan fixtures\\page and box provenance};
-\node[block,right=of check] (gold) {Independent human review\\separate gold subset};
-\node[block,right=of labels] (eval) {Separate evaluation tracks\\retrieval, pipeline and verifier};
-\path[flow] (history) edge (split) (split) edge (render) (render) edge (rewrite)
-  (rewrite) edge (check) (check) edge (labels) (render) edge (formats)
-  (check) edge (gold) (labels) edge (eval);
-\path[flow,dashed] (gold) edge (eval);
+\begin{tikzpicture}[med diagram]
+\node[med io] (seed) at (0,-.95) {Seed + scenario};
+\node[med data] (history) at (0,0) {History};
+\node[med code] (plan) at (0,1.1) {Documentation\\Plan};
+\node[med code] (assign) at (0,2.2) {Assign\\Split};
+\node[med code] (render) at (0,3.3) {Renderer};
+\node[med code] (mutate) at (0,4.4) {Mutations};
+\node[med model] (rewrite) at (0,5.5) {Prose\\Rewrite};
+\node[med check] (check) at (0,6.6) {Final-text\\Check};
+\node[med data] (labels) at (0,7.8) {Labels};
+\node[med store] (ledger) at (3.8,4.4) {Mutation\\Ledger};
+\node[med data] (pages) at (3.8,3.3) {PDF / Scan};
+\node[med data,text width=17mm] (train) at (-2.7,9.2) {Train};
+\node[med data,text width=17mm] (valid) at (0,9.2) {Validation};
+\node[med data,text width=17mm] (test) at (2.7,9.2) {Test};
+\node[med io] at (0,10.15) {Patient + family splits};
+
+\begin{scope}[on background layer]
+  \node[med stack,fit=(render)(mutate)(rewrite)(check)] (documents) {};
+\end{scope}
+\node[med note,rotate=90] at (-2.5,4.95) {per document};
+\node[med note,anchor=west] at (1.55,5.5) {optional};
+\path[med flow] (seed) edge (history) (history) edge (plan) (plan) edge (assign)
+  (assign) edge (render) (render) edge (mutate) (mutate) edge (rewrite)
+  (rewrite) edge (check) (check) edge (labels)
+  (render) edge (pages) (mutate) edge (ledger);
+\draw[med flow] (ledger.north) |- (check.east);
+\draw[med flow] (mutate.west) to (-1.9,4.4) |- (check.west);
+\draw[med wire] (labels.north) to (0,8.55);
+\draw[med flow] (0,8.55) -| (train.south);
+\draw[med flow] (0,8.55) to (valid.south);
+\draw[med flow] (0,8.55) -| (test.south);
 \end{tikzpicture}
-\caption{Synthetic data construction. Labels depend on what the final documents state,
-including deliberate omissions. The human review branch is a separate requirement;
-we do not infer that it is complete from successful code checks.}
+\caption{Synthetic data construction. Patient and family splits precede rewriting.
+Labels follow the final text and mutation ledger. Optional rewrites retain the original
+on check failure. Code-checked labels are distinct from human gold.}
 \label{fig:synthetic}
 \end{figure}
