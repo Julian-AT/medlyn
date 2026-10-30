@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { siteMetadata, siteViewport } from "@/lib/seo";
 import "./globals.css";
 
 const dmSans = localFont({
@@ -31,18 +31,8 @@ const abcMarist = localFont({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Medlyn — The facts your task needs, with sources",
-  description:
-    "Tell Medlyn your role and your task. It shows one screen with only the facts that task needs, each linked to the sentence or table row it came from.",
-  icons: {
-    icon: [
-      { url: "/images/favicon.svg", type: "image/svg+xml" },
-      { url: "/images/favicon.png", type: "image/png" },
-    ],
-    apple: "/images/apple-touch-icon.png",
-  },
-};
+export const metadata = siteMetadata;
+export const viewport = siteViewport;
 
 export default function RootLayout({
   children,
