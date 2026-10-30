@@ -19,6 +19,7 @@ export function PassageCard(props: ToolProps<UiToolOutputs["show_passage"]>) {
   return (
     <ToolFrame
       {...props}
+      layout="passage"
       title={output?.document.titleEn || "Source passage"}
       description={
         output
@@ -31,12 +32,22 @@ export function PassageCard(props: ToolProps<UiToolOutputs["show_passage"]>) {
         value={language}
         onValueChange={(value) => value && setLanguage(value)}
         size="sm"
+        variant="outline"
+        aria-label="Passage language"
       >
-        <ToggleGroupItem value="de" aria-label="German source text">
-          DE
+        <ToggleGroupItem
+          value="de"
+          className="h-8 rounded-control text-xs"
+          aria-label="German source text"
+        >
+          German source
         </ToggleGroupItem>
-        <ToggleGroupItem value="en" aria-label="English translation">
-          EN
+        <ToggleGroupItem
+          value="en"
+          className="h-8 rounded-control text-xs"
+          aria-label="English translation"
+        >
+          English translation
         </ToggleGroupItem>
       </ToggleGroup>
       {segments.map((segment) => (
@@ -44,8 +55,8 @@ export function PassageCard(props: ToolProps<UiToolOutputs["show_passage"]>) {
           key={segment.id}
           className={
             segment.id === output?.segment.id
-              ? "flex flex-col gap-2 rounded-xl border-0 bg-muted p-3"
-              : "flex flex-col gap-2 px-0 py-0"
+              ? "flex flex-col gap-2 rounded-2xl border-0 bg-muted p-4"
+              : "flex flex-col gap-2 p-0"
           }
         >
           <CardDescription className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
