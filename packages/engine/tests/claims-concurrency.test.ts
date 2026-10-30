@@ -1,10 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { validateClaims, type ValidationContext } from "../claims/validate.ts";
-import { structured } from "../llm/client.ts";
+import { type ValidationContext, validateClaims } from "../claims/validate.ts";
 import type { Claim, Segment } from "../contracts.ts";
+import { structured } from "../llm/client.ts";
 
-afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 
 describe("shared model request budget", () => {
   it.each([undefined, "0", "invalid"])("uses the default budget for %s", async (configured) => {
@@ -12,15 +15,21 @@ describe("shared model request budget", () => {
     vi.stubEnv("MEDLYN_LLM_CONCURRENCY", configured);
     let active = 0;
     let peak = 0;
-    vi.stubGlobal("fetch", vi.fn(async () => {
-      active++;
-      peak = Math.max(peak, active);
-      await new Promise((resolve) => setTimeout(resolve, 2));
-      active--;
-      return new Response(JSON.stringify({ choices: [{ message: { content: '{"ok":true}' } }] }));
-    }));
-    await Promise.all(Array.from({ length: 20 }, () =>
-      structured("fast", "synthetic", z.object({ ok: z.boolean() }), [])));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        active++;
+        peak = Math.max(peak, active);
+        await new Promise((resolve) => setTimeout(resolve, 2));
+        active--;
+        return new Response(JSON.stringify({ choices: [{ message: { content: '{"ok":true}' } }] }));
+      }),
+    );
+    await Promise.all(
+      Array.from({ length: 20 }, () =>
+        structured("fast", "synthetic", z.object({ ok: z.boolean() }), []),
+      ),
+    );
     expect(peak).toBe(8);
   });
 
@@ -37,22 +46,45 @@ describe("shared model request budget", () => {
       await new Promise((resolve) => setTimeout(resolve, 2));
       active--;
       const body = JSON.parse(String(init.body));
-      const result = body.response_format.json_schema.name === "claim_support"
-        ? { support: "supported", negationFlag: false, reason: "Synthetic" } : { ok: true };
-      return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(result) } }] }));
+      const result =
+        body.response_format.json_schema.name === "claim_support"
+          ? { support: "supported", negationFlag: false, reason: "Synthetic" }
+          : { ok: true };
+      return new Response(
+        JSON.stringify({ choices: [{ message: { content: JSON.stringify(result) } }] }),
+      );
     });
     vi.stubGlobal("fetch", request);
-    const segment: Segment = { id: "s", documentId: "d", kind: "sentence", section: null,
-      text: "Synthetic evidence.", textEn: null, start: 0, end: 19 };
-    const ctx: ValidationContext = { patientId: "p", facts: [], segments: [segment],
-      window: { asOf: "2025-01-01", corpusRevision: "r", eligibleDocumentIds: ["d"] } };
+    const segment: Segment = {
+      id: "s",
+      documentId: "d",
+      kind: "sentence",
+      section: null,
+      text: "Synthetic evidence.",
+      textEn: null,
+      start: 0,
+      end: 19,
+    };
+    const ctx: ValidationContext = {
+      patientId: "p",
+      facts: [],
+      segments: [segment],
+      window: { asOf: "2025-01-01", corpusRevision: "r", eligibleDocumentIds: ["d"] },
+    };
     const claims: Claim[] = Array.from({ length: 20 }, (_, index) => ({
-      id: `c-${index}`, kind: "composed", text: `Synthetic evidence ${String.fromCharCode(65 + index)}`,
-      factIds: [], segmentIds: ["s"], author: "machine", validation: { key: "", support: "unsupported" },
+      id: `c-${index}`,
+      kind: "composed",
+      text: `Synthetic evidence ${String.fromCharCode(65 + index)}`,
+      factIds: [],
+      segmentIds: ["s"],
+      author: "machine",
+      validation: { key: "", support: "unsupported" },
     }));
     const [checked] = await Promise.all([
       validateClaims(claims, ctx),
-      ...Array.from({ length: 7 }, () => structured("reasoning", "synthetic", z.object({ ok: z.boolean() }), [])),
+      ...Array.from({ length: 7 }, () =>
+        structured("reasoning", "synthetic", z.object({ ok: z.boolean() }), []),
+      ),
     ]);
     expect(checked.every((claim) => claim.validation.support === "supported")).toBe(true);
     expect(request).toHaveBeenCalledTimes(27);
@@ -64,16 +96,28 @@ describe("shared model request budget", () => {
     vi.stubEnv("MODEL_FAST", "synthetic-fast");
     vi.stubEnv("MEDLYN_LLM_CONCURRENCY", "1");
     let count = 0;
-    vi.stubGlobal("fetch", vi.fn(async () => {
-      count++;
-      if (count === 1) throw new Error("Synthetic failure");
-      return new Response(JSON.stringify({ choices: [{ message: {
-        content: count === 2 ? "invalid" : JSON.stringify({ ok: true }),
-      } }] }));
-    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        count++;
+        if (count === 1) throw new Error("Synthetic failure");
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  content: count === 2 ? "invalid" : JSON.stringify({ ok: true }),
+                },
+              },
+            ],
+          }),
+        );
+      }),
+    );
     const schema = z.object({ ok: z.boolean() });
     const results = await Promise.allSettled([
-      structured("fast", "first", schema, []), structured("fast", "second", schema, []),
+      structured("fast", "first", schema, []),
+      structured("fast", "second", schema, []),
       structured("fast", "third", schema, []),
     ]);
     expect(results.map((result) => result.status)).toEqual(["rejected", "fulfilled", "fulfilled"]);

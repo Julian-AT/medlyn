@@ -2,8 +2,13 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { speechReceipt, verifySpeechReceipt } from "../agent/voice.ts";
 
 const prior = process.env.OPENAI_API_KEY;
-beforeAll(() => { process.env.OPENAI_API_KEY = "synthetic-test-signing-key"; });
-afterAll(() => { if (prior === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = prior; });
+beforeAll(() => {
+  process.env.OPENAI_API_KEY = "synthetic-test-signing-key";
+});
+afterAll(() => {
+  if (prior === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = prior;
+});
 
 describe("validated speech receipts", () => {
   it("binds the receipt to the exact validated text", () => {
