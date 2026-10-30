@@ -17,13 +17,14 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "ai": "^7.0.157",
     "drizzle-orm": "^0.44.0",
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@medlyn/tsconfig": "workspace:*",
     "@types/node": "^24.0.0",
     "drizzle-kit": "^0.31.0",
-    "vitest": "^3.2.0",
-    "@medlyn/tsconfig": "workspace:*"
+    "vitest": "^3.2.0"
   }
 }
