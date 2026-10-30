@@ -1,43 +1,67 @@
 "use client";
+
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
+import type { Fact } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
-import { MedicationChanges } from "@/components/gen-ui/medication-changes";
-import { MedicationList } from "@/components/gen-ui/medication-list";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { usePatientFacts } from "@/components/patient/use-patient-facts";
+import { CardContent, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-export function MedicationSourceLists({ output }: { output: UiToolOutputs["show_medications"] }) {
-  const lists = [...output.lists].sort((a, b) => b.date.localeCompare(a.date));
-  if (!lists.length) return null;
-  const key = (item: (typeof lists)[number]) => `${item.documentId}:${item.listLabel}`;
+import { medicationSourceLists } from "./medication-data";
+import { MedicationEmptyState } from "./medication-empty-state";
+import { MedicationListChanges } from "./medication-list-changes";
+import { MedicationSkeleton } from "./medication-skeleton";
+import { MedicationSourceTable } from "./medication-source-table";
+
+export function MedicationSourceLists({
+  output,
+  facts,
+}: {
+  output: UiToolOutputs["show_medications"];
+  facts?: Fact[];
+}) {
+  const patientFacts = usePatientFacts();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  if (!facts && !patientFacts.size && output.lists.length) return <MedicationSkeleton />;
+  const lists = medicationSourceLists(
+    output.lists,
+    facts ? new Map(facts.map((fact) => [fact.id, fact])) : patientFacts,
+  );
+  const selected = lists.find((list) => list.id === selectedId) ?? lists[0];
+  if (!selected) return <MedicationEmptyState />;
+  const previous = lists[lists.indexOf(selected) + 1];
   return (
-    <Card className="min-w-0 gap-4 rounded-none bg-transparent py-0 shadow-none ring-0">
-      <CardHeader className="p-0">
-        <CardTitle>Medication source lists</CardTitle>
-        <CardDescription>
-          As of {formatDate(output.asOf)}. Each list reflects its source document.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="min-w-0 p-0">
-        <Tabs defaultValue={key(lists[0])} className="min-w-0">
-          <TabsList className="h-auto flex-wrap justify-start" aria-label="Medication source lists">
-            {lists.map((item) => (
+    <CardContent className="flex min-w-0 flex-col gap-6 p-0">
+      <Tabs value={selected.id} onValueChange={setSelectedId} className="min-w-0 gap-4">
+        <CardContent className="flex flex-col gap-3 p-0">
+          <CardContent className="flex flex-wrap items-center justify-between gap-2 p-0">
+            <CardDescription className="text-xs font-medium">Source lists</CardDescription>
+            <CardDescription className="text-xs tabular-nums">
+              Available as of {formatDate(output.asOf)}
+            </CardDescription>
+          </CardContent>
+          <TabsList
+            className="h-auto max-w-full flex-wrap justify-start gap-1 rounded-xl p-1 group-data-horizontal/tabs:h-auto"
+            aria-label="Medication source lists"
+          >
+            {lists.map((list) => (
               <TabsTrigger
-                key={key(item)}
-                value={key(item)}
-                className="h-8 whitespace-normal rounded-control"
+                key={list.id}
+                value={list.id}
+                className="h-auto min-h-9 flex-none whitespace-normal rounded-lg px-3 py-2 text-left text-sm tabular-nums"
               >
-                {item.listLabel.replace(/\d{4}-\d{2}-\d{2}/g, (date) => formatDate(date))}
+                {list.listLabel}
               </TabsTrigger>
             ))}
           </TabsList>
-          {lists.map((item) => (
-            <TabsContent key={key(item)} value={key(item)}>
-              <MedicationList list={item} />
-            </TabsContent>
-          ))}
-        </Tabs>
-        {output.changes.length > 0 && <MedicationChanges changes={output.changes} />}
-      </CardContent>
-    </Card>
+        </CardContent>
+        {lists.map((list) => (
+          <TabsContent key={list.id} value={list.id} className="min-w-0">
+            <MedicationSourceTable list={list} />
+          </TabsContent>
+        ))}
+      </Tabs>
+      <MedicationListChanges selected={selected} previous={previous} />
+    </CardContent>
   );
 }
