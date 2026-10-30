@@ -23,12 +23,12 @@ export function GapCoverage({ card, window }: { card: ClinicalCard; window: Evid
     <Dialog>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          Compare sources · absence coverage
+          View documents checked
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{card.title} · absence coverage</DialogTitle>
+          <DialogTitle>{card.title} · documents checked</DialogTitle>
           <DialogDescription>{absence.text}</DialogDescription>
         </DialogHeader>
         <CardContent className="space-y-3 p-0">

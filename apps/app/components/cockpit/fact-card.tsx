@@ -1,8 +1,6 @@
 "use client";
 
-import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import type { Card as ClinicalCard } from "@medlyn/engine/contracts";
+import type { Card as ClinicalCard, EvidenceWindow } from "@medlyn/engine/contracts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,23 +16,25 @@ import { cn } from "@/lib/utils";
 import { FactLines } from "./fact-lines";
 import { GapCard } from "./gap-card";
 import { ReviewControls, type ReviewHandler, reviewLabel } from "./review-controls";
+import { WorkflowStatus } from "./workflow-status";
 
 type Props = {
   card: ClinicalCard;
+  window?: EvidenceWindow;
   onFinding: (id: string) => void;
   onRetry: () => void;
   onReview: ReviewHandler;
   activeFindingIds: string[];
 };
 
-export function FactCard({ card, onFinding, onRetry, onReview, activeFindingIds }: Props) {
+export function FactCard({ card, window, onFinding, onRetry, onReview, activeFindingIds }: Props) {
   const absence = card.lines.find((line) => line.kind === "absence" && showClaim(line));
   const conflict = card.findingIds.find((id) => activeFindingIds.includes(id));
   const corrections = card.lines
     .filter((line) => showClaim(line) && line.factIds.length === 1)
     .map((line) => ({ id: line.factIds[0], label: line.text }));
   if (card.availability === "not_documented" && absence)
-    return <GapCard card={card} absence={absence} onReview={onReview} />;
+    return <GapCard card={card} window={window} absence={absence} onReview={onReview} />;
   return (
     <Card
       size="sm"
@@ -60,15 +60,10 @@ export function FactCard({ card, onFinding, onRetry, onReview, activeFindingIds 
       </CardHeader>
       <CardContent className="flex flex-col gap-3 px-0">
         {card.conflict !== "none" && conflict && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-6 w-fit rounded-full border-warning/30 bg-warning/10 px-2 text-xs text-warning"
-            onClick={() => onFinding(conflict)}
-          >
-            {card.conflict === "contradicted" ? "Contradiction" : "Needs clarification"}
-            <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
-          </Button>
+          <WorkflowStatus
+            status={card.conflict === "contradicted" ? "contradiction" : "needs_clarification"}
+            onCompare={() => onFinding(conflict)}
+          />
         )}
         {card.headline && showClaim(card.headline) && (
           <CardDescription className="text-foreground" data-claim-id={card.headline.id}>
@@ -77,7 +72,8 @@ export function FactCard({ card, onFinding, onRetry, onReview, activeFindingIds 
         )}
         {card.availability !== "documented" ? (
           <CardContent className="flex flex-wrap items-center justify-between gap-2 px-0">
-            <CardDescription>Couldn't check · The evidence check did not complete.</CardDescription>
+            <WorkflowStatus status="unavailable" />
+            <CardDescription>The evidence check did not complete.</CardDescription>
             <Button variant="outline" size="sm" onClick={onRetry}>
               Retry check
             </Button>

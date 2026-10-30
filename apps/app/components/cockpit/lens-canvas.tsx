@@ -34,6 +34,7 @@ export function LensCanvas({
     card.critical || screen?.critical.includes(card.id);
   const critical = cards.filter(isCritical);
   const props = {
+    window: screen?.window,
     onFinding,
     onRetry,
     onReview,
@@ -42,7 +43,7 @@ export function LensCanvas({
   return (
     <Card
       role="region"
-      aria-label="Clinical lens"
+      aria-label="Situation facts"
       aria-busy={loading}
       data-lens-state={
         loading ? "loading" : state.error ? "error" : state.complete ? "done" : "idle"
@@ -55,7 +56,7 @@ export function LensCanvas({
           <AlertDescription>
             {state.error}
             <Button size="sm" variant="outline" onClick={onRetry}>
-              Retry lens
+              Retry situation
             </Button>
           </AlertDescription>
         </Alert>
@@ -99,7 +100,8 @@ export function LensCanvas({
           <EmptyHeader>
             <EmptyTitle>No facts to display</EmptyTitle>
             <EmptyDescription>
-              Try a more specific role and task to build another lens.
+              Enter your role and the task you are about to do, or choose one of the five
+              situations.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
