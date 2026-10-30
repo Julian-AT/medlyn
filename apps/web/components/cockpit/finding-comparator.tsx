@@ -24,7 +24,7 @@ export function FindingComparator({
   onReview: ReviewHandler;
 }) {
   return (
-    <Card className="bg-transparent ring-0">
+    <Card className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
         <Badge variant="outline" className="w-fit border-warning/40 text-warning">
           {finding.type.replaceAll("_", " ")}
@@ -37,7 +37,7 @@ export function FindingComparator({
           <Card
             key={`${passage.segmentId}:${passage.start}:${passage.end}`}
             size="sm"
-            className="rounded-xl border shadow-none ring-0"
+            className="rounded-xl border-0 bg-gray-alpha-50 shadow-none ring-0"
           >
             <CardHeader>
               <CardDescription className="break-all font-mono text-xs">
@@ -57,7 +57,12 @@ export function FindingComparator({
               <CardDescription className="text-sm">{passage.claimEn}</CardDescription>
             </CardContent>
             <CardFooter>
-              <Button variant="link" size="sm" onClick={() => onSource(passage.segmentId)}>
+              <Button
+                className="rounded-full"
+                variant="link"
+                size="sm"
+                onClick={() => onSource(passage.segmentId)}
+              >
                 Open in document
               </Button>
             </CardFooter>
