@@ -55,6 +55,15 @@ export function messageEvidence(message: UIMessage) {
     factIds: [...new Set(allClaims.flatMap((claim) => claim.factIds))],
     checked: allClaims.length > 0,
     speech,
+    notice:
+      message.role === "assistant" &&
+      message.parts.some(
+        (part) =>
+          part.type === "data-response-status" &&
+          z.object({ status: z.literal("view") }).safeParse(part.data).success,
+      )
+        ? "Showing the source-linked view."
+        : null,
     unavailable:
       !checked.length &&
       message.parts.some((part) => part.type === "text" && part.text === UNSUPPORTED_ANSWER),

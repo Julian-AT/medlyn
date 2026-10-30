@@ -14,6 +14,20 @@ const message = (parts) => ({ id: "answer-example", role: "assistant", parts });
 const validated = (claims, speech = null) => ({ type: "data-validated", data: { claims, speech } });
 
 describe("chat claim boundary", () => {
+  it("uses fixed view status copy without accepting server prose as a claim", () => {
+    const evidence = messageEvidence(
+      message([
+        { type: "data-response-status", data: { status: "view", text: "Untrusted claim" } },
+      ]),
+    );
+    expect(evidence.notice).toBe("Showing the source-linked view.");
+    expect(evidence.text).toBe("");
+    expect(evidence.speech).toEqual([]);
+    expect(
+      messageEvidence(message([{ type: "data-response-status", data: { status: "other" } }]))
+        .notice,
+    ).toBeNull();
+  });
   it("never exposes assistant text without a validation payload", () => {
     const evidence = messageEvidence(message([{ type: "text", text: "Unvalidated statement." }]));
     expect(evidence.text).toBe("");
