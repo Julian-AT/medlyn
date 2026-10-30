@@ -23,7 +23,12 @@ import { passageContext } from "../evidence/passage.ts";
 import { checkDocumented } from "../lens/absence.ts";
 import { screenFromEvents } from "../lens/screen.ts";
 import { streamLens } from "../lens/stream.ts";
-import { medicationSchedule, renderLine, trendLines } from "../lens/templates.ts";
+import {
+  medicationSchedule,
+  renderLine,
+  trendLines,
+  withDocumentTitles,
+} from "../lens/templates.ts";
 import { buildLetter } from "../letter/build.ts";
 import { hybridSearch } from "../search/hybrid.ts";
 import {
@@ -424,7 +429,10 @@ export function uiTools(ctx: UiToolContext) {
     (sourcesJob ??= Promise.all([
       loadFacts(ctx.window, undefined, ctx.patientId),
       loadSegments(ctx.window, ctx.patientId),
-    ]).then(([facts, segments]) => ({ facts: locatedUiFacts(facts, segments), segments })));
+    ]).then(([facts, segments]) => ({
+      facts: locatedUiFacts(facts, segments),
+      segments,
+    })));
   const run = async <K extends keyof UiToolOutputs>(
     name: K,
     execute: () => Promise<UiToolOutputs[K]>,
@@ -440,7 +448,7 @@ export function uiTools(ctx: UiToolContext) {
         "Open source-linked situation cards for a clinical role and task. Card text is rendered by templates.",
       inputSchema: z.object({
         text: z.string().trim().min(1).max(2000),
-        chipId: z.string().optional(),
+        chipId: z.string().nullish(),
       }),
       outputSchema: UiToolSchemas.open_lens,
       execute: ({ text, chipId }) =>
@@ -450,7 +458,7 @@ export function uiTools(ctx: UiToolContext) {
           const events: LensEvent[] = [];
           for await (const event of streamLens({
             text,
-            chipId,
+            chipId: chipId ?? undefined,
             asOf: ctx.window.asOf,
             sessionId: ctx.sessionId,
           })) {
@@ -507,7 +515,7 @@ export function uiTools(ctx: UiToolContext) {
     show_medications: tool({
       description:
         "Show source-labelled medication lists and documented changes between lists, never infer current medication.",
-      inputSchema: z.object({ list: z.enum(["latest", "all"]).optional() }),
+      inputSchema: z.object({ list: z.enum(["latest", "all"]).nullish() }),
       outputSchema: UiToolSchemas.show_medications,
       execute: ({ list }) =>
         run("show_medications", async () => {
@@ -517,7 +525,7 @@ export function uiTools(ctx: UiToolContext) {
             facts,
             await displayLines(facts, data, ctx),
             ctx.window.asOf,
-            list,
+            list ?? undefined,
           );
         }),
     }),
@@ -554,7 +562,7 @@ export function uiTools(ctx: UiToolContext) {
     show_timeline: tool({
       description:
         "Show dated source-linked events; planned and recommended events keep their status.",
-      inputSchema: z.object({ kinds: z.array(FactKind).optional() }),
+      inputSchema: z.object({ kinds: z.array(FactKind).nullish() }),
       outputSchema: UiToolSchemas.show_timeline,
       execute: ({ kinds }) =>
         run("show_timeline", async () => {
@@ -578,7 +586,7 @@ export function uiTools(ctx: UiToolContext) {
     show_findings: tool({
       description:
         "Compare adjudicated contradictions and needs-clarification findings with all eligible passages.",
-      inputSchema: z.object({ topic: z.string().optional() }),
+      inputSchema: z.object({ topic: z.string().nullish() }),
       outputSchema: UiToolSchemas.show_findings,
       execute: ({ topic }) =>
         run("show_findings", async () => ({
@@ -645,11 +653,32 @@ export function uiTools(ctx: UiToolContext) {
         run("draft_letter", async () => {
           if (ctx.patientId !== PATIENT_ID)
             throw new Error("GP letters currently support the default patient only");
-          return buildLetter({
-            sessionId: ctx.sessionId,
-            asOf: ctx.window.asOf,
-            corpusRevision: ctx.window.corpusRevision,
-          });
+          const [letter, data, documents] = await Promise.all([
+            buildLetter({
+              sessionId: ctx.sessionId,
+              asOf: ctx.window.asOf,
+              corpusRevision: ctx.window.corpusRevision,
+            }),
+            sources(),
+            loadDocuments(ctx.window, ctx.patientId),
+          ]);
+          const facts = withDocumentTitles(data.facts, documents);
+          const templates = letter.sections.flatMap((section) =>
+            section.claims.flatMap((claim) => {
+              if (claim.kind !== "template" || claim.factIds.length !== 1 || claim.flag) return [];
+              const fact = facts.find((fact) => fact.id === claim.factIds[0]);
+              return fact ? [{ ...renderLine(fact, ctx), id: claim.id }] : [];
+            }),
+          );
+          const checked = await validateClaims(templates, { ...ctx, ...data, facts });
+          const titled = new Map(checked.filter(isShowable).map((claim) => [claim.id, claim]));
+          return {
+            ...letter,
+            sections: letter.sections.map((section) => ({
+              ...section,
+              claims: section.claims.map((claim) => titled.get(claim.id) ?? claim),
+            })),
+          };
         }),
     }),
   };
