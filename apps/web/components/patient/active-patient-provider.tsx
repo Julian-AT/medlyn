@@ -1,6 +1,6 @@
 "use client";
 
-import type { Fact } from "@medlyn/engine/contracts";
+import type { Document, Fact } from "@medlyn/engine/contracts";
 import { usePathname } from "next/navigation";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ type ActivePatient = {
   patients: PatientOption[];
   selectPatient: (id: string) => void;
   facts: Map<string, Fact>;
+  documents: Map<string, Document>;
 };
 const PatientContext = createContext<ActivePatient | null>(null);
 
@@ -29,6 +30,27 @@ export function ActivePatientProvider({
   const options = uniquePatients([...(loadedPatients ?? patients), patient]);
   const activePatient = options.find((entry) => entry.id === patient.id) ?? patient;
   const [facts, setFacts] = useState(new Map<string, Fact>());
+  const [documents, setDocuments] = useState(new Map<string, Document>());
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch(`/api/patient/documents?patientId=${patient.id}&asOf=${patient.asOf}`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Document titles unavailable");
+        const body: { documents: Document[] } = await response.json();
+        if (!controller.signal.aborted)
+          setDocuments(new Map(body.documents.map((document) => [document.id, document])));
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          console.warn(
+            "document_titles_unavailable",
+            error instanceof Error ? error.name : "Unknown",
+          );
+      });
+    return () => controller.abort();
+  }, [patient.id, patient.asOf]);
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/patient/list", { signal: controller.signal })
@@ -82,7 +104,7 @@ export function ActivePatientProvider({
   }
   return (
     <PatientContext.Provider
-      value={{ patient: activePatient, patients: options, selectPatient, facts }}
+      value={{ patient: activePatient, patients: options, selectPatient, facts, documents }}
     >
       {children}
     </PatientContext.Provider>
