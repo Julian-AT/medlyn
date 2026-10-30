@@ -60,6 +60,17 @@
 }
 
 :root {
+  --gradient-1: radial-gradient(
+    circle at 25% 25%,
+    #ffe9c9 0%,
+    #f4b9be 45%,
+    #cabaf0 80%,
+    #d9eaff 100%
+  );
+  --gradient-2: linear-gradient(135deg, #d7f2df, #c7e5f4);
+  --gradient-3: linear-gradient(135deg, #eadffb, #c8b5ee);
+  --gradient-4: linear-gradient(135deg, #f7ebce, #f3d2a2);
+  --gradient-5: linear-gradient(135deg, #e0e7ef, #bcd3f3);
   color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
@@ -110,6 +121,17 @@
 }
 
 .dark {
+  --gradient-1: radial-gradient(
+    circle at 25% 25%,
+    #775349 0%,
+    #68475f 45%,
+    #474068 80%,
+    #354c63 100%
+  );
+  --gradient-2: linear-gradient(135deg, #294c40, #2d4a5c);
+  --gradient-3: linear-gradient(135deg, #4b3d61, #453968);
+  --gradient-4: linear-gradient(135deg, #52472d, #63492c);
+  --gradient-5: linear-gradient(135deg, #364353, #354f70);
   color-scheme: dark;
   --background: #141414;
   --foreground: #fafafa;
