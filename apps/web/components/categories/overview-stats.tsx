@@ -31,10 +31,10 @@ export function OverviewStats({ data }: { data: PatientData }) {
       {stats.map(({ label, value, category }) => (
         <Card
           key={label}
-          className="gap-3 rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0"
+          className="gap-3 rounded-2xl border border-gray-alpha-150 bg-card p-4 shadow-none ring-0"
         >
-          <CardHeader className="gap-3">
-            <CardDescription className="font-medium">{label}</CardDescription>
+          <CardHeader className="gap-3 p-0">
+            <CardDescription className="min-h-10 font-medium">{label}</CardDescription>
             <CardTitle className="text-3xl font-medium tabular-nums text-foreground">
               {value}
             </CardTitle>
