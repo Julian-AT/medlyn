@@ -1,10 +1,23 @@
 # Medlyn landing page
 
-Public marketing site; the clinician cockpit lives in the sibling app.
-Run commands from the repository root with pnpm.
-`pnpm --filter @medlyn/www dev` serves http://localhost:3001.
-`pnpm --filter @medlyn/www build` creates the production build.
-`pnpm --filter @medlyn/www start` serves the production build on port 3001.
-`pnpm --filter @medlyn/www typecheck` checks TypeScript.
-Set `NEXT_PUBLIC_APP_URL` at build time; it defaults to http://localhost:3000.
-Original landing-page copy, styling, fonts and media are preserved.
+Public landing page for the Medlyn clinical documentation prototype.
+
+[medlyn.health](https://medlyn.health)
+
+Run from the repository root with Node.js 24+ and pnpm 10.18.0:
+
+```sh
+pnpm --filter @medlyn/www dev
+```
+
+Open [localhost:3001](http://localhost:3001). Set `NEXT_PUBLIC_SITE_URL` and
+`NEXT_PUBLIC_APP_URL` before building to override the public origins. They default
+to `https://medlyn.health` and `https://app.medlyn.health`.
+
+- `src/app/`: landing page, metadata and indexing routes.
+- `src/components/`: supplied landing design and shared outbound links.
+- `src/lib/seo.ts`: public origins and search metadata.
+- `public/`: fonts, illustrations and images.
+
+See the [root README](../../README.md) for workspace setup and the
+[deployment guide](../../docs/deploy.md) for production configuration.
