@@ -9,15 +9,28 @@ TRACK-1-clinical-documentation/
 !.env.example
 
 node_modules/
+.pnpm-store/
+bun.lock
+bun.lockb
+
 .next/
 .turbo/
+.vercel/
 dist/
+out/
 coverage/
 *.tsbuildinfo
-.DS_Store
+next-env.d.ts
 
 eval/output/
-eval/playwright/test-results/
-eval/playwright/report/
+.promptfoo/
+test-results/
+playwright-report/
+blob-report/
+
+*.log
+.DS_Store
+.idea/
+.vscode/
 
 .agents/
