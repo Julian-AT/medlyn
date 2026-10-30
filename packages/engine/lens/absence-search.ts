@@ -1,8 +1,9 @@
 import { z } from "zod";
 import type { EvidenceWindow } from "../contracts.ts";
 import { structured } from "../llm/client.ts";
-import { hybridSearch } from "../search/hybrid.ts";
+import { PATIENT_ID } from "../store.ts";
 import { type AbsenceOptions, locatedAbsenceHits } from "./absence.ts";
+import { searchAbsenceCandidates } from "./absence-retrieval.ts";
 import { withModelSlot } from "./select.ts";
 
 type Search = NonNullable<AbsenceOptions["search"]>;
@@ -25,7 +26,11 @@ const Results = z.object({
 });
 
 /** Shares one supplemental retrieval across simultaneous concepts in the same evidence window. */
-export function batchCandidateSearch(window: EvidenceWindow, search = hybridSearch) {
+export function batchCandidateSearch(
+  window: EvidenceWindow,
+  search = searchAbsenceCandidates,
+  patientId = PATIENT_ID,
+) {
   let pending: {
     query: string;
     resolve: (ids: string[]) => void;
@@ -36,7 +41,7 @@ export function batchCandidateSearch(window: EvidenceWindow, search = hybridSear
     pending = [];
     try {
       const query = [...new Set(jobs.map((job) => job.query))].join("\n");
-      const hits = await search(query, window, { k: Math.min(1000, 60 * jobs.length) });
+      const hits = await search(query, window, { k: Math.min(1000, 60 * jobs.length), patientId });
       const ids = [...new Set(hits.map((hit) => hit.segmentId))];
       for (const job of jobs) job.resolve(ids);
     } catch (error) {
