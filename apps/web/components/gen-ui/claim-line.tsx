@@ -1,10 +1,10 @@
 "use client";
 
 import type { ClaimLine as ClaimLineType } from "@medlyn/engine/contracts";
-import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { displayDates } from "./display-dates";
+import { SourceChips } from "./evidence-sources";
 
 export function ClaimLine({
   line,
