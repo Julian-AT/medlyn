@@ -1,12 +1,14 @@
 import { formatDate } from "@medlyn/engine/dates";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { categories } from "./category-config";
 import { CategoryEmpty } from "./category-empty";
+import { DocumentsTable } from "./documents-table";
 import { FactTable } from "./fact-table";
+import { OverviewStats } from "./overview-stats.tsx";
 import { PageHeading } from "./page-heading";
+import { PageShell } from "./page-shell.tsx";
 import { patientData } from "./patient-data";
+import { SafetyBand } from "./safety-band.tsx";
 export async function OverviewPage() {
   let data: Awaited<ReturnType<typeof patientData>> | null = null;
   try {
@@ -18,47 +20,46 @@ export async function OverviewPage() {
     );
   }
   return (
-    <Card className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-6xl px-4 py-6 shadow-none ring-0 md:px-8">
-      <CardContent className="flex flex-col gap-8 px-0">
-        <PageHeading
-          title="Patient overview"
-          description="A source-linked view of Anna Musterfrau’s record."
-        />
-        {!data ? (
-          <CategoryEmpty unavailable />
-        ) : (
-          <>
-            <Card className="rounded-xl border shadow-none ring-0">
-              <CardHeader>
-                <CardTitle>Anna Musterfrau</CardTitle>
-                <CardDescription>
-                  {data.documents.length} documents · Evidence as of {formatDate(data.window.asOf)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {Object.entries(categories).map(([key, category]) => (
-                  <Button key={key} asChild variant="outline" className="justify-between">
-                    <Link href={`/patient/${key}`}>
-                      {category.title}
-                      <span>
-                        {data.rows.filter((row) => category.kinds.includes(row.fact.kind)).length}
-                      </span>
-                    </Link>
-                  </Button>
-                ))}
-              </CardContent>
-            </Card>
-            <FactTable
-              title="Safety and upcoming care"
-              rows={data.rows.filter(
-                (row) =>
-                  row.fact.kind === "allergy" ||
-                  (row.fact.kind === "procedure" && row.fact.temporalStatus === "planned"),
-              )}
-            />
-          </>
-        )}
-      </CardContent>
-    </Card>
+    <PageShell>
+      <PageHeading
+        title="Patient overview"
+        description={
+          data
+            ? `Source-linked patient record · Evidence as of ${formatDate(data.window.asOf)}`
+            : "A source-linked view of the patient record."
+        }
+        action={
+          <Button asChild>
+            <Link href="/situations">Open a situation</Link>
+          </Button>
+        }
+      />
+      {!data ? (
+        <CategoryEmpty unavailable />
+      ) : (
+        <>
+          <OverviewStats data={data} />
+          <SafetyBand rows={data.rows.filter(({ fact }) => fact.kind === "allergy")} />
+          <FactTable
+            title="Upcoming care"
+            description="Plans retain the status stated in their source document."
+            rows={data.rows.filter(
+              ({ fact }) => fact.kind === "procedure" && fact.temporalStatus === "planned",
+            )}
+          />
+          <DocumentsTable
+            title="Recent documents"
+            documents={[...data.documents]
+              .sort((a, b) => b.docDate.localeCompare(a.docDate))
+              .slice(0, 4)
+              .map((document) => ({
+                ...document,
+                segmentId:
+                  data.facts.find((fact) => fact.documentId === document.id)?.segmentId ?? null,
+              }))}
+          />
+        </>
+      )}
+    </PageShell>
   );
 }
