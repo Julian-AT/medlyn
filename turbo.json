@@ -1,6 +1,21 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalEnv": ["NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_SITE_URL", "MEDLYN_MOCK"],
+  "globalPassThroughEnv": [
+    "DATABASE_URL",
+    "OPENAI_BASE_URL",
+    "OPENAI_API_KEY",
+    "MODEL_FAST",
+    "MODEL_REASONING",
+    "DEMO_PASSWORD",
+    "DEMO_SESSION_SECRET",
+    "MEDLYN_VERIFIER",
+    "MEDLYN_LLM_CONCURRENCY",
+    "GEMINI_API_KEY",
+    "GEMINI_EMBED_REQUESTS_PER_MINUTE",
+    "FISH_AUDIO_API_KEY",
+    "FISH_AUDIO_VOICE_ID"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
