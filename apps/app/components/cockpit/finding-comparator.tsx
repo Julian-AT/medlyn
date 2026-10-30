@@ -3,7 +3,6 @@
 import type { Finding } from "@medlyn/engine/contracts";
 import { HighlightDifference } from "@/components/gen-ui/highlight-difference";
 import { SourceChips } from "@/components/sources/source-chips";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ReviewControls, type ReviewHandler } from "./review-controls";
+import { WorkflowStatus } from "./workflow-status";
 
 export function FindingComparator({
   finding,
@@ -25,9 +25,7 @@ export function FindingComparator({
   return (
     <Card className="rounded-none bg-transparent shadow-none ring-0">
       <CardHeader>
-        <Badge variant="outline" className="w-fit border-warning/40 text-warning">
-          {finding.type === "contradiction" ? "Contradiction" : "Needs clarification"}
-        </Badge>
+        <WorkflowStatus status={finding.type} />
         <CardTitle>{finding.title}</CardTitle>
         <CardDescription>{finding.explanation}</CardDescription>
       </CardHeader>
