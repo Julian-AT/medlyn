@@ -50,6 +50,29 @@ export function modelFor(role: ModelRole): string {
   return model;
 }
 
+export function usesOfficialOpenAI(): boolean {
+  try {
+    return (
+      new URL(process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1").hostname ===
+      "api.openai.com"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Log only diagnostic fields, never provider request bodies or credentials. */
+export function llmErrorDetails(error: unknown): { name: string; message: string } {
+  let message = error instanceof Error ? error.message : "Unknown error";
+  for (const key of [process.env.OPENAI_API_KEY, process.env.OPENAI_API_KEY_PROD]) {
+    if (key) message = message.replaceAll(key, "[redacted]");
+  }
+  return {
+    name: error instanceof Error ? error.name : "Unknown",
+    message: message.replace(/Bearer\s+\S+|sk-[\w-]+/gi, "[redacted]").slice(0, 1000),
+  };
+}
+
 async function complete(
   model: string,
   messages: Message[],
@@ -62,7 +85,8 @@ async function complete(
     const started = performance.now();
     let status: number | undefined;
     try {
-      const url = `${process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1"}/chat/completions`;
+      const base = (process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1").replace(/\/+$/, "");
+      const url = `${base}/chat/completions`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -75,7 +99,18 @@ async function complete(
       status = res.status;
       if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
       const json = await res.json();
-      return json.choices[0].message.content as string;
+      const choice = json.choices?.[0];
+      if (choice?.message?.refusal)
+        throw new StructuredOutputError(`LLM ${name}: structured response refused`);
+      if (choice?.finish_reason === "length")
+        throw new StructuredOutputError(`LLM ${name}: structured response truncated`);
+      const content: unknown = choice?.message?.content;
+      if (typeof content !== "string" || !content.trim())
+        throw new StructuredOutputError(`LLM ${name}: missing structured response`);
+      return content;
+    } catch (error) {
+      console.warn("llm_request_failed", { operation: name, status, ...llmErrorDetails(error) });
+      throw error;
     } finally {
       if (process.env.MEDLYN_PROFILE_LENS === "1") {
         console.info("llm_timing", {
@@ -108,7 +143,16 @@ export async function structured<T extends z.ZodType>(
   };
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const content = await complete(model, messages, { response_format }, timeoutMs, name);
+    const content = await complete(
+      model,
+      messages,
+      {
+        response_format,
+        ...(role === "fast" && usesOfficialOpenAI() ? { reasoning_effort: "none" } : {}),
+      },
+      timeoutMs,
+      name,
+    );
     try {
       return schema.parse(JSON.parse(content));
     } catch (error) {
