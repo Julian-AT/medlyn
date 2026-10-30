@@ -57,7 +57,7 @@ export function ChatHistoryRow({
         asChild
         tooltip={chat.title}
         isActive={pathname === href}
-        className="h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-sidebar-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground [&_svg]:size-[18px] [&_svg]:text-foreground/70 data-active:[&_svg]:text-sidebar-accent-foreground"
+        className="h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground data-active:bg-sidebar-accent data-active:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground data-active:[&_svg]:text-foreground"
       >
         <Link
           href={href}
