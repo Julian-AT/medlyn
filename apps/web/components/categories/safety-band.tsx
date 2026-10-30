@@ -20,8 +20,11 @@ export function SafetyBand({ rows }: { rows: PatientRow[] }) {
   if (!rows.length) return null;
   return (
     <>
-      <Alert variant="destructive" className="rounded-2xl">
-        <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={1.75} aria-hidden="true" />
+      <Alert
+        variant="destructive"
+        className="rounded-2xl border-0 bg-destructive/5 px-5 py-4 dark:bg-destructive/10"
+      >
+        <HugeiconsIcon icon={ShieldAlertIcon} strokeWidth={2} aria-hidden="true" />
         <AlertTitle className="font-semibold">Safety information</AlertTitle>
         <AlertDescription className="gap-3">
           {grouped.map(({ item: { claim }, sources }) => (
