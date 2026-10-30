@@ -27,6 +27,7 @@ export default async function Page() {
   return (
     <PageShell>
       <PageHeading
+        category="documents"
         title="Documents"
         description="The original clinical record, with German passages and available English translations."
       />

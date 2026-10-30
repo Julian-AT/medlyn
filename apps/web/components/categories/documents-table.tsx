@@ -40,8 +40,8 @@ export function DocumentsTable({
   );
   return (
     <>
-      <Card className="gap-5 rounded-2xl border shadow-none ring-0">
-        <CardHeader>
+      <Card className="gap-5 rounded-none border-0 bg-transparent py-0 shadow-none ring-0">
+        <CardHeader className="px-0">
           <CardTitle className="font-semibold tracking-tight">{title}</CardTitle>
           <CardDescription>
             Open the original passages and their available translations.
@@ -52,10 +52,10 @@ export function DocumentsTable({
             </Badge>
           </CardAction>
         </CardHeader>
-        <CardContent>
-          <InputGroup className="h-9 rounded-lg sm:max-w-sm">
+        <CardContent className="px-0">
+          <InputGroup className="h-10 rounded-xl border-0 bg-gray-alpha-100 shadow-none sm:max-w-sm">
             <InputGroupAddon>
-              <HugeiconsIcon icon={Search01Icon} strokeWidth={1.75} aria-hidden="true" />
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
             </InputGroupAddon>
             <InputGroupInput
               aria-label="Search source documents"
@@ -65,9 +65,9 @@ export function DocumentsTable({
             />
           </InputGroup>
         </CardContent>
-        <CardContent className="[&>[data-slot=table-container]]:max-h-[36rem]">
+        <CardContent className="px-0 [&>[data-slot=table-container]]:max-h-[36rem] [&_[data-slot=table-row]]:border-gray-alpha-100">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-card">
+            <TableHeader className="sticky top-0 z-10 bg-background [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-head]]:text-muted-foreground">
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Document</TableHead>
@@ -87,6 +87,7 @@ export function DocumentsTable({
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-full h-7 rounded-full border-gray-alpha-150 bg-transparent px-2.5 text-xs shadow-none"
                       disabled={!doc.segmentId}
                       onClick={() => setSource(doc.segmentId)}
                     >
