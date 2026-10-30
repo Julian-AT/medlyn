@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Loading() {
   return (
     <Card
-      className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-6xl px-4 py-6 shadow-none ring-0 md:px-8"
+      className="gap-8 rounded-none bg-transparent mx-auto w-full max-w-[1100px] px-4 py-6 shadow-none ring-0 md:px-8 md:py-8"
       aria-busy="true"
       aria-label="Loading patient workspace"
     >

@@ -1,11 +1,13 @@
 import { formatDate } from "@medlyn/engine/dates";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { categories } from "./category-config";
 import { CategoryEmpty } from "./category-empty";
 import { LabTrends, MedicationView } from "./clinical-views";
 import { FactTable } from "./fact-table";
 import { ImagingFindings } from "./imaging-findings";
 import { PageHeading } from "./page-heading";
+import { PageShell } from "./page-shell.tsx";
 import { patientData } from "./patient-data";
 export async function CategoryPage({ category }: { category: string }) {
   const config = categories[category];
@@ -29,33 +31,39 @@ export async function CategoryPage({ category }: { category: string }) {
           )),
     ) ?? [];
   return (
-    <Card className="mx-auto w-full max-w-6xl gap-8 rounded-none bg-transparent px-4 py-6 shadow-none ring-0 md:px-8">
-      <CardContent className="flex flex-col gap-8 px-0">
-        <PageHeading title={config.title} description={config.description} />
-        {!data ? (
-          <CategoryEmpty unavailable />
-        ) : category === "medications" ? (
-          rows.length ? (
-            <MedicationView data={data} rows={rows} />
+    <PageShell>
+      <PageHeading
+        title={config.title}
+        description={config.description}
+        action={
+          <Button asChild>
+            <Link href="/situations">Open a situation</Link>
+          </Button>
+        }
+      />
+      {!data ? (
+        <CategoryEmpty unavailable />
+      ) : category === "medications" ? (
+        rows.length ? (
+          <MedicationView data={data} rows={rows} />
+        ) : (
+          <CategoryEmpty />
+        )
+      ) : (
+        <>
+          {category === "labs" && <LabTrends data={data} rows={rows} />}
+          {rows.length ? (
+            <FactTable
+              title={config.title}
+              description={`Evidence available as of ${formatDate(data.window.asOf)}`}
+              rows={rows}
+            />
           ) : (
             <CategoryEmpty />
-          )
-        ) : (
-          <>
-            {category === "labs" && <LabTrends data={data} rows={rows} />}{" "}
-            {rows.length ? (
-              <FactTable
-                title={config.title}
-                description={`Evidence available as of ${formatDate(data.window.asOf)}`}
-                rows={rows}
-              />
-            ) : (
-              <CategoryEmpty />
-            )}
-            {category === "imaging" && <ImagingFindings window={data.window} />}
-          </>
-        )}
-      </CardContent>
-    </Card>
+          )}
+          {category === "imaging" && <ImagingFindings window={data.window} />}
+        </>
+      )}
+    </PageShell>
   );
 }
