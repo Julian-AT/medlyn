@@ -1,13 +1,4 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function PageHeading({
@@ -21,19 +12,6 @@ export function PageHeading({
 }) {
   return (
     <Card className="gap-5 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0">
-      <Breadcrumb>
-        <BreadcrumbList className="text-xs">
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/">Medlyn</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <CardHeader className="gap-2 px-0">
         <CardTitle className="text-2xl font-semibold tracking-tight" role="heading" aria-level={1}>
           {title}
