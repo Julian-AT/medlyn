@@ -20,7 +20,7 @@ import {
 export const navigation = [
   { label: "Workspace", items: [{ title: "Chat", href: "/", icon: BubbleChatIcon }] },
   {
-    label: "Patient",
+    label: "Patient record",
     items: [
       { title: "Overview", href: "/patient", icon: UserIcon },
       { title: "Medications", href: "/patient/medications", icon: Medicine01Icon },
