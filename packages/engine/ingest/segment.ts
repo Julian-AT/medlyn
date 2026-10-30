@@ -12,7 +12,7 @@ export type RawSegment = {
 export const MEDICATION_SECTION = "Entlassungsmedikation";
 const TABLE_END = /^Mit freundlichen Grüßen/;
 const LIST_SECTIONS = new Set(["Diagnosen", "Allergien"]);
-const HEADING = /^[^:\d]{2,44}:$/;
+const HEADING = /^[^:]{2,100}:$/;
 const INLINE_SECTIONS = [
   "Gesamtbeurteilung",
   "Weiteres Procedere",
@@ -20,24 +20,34 @@ const INLINE_SECTIONS = [
   "Zusammenfassung",
   "Befundzusammenfassung",
   "Interpretation",
+  "Anamnese",
+  "Diagnose",
+  "Therapie",
 ];
+const BARE_HEADINGS = new Set([
+  "Gesamtbeurteilung", "Befundzusammenfassung", "Zusammenfassung", "Laborbefund",
+  "Diagnosen", "Allergien", "Anamnese", "Erhobene Befunde", "Labor", "Therapie und Verlauf",
+  "Entlassungsmedikation", "Weiteres Procedere", "Verlauf", "Vitalparameter", "Befunde",
+  "Mikroskopischer Befund", "Immunhistologisches Profil", "Diagnose",
+]);
 
 const ABBREVIATIONS = new Set(
   [
     "st.p.", "z.n.", "vd.a.", "v.a.", "li.", "re.", "bds.", "pat.", "dr.", "prim.", "diab.",
     "mell.", "z.b.", "ca.", "bzw.", "fr.", "hr.", "nr.", "i.v.", "s.c.", "i.m.", "tabl.", "art.",
     "a.", "aa.", "v.", "li.,", "re.,", "geb.", "lt.", "evtl.", "inkl.", "max.", "min.", "o.",
-    "u.", "vs.", "ggf.", "zn.", "st.", "dd.", "rez.",
+    "u.", "vs.", "ggf.", "zn.", "st.", "dd.", "rez.", "wg.", "gem.", "ventr.", "sin.",
   ],
 );
 
 function sentenceBounds(line: string): [number, number][] {
   const bounds: [number, number][] = [];
   let start = 0;
-  for (const match of line.matchAll(/[.!?](?=\s+[A-ZÄÖÜ0-9])/g)) {
+  for (const match of line.matchAll(/[.!?](?=\s+\S)/g)) {
     const end = match.index + 1;
     const token = line.slice(0, end).split(/\s+/).at(-1)!.toLowerCase();
     if (ABBREVIATIONS.has(token) || /^\d+\.$/.test(token) || /^[a-zäöü]\.$/i.test(token)) continue;
+    if (match[0] === "." && line[end] === ".") continue;
     bounds.push([start, end]);
     start = end;
   }
@@ -63,6 +73,14 @@ export function segment(text: string): RawSegment[] {
   const push = (kind: SegmentKind, start: number, end: number) =>
     segments.push({ kind, section, ordinal: segments.length, start, end, text: text.slice(start, end) });
 
+  let pending: { start: number; end: number } | null = null;
+  const flush = () => {
+    if (!pending) return;
+    const { start, end } = pending;
+    for (const [s, e] of sentenceBounds(text.slice(start, end))) push("sentence", start + s, start + e);
+    pending = null;
+  };
+
   for (const line of text.split("\n")) {
     const lineStart = offset;
     offset += line.length + 1;
@@ -71,22 +89,43 @@ export function segment(text: string): RawSegment[] {
     const start = lineStart + line.indexOf(trimmed);
     const end = start + trimmed.length;
 
-    if (HEADING.test(trimmed)) {
-      section = trimmed.slice(0, -1).trim();
+    if (HEADING.test(trimmed) || BARE_HEADINGS.has(trimmed)) {
+      flush();
+      section = trimmed.replace(/:$/, "").trim();
       push("heading", start, end);
       continue;
     }
-    if (section === MEDICATION_SECTION && TABLE_END.test(trimmed)) section = null;
+    if (section === MEDICATION_SECTION && TABLE_END.test(trimmed)) { flush(); section = null; }
     if (section === MEDICATION_SECTION) {
       push("table_row", start, end);
       continue;
     }
-    section = inlineSection(trimmed) ?? section;
+    const inline = inlineSection(trimmed);
+    if (inline) {
+      flush();
+      section = inline;
+      push("heading", start, start + inline.length + 1);
+      const content = start + inline.length + 1;
+      const lead = text.slice(content, end).length - text.slice(content, end).trimStart().length;
+      for (const [s, e] of sentenceBounds(text.slice(content + lead, end))) push("sentence", content + lead + s, content + lead + e);
+      continue;
+    }
+    if (/^(?:Sehr geehrte|Wir berichten|Mit (?:freundlichen|kollegialen))/i.test(trimmed) && section && LIST_SECTIONS.has(section)) {
+      flush();
+      section = null;
+    }
     if (section && LIST_SECTIONS.has(section)) {
       push("list_item", start, end);
       continue;
     }
-    for (const [s, e] of sentenceBounds(trimmed)) push("sentence", start + s, start + e);
+    const previous = pending ? text.slice(pending.start, pending.end) : "";
+    const lastToken = previous.split(/\s+/).at(-1)?.toLowerCase() ?? "";
+    const unfinished = previous && (!/[.!?;]$/.test(previous) || ABBREVIATIONS.has(lastToken));
+    const continuation = !/^[^:]{1,90}:/.test(trimmed) && !/^Mit (?:freundlichen|kollegialen) Grüßen/.test(previous) &&
+      (/^[a-zäöü(]/.test(trimmed) || /,$/.test(previous) || ABBREVIATIONS.has(lastToken) || /\b(?:von|vom|am|um|auf|mit|und|zu)\s*$/.test(previous));
+    if (pending && unfinished && continuation) pending.end = end;
+    else { flush(); pending = { start, end }; }
   }
+  flush();
   return segments;
 }

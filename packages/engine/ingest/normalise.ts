@@ -1,14 +1,18 @@
-const REPLACEMENTS: [RegExp, string][] = [
-  [/<BR>/gi, "\n"],
-  [/&gt;/g, ">"],
-  [/&lt;/g, "<"],
-  [/&quot;/g, '"'],
-  [/&#39;/g, "'"],
-  [/&nbsp;/g, " "],
-  [/&amp;/g, "&"],
-];
+const ENTITIES: Record<string, string> = {
+  gt: ">", lt: "<", quot: '"', apos: "'", nbsp: " ", amp: "&",
+  auml: "ä", ouml: "ö", uuml: "ü", Auml: "Ä", Ouml: "Ö", Uuml: "Ü", szlig: "ß",
+  deg: "°", micro: "µ", frac12: "½", frac14: "¼", frac34: "¾", ndash: "–", mdash: "—",
+};
+const TOKEN = /<br\s*\/?>|&(?:#x[\da-f]+|#\d+|[a-z][a-z\d]+);/gi;
 
-const TOKEN = new RegExp(REPLACEMENTS.map(([re]) => re.source).join("|"), "gi");
+function replacement(token: string): string {
+  if (token.startsWith("<")) return "\n";
+  const entity = token.slice(1, -1);
+  if (!entity.startsWith("#")) return ENTITIES[entity] ?? token;
+  const hex = /^#x/i.test(entity);
+  const point = Number.parseInt(entity.slice(hex ? 2 : 1), hex ? 16 : 10);
+  return point > 0 && point <= 0x10ffff && !(point >= 0xd800 && point <= 0xdfff) ? String.fromCodePoint(point) : token;
+}
 
 /**
  * `<BR>` becomes a newline and entities are decoded. `offsetMap[i]` is the raw offset of
@@ -21,9 +25,9 @@ export function normalise(raw: string): { text: string; offsetMap: number[] } {
   for (const match of raw.matchAll(TOKEN)) {
     for (let i = last; i < match.index; i++) offsetMap.push(i);
     text += raw.slice(last, match.index);
-    const [, replacement] = REPLACEMENTS.find(([re]) => new RegExp(`^${re.source}$`, "i").test(match[0]))!;
-    text += replacement;
-    offsetMap.push(match.index);
+    const decoded = replacement(match[0]);
+    text += decoded;
+    for (let i = 0; i < decoded.length; i++) offsetMap.push(decoded === match[0] ? match.index + i : match.index);
     last = match.index + match[0].length;
   }
   for (let i = last; i < raw.length; i++) offsetMap.push(i);

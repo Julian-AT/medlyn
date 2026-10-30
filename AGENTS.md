@@ -115,6 +115,8 @@ contract, not the other way round.
 | 30 Oct | pnpm only (see Toolchain)                                                                                                                                                                                                                                        |
 | 30 Oct | Push-to-talk uses the browser's speech recognition, and only if it integrates cleanly: feature-detected, the orb hidden when unsupported, no polyfill or extra dependency. The transcript goes through the same path as typed text. Otherwise voice input is cut. |
 | 30 Oct | Chips skip the parse call (see Models and latency)                                                                                                                                                                                                               |
+| 30 Oct | `eval/` is a workspace package (`@medlyn/eval`); engine exports `"./*": "./*.ts"` so the web app imports engine modules by path                                                                       |
+| 30 Oct | Engine LLM calls use a thin fetch client (`llm/client.ts`, JSON-schema + Zod, one retry); AI SDK v7 is used only for the Ask Medlyn agent route and dock                                                     |
 
 Add a row whenever the build departs from the PRD.
 
