@@ -53,10 +53,10 @@ Research › Evaluation.
 
 **9. What does not work yet (1:50 to 2:00)**
 End card.
-"Not there yet: cold typed situations are slower than our target, PDF extraction misses facts, and the verifier is synthetic-trained. Live at aim.julianschmidt.cv."
+"Not there yet: cold typed situations are slower than our target, PDF extraction misses facts, and the verifier is synthetic-trained. Live at medlyn.health."
 
 ## Before recording
 
-- Deployed app at app.aim.julianschmidt.cv in a 1440 × 900 window, cache warmed, review layer reset.
+- Deployed app at app.medlyn.health in a 1440 × 900 window, cache warmed, review layer reset.
 - Tabs open in advance: app, Hugging Face model, Hugging Face dataset, paper PDF at Figure 1.
 - Rehearse once against `docs/video/skeleton.mp4`; the countdown turns red with three seconds left.
