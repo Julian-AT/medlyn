@@ -10,23 +10,42 @@ import {
 } from "../contracts.ts";
 import { PATIENT_ID } from "../store.ts";
 
-export function patientView(segments: Segment[]): Patient {
+export function patientView(segments: Segment[], patientId = PATIENT_ID): Patient {
   for (const segment of segments) {
-    const match = segment.text.match(/(?:geb\.?|born)\s*(\d{1,2})[.](\d{1,2})[.](\d{4})/i);
+    const match = segment.text.match(
+      /(?:geb\.?|born)\s*(?:am\s+)?(\d{1,2})[.](\d{1,2})[.](\d{4})/i,
+    );
     if (!match) continue;
     const birthDate = `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}`;
     const date = new Date(`${birthDate}T00:00:00Z`);
     if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== birthDate) continue;
     return {
-      id: PATIENT_ID,
-      displayName: "Anna Musterfrau",
-      sex: segments.some((source) => /\b(Frau|weiblich|female)\b/i.test(source.text)) ? "F" : "X",
+      id: patientId,
+      displayName: patientName(segment.text.slice(0, match.index)),
+      sex: patientSex(segments),
       birthDate,
       birthDateQuote: match[0],
       birthDateSegmentId: segment.id,
     };
   }
   throw new Error("Patient birth date has no located eligible source");
+}
+
+function patientName(prefix: string): string {
+  const name = prefix
+    .split(/\n|:/)
+    .at(-1)!
+    .trim()
+    .replace(/^(?:Frau|Herr|Patient(?:in)?|Name)\s+/i, "")
+    .replace(/[,;·\s]+$/, "");
+  if (!name || name.length > 100) throw new Error("Patient name has no located eligible source");
+  return name;
+}
+
+function patientSex(segments: Segment[]): Patient["sex"] {
+  const female = segments.some((source) => /\b(Frau|weiblich|female)\b/i.test(source.text));
+  const male = segments.some((source) => /\b(Herr|männlich|male)\b/i.test(source.text));
+  return female === male ? "X" : female ? "F" : "M";
 }
 
 export function openQuestions(sections: Section[], findings: Finding[]): OpenQuestion[] {
