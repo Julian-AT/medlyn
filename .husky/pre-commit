@@ -1,1 +1,7 @@
-node scripts/check-data.mjs && pnpm exec biome check --staged --no-errors-on-unmatched && (cd ml && uv run --no-sync ruff check --quiet .)
+set -e
+node scripts/check-data.mjs
+pnpm exec biome check --staged --no-errors-on-unmatched
+py=$(git diff --cached --name-only --diff-filter=ACMR -- 'ml/*.py' 'ml/**/*.py' | sed 's#^ml/##')
+if [ -n "$py" ]; then
+  (cd ml && uv run --no-sync ruff check --quiet $py)
+fi
