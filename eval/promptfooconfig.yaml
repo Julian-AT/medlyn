@@ -1,6 +1,6 @@
 description: Medlyn — runtime challenge regression and blind held-out evaluation
 prompts:
-  - '{{situationText}}'
+  - "{{situationText}}"
 providers:
   - id: file://provider.ts
     config:

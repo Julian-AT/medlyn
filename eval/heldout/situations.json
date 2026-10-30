@@ -1,22 +1,239 @@
 [
-  {"id":"h01","tier":1,"title":"Anaesthesia clinic before breast conservation","description":"You are the anaesthetist assessing Anna Musterfrau for the breast operation booked in May 2016.","expectedKeyPoints":["Show aspirin 100 mg each morning from the April 2016 discharge list and the contrast allergy with its recorded reactions.","Show the latest documented ejection fraction as 60% from June 2015; do not present it as a new measurement."],"sourceDocumentIds":["12340012","12340018"]},
-  {"id":"h02","tier":1,"title":"Surgeon reviewing the biopsy before booking theatre","description":"You are her breast surgeon checking pathology and the agreed operative plan after the April tumour discussion.","expectedKeyPoints":["Show left invasive ductal carcinoma with the recorded T2 N0 M0 V0 G2 classification.","Show ER 100%, PR 70%, HER2 negative and Ki-67 20% with pathology citations.","Show quadrantectomy with IORT on 16 May 2016 as planned rather than completed."],"sourceDocumentIds":["12340016","12340018"]},
-  {"id":"h03","tier":1,"title":"Spring diabetes medication reconciliation","description":"You are the GP reconciling diabetes treatment after her April 2016 discharge.","expectedKeyPoints":["Show metformin 1000 mg three times daily, pioglitazone 30 mg at midday and exenatide 5 micrograms subcutaneously morning and evening, attributed to the discharge list.","Show HbA1c 6.4% dated June 2015 and make clear that a newer value is not documented."],"sourceDocumentIds":["12340011","12340012","12340018"]},
-  {"id":"h04","tier":1,"title":"Emergency recurrence of transient visual symptoms","description":"You are the emergency physician seeing renewed dizziness and short episodes of blurred vision affecting her left eye.","expectedKeyPoints":["Show the June 2015 hypertensive episode with transient left-eye visual loss and the attributed carotid disease; retain the carotid laterality discrepancy.","Surface the contrast allergy, metformin exposure and absence of documented kidney function if contrast imaging is being considered.","Show candesartan 16 mg morning and evening from the April 2016 discharge list."],"sourceDocumentIds":["12340008","12340011","12340012","12340018"]},
-  {"id":"h05","tier":1,"title":"Primary care check of outstanding vascular follow-up","description":"You are the GP checking whether the recommendations in the June 2015 discharge letter were followed up.","expectedKeyPoints":["Show the recommendation for carotid ultrasound after about two months, regular eye review and blood pressure checks.","State that completion of the recommended repeat carotid study is not documented after checking all eligible documents; do not count the original study as follow-up."],"sourceDocumentIds":["12340008","12340011","12340012"]},
-  {"id":"h06","tier":1,"title":"GP reviewing diabetes and weight after discharge","description":"You are her family doctor reviewing glycaemic monitoring and body-weight change in April 2016.","expectedKeyPoints":["Show 78 kg in June 2015, 67 kg at the early April 2016 visit and 66 kg during the April admission, as a trend rather than a contradiction.","Show the last HbA1c as 6.4% in June 2015; do not invent a recent result.","Keep the two inconsistent historical BMI calculations separate from the weight trend."],"sourceDocumentIds":["12340011","12340012","12340014","12340018"]},
-  {"id":"h07","tier":2,"title":"Radiologist preparing neck-vessel contrast CT","description":"You are the radiologist assessing a request for iodinated contrast CT of the neck arteries after her earlier visual symptoms.","expectedKeyPoints":["Surface the recorded contrast allergy and its reactions, and the previous noncontrast head CT.","Show metformin on the April discharge list and state that kidney function is not documented; do not give an invented eGFR.","Show the left-sided carotid stenosis supported by the original report together with the conflicting laterality in the discharge summary."],"sourceDocumentIds":["12340008","12340012","12340018"]},
-  {"id":"h08","tier":2,"title":"Anaesthetist reviewing sleep and diabetes risks","description":"You are the anaesthetist checking documented comorbidities and diabetes treatment before the scheduled breast procedure.","expectedKeyPoints":["Show documented sleep apnoea and type 2 diabetes with source links.","Show the three glucose-lowering medicines from the April discharge list with dose and route where recorded.","Do not invent CPAP settings, a perioperative drug-withholding plan or a newer HbA1c."],"sourceDocumentIds":["12340012","12340014","12340018"]},
-  {"id":"h09","tier":2,"title":"GP checking cancer plans alongside vascular follow-up","description":"You are her GP coordinating the upcoming breast operation and the unresolved recommendations from the earlier vascular admission.","expectedKeyPoints":["Show the planned 16 May 2016 quadrantectomy with IORT and identify the April source.","Show the repeat carotid duplex recommendation and that its completion is not documented.","Show antiplatelet treatment with the source-labelled aspirin dose."],"sourceDocumentIds":["12340011","12340012","12340018"]},
-  {"id":"h10","tier":2,"title":"Breast surgeon checking imaging and axillary findings","description":"You are her surgeon comparing the April breast imaging with the pathological node status before surgery.","expectedKeyPoints":["Show the left breast lesion measuring up to 3 by 1.5 cm on ultrasound and its BI-RADS V assessment.","Show the earlier right axillary palpable nodes, the later ultrasound without enlarged axillary nodes and the recorded N0 classification as needing clarification rather than a proven contradiction.","Keep the breast operation in planned status."],"sourceDocumentIds":["12340014","12340016","12340018"]},
-  {"id":"h11","tier":2,"title":"Emergency physician separating rhythm and vascular evidence","description":"You are the emergency physician reviewing the older cardiac and carotid investigations during another episode of dizziness.","expectedKeyPoints":["Show the June 2015 ambulatory ECG reporting continuous sinus rhythm, no pauses and no complex ventricular arrhythmias with its date.","Show the carotid stenosis and the laterality contradiction without treating the rhythm findings as proof that no future arrhythmia can occur.","Show the latest documented ejection fraction of 60% with its historical date."],"sourceDocumentIds":["12340008","12340009","12340012"]},
-  {"id":"h12","tier":2,"title":"GP checking blood pressure treatment across admissions","description":"You are the GP reconciling antihypertensive therapy and the monitoring advice from June 2015 through April 2016.","expectedKeyPoints":["Show candesartan 16 mg with the June morning/half-evening schedule and April morning/evening schedule as a treatment change.","Show the June ambulatory blood pressure average of 135/84 and the documented morning peaks up to 170/85 with source dates.","Show the recommendation for regular blood pressure checks; do not flag the differing admission measurements as a contradiction."],"sourceDocumentIds":["12340010","12340012","12340018"]},
-  {"id":"h13","tier":2,"title":"Surgeon checking the diagnostic sequence","description":"You are the breast surgeon reviewing the admission, tissue sampling and pathology sequence for the April procedure plan.","expectedKeyPoints":["Flag the biopsy collection-date discrepancy between the pathology and discharge documents rather than choosing one date silently.","Keep the two admission dates as a clarification item and distinguish the pathology report date from tissue collection.","Show the confirmed histology and the future 16 May operation without asserting that surgery has happened."],"sourceDocumentIds":["12340014","12340016","12340018"]},
-  {"id":"h14","tier":3,"title":"Dentist before a tooth extraction","description":"You are her dentist reviewing the documented medication and medical background before removing a tooth.","expectedKeyPoints":["Surface weekly oral alendronate 70 mg and aspirin 100 mg each morning from the discharge medication list.","Surface type 2 diabetes and systemic lupus erythematosus with source links.","Do not invent a dental clearance, medication interruption instruction or previous jaw complication."],"sourceDocumentIds":["12340012","12340014","12340018"]},
-  {"id":"h15","tier":3,"title":"Physiotherapist preparing a mobility assessment","description":"You are a physiotherapist planning a first mobility assessment before her scheduled breast operation.","expectedKeyPoints":["Surface osteoporosis, the prior dizziness and hypertensive episode, and the planned breast operation with their dates.","Show the documented weight trend if discussing physical change.","State that a measured walking distance or formal mobility score is not documented rather than assigning one."],"sourceDocumentIds":["12340012","12340014","12340018"]},
-  {"id":"h16","tier":3,"title":"Podiatrist planning routine diabetic foot care","description":"You are a podiatrist reviewing her diabetes history and antiplatelet exposure before routine foot care.","expectedKeyPoints":["Show type 2 diabetes, the recorded glucose-lowering regimen and the dated HbA1c of 6.4% from June 2015.","Show aspirin 100 mg each morning with its discharge-list source.","State that a diabetic foot examination or neuropathy assessment is not documented; do not infer a normal foot examination."],"sourceDocumentIds":["12340011","12340012","12340018"]},
-  {"id":"h17","tier":3,"title":"Occupational health review before returning to work","description":"You are an occupational health physician reviewing her records before discussing work after the planned cancer procedure.","expectedKeyPoints":["Show the scheduled breast operation as future and the previous visual symptoms with hypertension as historical.","Surface documented sleep apnoea where relevant to the requested review.","State that occupational duties, fitness-for-work certification and return-to-work restrictions are not documented; do not certify fitness."],"sourceDocumentIds":["12340012","12340014","12340018"]},
-  {"id":"h18","tier":3,"title":"Exercise physiologist reviewing body-weight change","description":"You are an exercise physiologist reviewing her diabetes and documented weight change before cancer treatment.","expectedKeyPoints":["Show the fall from 78 kg in June 2015 to 67 kg and then 66 kg in April 2016, with source dates.","Show type 2 diabetes and the latest documented HbA1c with its June 2015 date.","State that a dietary intake assessment or documented cause of the weight loss is not available; do not diagnose malnutrition from the trend alone."],"sourceDocumentIds":["12340011","12340012","12340014","12340018"]},
-  {"id":"h19","tier":3,"title":"Periodontist reviewing bone-health medication","description":"You are a periodontist reviewing the April oncology discharge list before a dental implant assessment, with attention to bone health and dosing.","expectedKeyPoints":["Show alendronate 70 mg once weekly and colecalciferol drops with the recorded morning/evening schedule, attributed to their source list.","Surface osteoporosis and the documented contrast allergy.","Do not infer a bone-density value, fracture history or normal renal function from the prescription list."],"sourceDocumentIds":["12340012","12340014","12340018"]},
-  {"id":"h20","tier":3,"title":"Rheumatologist reviewing lupus before cancer surgery","description":"You are a rheumatologist reviewing the available lupus history and medication exposure before her planned breast surgery.","expectedKeyPoints":["Show that systemic lupus erythematosus is documented and link it to the source.","Show the planned breast procedure and the source-labelled discharge medicines without inventing immunosuppressants.","State that a formal lupus activity score and a specific lupus treatment plan are not documented; do not label the disease active or in remission without evidence."],"sourceDocumentIds":["12340012","12340014","12340018"]}
+  {
+    "id": "h01",
+    "tier": 1,
+    "title": "Anaesthesia clinic before breast conservation",
+    "description": "You are the anaesthetist assessing Anna Musterfrau for the breast operation booked in May 2016.",
+    "expectedKeyPoints": [
+      "Show aspirin 100 mg each morning from the April 2016 discharge list and the contrast allergy with its recorded reactions.",
+      "Show the latest documented ejection fraction as 60% from June 2015; do not present it as a new measurement."
+    ],
+    "sourceDocumentIds": ["12340012", "12340018"]
+  },
+  {
+    "id": "h02",
+    "tier": 1,
+    "title": "Surgeon reviewing the biopsy before booking theatre",
+    "description": "You are her breast surgeon checking pathology and the agreed operative plan after the April tumour discussion.",
+    "expectedKeyPoints": [
+      "Show left invasive ductal carcinoma with the recorded T2 N0 M0 V0 G2 classification.",
+      "Show ER 100%, PR 70%, HER2 negative and Ki-67 20% with pathology citations.",
+      "Show quadrantectomy with IORT on 16 May 2016 as planned rather than completed."
+    ],
+    "sourceDocumentIds": ["12340016", "12340018"]
+  },
+  {
+    "id": "h03",
+    "tier": 1,
+    "title": "Spring diabetes medication reconciliation",
+    "description": "You are the GP reconciling diabetes treatment after her April 2016 discharge.",
+    "expectedKeyPoints": [
+      "Show metformin 1000 mg three times daily, pioglitazone 30 mg at midday and exenatide 5 micrograms subcutaneously morning and evening, attributed to the discharge list.",
+      "Show HbA1c 6.4% dated June 2015 and make clear that a newer value is not documented."
+    ],
+    "sourceDocumentIds": ["12340011", "12340012", "12340018"]
+  },
+  {
+    "id": "h04",
+    "tier": 1,
+    "title": "Emergency recurrence of transient visual symptoms",
+    "description": "You are the emergency physician seeing renewed dizziness and short episodes of blurred vision affecting her left eye.",
+    "expectedKeyPoints": [
+      "Show the June 2015 hypertensive episode with transient left-eye visual loss and the attributed carotid disease; retain the carotid laterality discrepancy.",
+      "Surface the contrast allergy, metformin exposure and absence of documented kidney function if contrast imaging is being considered.",
+      "Show candesartan 16 mg morning and evening from the April 2016 discharge list."
+    ],
+    "sourceDocumentIds": ["12340008", "12340011", "12340012", "12340018"]
+  },
+  {
+    "id": "h05",
+    "tier": 1,
+    "title": "Primary care check of outstanding vascular follow-up",
+    "description": "You are the GP checking whether the recommendations in the June 2015 discharge letter were followed up.",
+    "expectedKeyPoints": [
+      "Show the recommendation for carotid ultrasound after about two months, regular eye review and blood pressure checks.",
+      "State that completion of the recommended repeat carotid study is not documented after checking all eligible documents; do not count the original study as follow-up."
+    ],
+    "sourceDocumentIds": ["12340008", "12340011", "12340012"]
+  },
+  {
+    "id": "h06",
+    "tier": 1,
+    "title": "GP reviewing diabetes and weight after discharge",
+    "description": "You are her family doctor reviewing glycaemic monitoring and body-weight change in April 2016.",
+    "expectedKeyPoints": [
+      "Show 78 kg in June 2015, 67 kg at the early April 2016 visit and 66 kg during the April admission, as a trend rather than a contradiction.",
+      "Show the last HbA1c as 6.4% in June 2015; do not invent a recent result.",
+      "Keep the two inconsistent historical BMI calculations separate from the weight trend."
+    ],
+    "sourceDocumentIds": ["12340011", "12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h07",
+    "tier": 2,
+    "title": "Radiologist preparing neck-vessel contrast CT",
+    "description": "You are the radiologist assessing a request for iodinated contrast CT of the neck arteries after her earlier visual symptoms.",
+    "expectedKeyPoints": [
+      "Surface the recorded contrast allergy and its reactions, and the previous noncontrast head CT.",
+      "Show metformin on the April discharge list and state that kidney function is not documented; do not give an invented eGFR.",
+      "Show the left-sided carotid stenosis supported by the original report together with the conflicting laterality in the discharge summary."
+    ],
+    "sourceDocumentIds": ["12340008", "12340012", "12340018"]
+  },
+  {
+    "id": "h08",
+    "tier": 2,
+    "title": "Anaesthetist reviewing sleep and diabetes risks",
+    "description": "You are the anaesthetist checking documented comorbidities and diabetes treatment before the scheduled breast procedure.",
+    "expectedKeyPoints": [
+      "Show documented sleep apnoea and type 2 diabetes with source links.",
+      "Show the three glucose-lowering medicines from the April discharge list with dose and route where recorded.",
+      "Do not invent CPAP settings, a perioperative drug-withholding plan or a newer HbA1c."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h09",
+    "tier": 2,
+    "title": "GP checking cancer plans alongside vascular follow-up",
+    "description": "You are her GP coordinating the upcoming breast operation and the unresolved recommendations from the earlier vascular admission.",
+    "expectedKeyPoints": [
+      "Show the planned 16 May 2016 quadrantectomy with IORT and identify the April source.",
+      "Show the repeat carotid duplex recommendation and that its completion is not documented.",
+      "Show antiplatelet treatment with the source-labelled aspirin dose."
+    ],
+    "sourceDocumentIds": ["12340011", "12340012", "12340018"]
+  },
+  {
+    "id": "h10",
+    "tier": 2,
+    "title": "Breast surgeon checking imaging and axillary findings",
+    "description": "You are her surgeon comparing the April breast imaging with the pathological node status before surgery.",
+    "expectedKeyPoints": [
+      "Show the left breast lesion measuring up to 3 by 1.5 cm on ultrasound and its BI-RADS V assessment.",
+      "Show the earlier right axillary palpable nodes, the later ultrasound without enlarged axillary nodes and the recorded N0 classification as needing clarification rather than a proven contradiction.",
+      "Keep the breast operation in planned status."
+    ],
+    "sourceDocumentIds": ["12340014", "12340016", "12340018"]
+  },
+  {
+    "id": "h11",
+    "tier": 2,
+    "title": "Emergency physician separating rhythm and vascular evidence",
+    "description": "You are the emergency physician reviewing the older cardiac and carotid investigations during another episode of dizziness.",
+    "expectedKeyPoints": [
+      "Show the June 2015 ambulatory ECG reporting continuous sinus rhythm, no pauses and no complex ventricular arrhythmias with its date.",
+      "Show the carotid stenosis and the laterality contradiction without treating the rhythm findings as proof that no future arrhythmia can occur.",
+      "Show the latest documented ejection fraction of 60% with its historical date."
+    ],
+    "sourceDocumentIds": ["12340008", "12340009", "12340012"]
+  },
+  {
+    "id": "h12",
+    "tier": 2,
+    "title": "GP checking blood pressure treatment across admissions",
+    "description": "You are the GP reconciling antihypertensive therapy and the monitoring advice from June 2015 through April 2016.",
+    "expectedKeyPoints": [
+      "Show candesartan 16 mg with the June morning/half-evening schedule and April morning/evening schedule as a treatment change.",
+      "Show the June ambulatory blood pressure average of 135/84 and the documented morning peaks up to 170/85 with source dates.",
+      "Show the recommendation for regular blood pressure checks; do not flag the differing admission measurements as a contradiction."
+    ],
+    "sourceDocumentIds": ["12340010", "12340012", "12340018"]
+  },
+  {
+    "id": "h13",
+    "tier": 2,
+    "title": "Surgeon checking the diagnostic sequence",
+    "description": "You are the breast surgeon reviewing the admission, tissue sampling and pathology sequence for the April procedure plan.",
+    "expectedKeyPoints": [
+      "Flag the biopsy collection-date discrepancy between the pathology and discharge documents rather than choosing one date silently.",
+      "Keep the two admission dates as a clarification item and distinguish the pathology report date from tissue collection.",
+      "Show the confirmed histology and the future 16 May operation without asserting that surgery has happened."
+    ],
+    "sourceDocumentIds": ["12340014", "12340016", "12340018"]
+  },
+  {
+    "id": "h14",
+    "tier": 3,
+    "title": "Dentist before a tooth extraction",
+    "description": "You are her dentist reviewing the documented medication and medical background before removing a tooth.",
+    "expectedKeyPoints": [
+      "Surface weekly oral alendronate 70 mg and aspirin 100 mg each morning from the discharge medication list.",
+      "Surface type 2 diabetes and systemic lupus erythematosus with source links.",
+      "Do not invent a dental clearance, medication interruption instruction or previous jaw complication."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h15",
+    "tier": 3,
+    "title": "Physiotherapist preparing a mobility assessment",
+    "description": "You are a physiotherapist planning a first mobility assessment before her scheduled breast operation.",
+    "expectedKeyPoints": [
+      "Surface osteoporosis, the prior dizziness and hypertensive episode, and the planned breast operation with their dates.",
+      "Show the documented weight trend if discussing physical change.",
+      "State that a measured walking distance or formal mobility score is not documented rather than assigning one."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h16",
+    "tier": 3,
+    "title": "Podiatrist planning routine diabetic foot care",
+    "description": "You are a podiatrist reviewing her diabetes history and antiplatelet exposure before routine foot care.",
+    "expectedKeyPoints": [
+      "Show type 2 diabetes, the recorded glucose-lowering regimen and the dated HbA1c of 6.4% from June 2015.",
+      "Show aspirin 100 mg each morning with its discharge-list source.",
+      "State that a diabetic foot examination or neuropathy assessment is not documented; do not infer a normal foot examination."
+    ],
+    "sourceDocumentIds": ["12340011", "12340012", "12340018"]
+  },
+  {
+    "id": "h17",
+    "tier": 3,
+    "title": "Occupational health review before returning to work",
+    "description": "You are an occupational health physician reviewing her records before discussing work after the planned cancer procedure.",
+    "expectedKeyPoints": [
+      "Show the scheduled breast operation as future and the previous visual symptoms with hypertension as historical.",
+      "Surface documented sleep apnoea where relevant to the requested review.",
+      "State that occupational duties, fitness-for-work certification and return-to-work restrictions are not documented; do not certify fitness."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h18",
+    "tier": 3,
+    "title": "Exercise physiologist reviewing body-weight change",
+    "description": "You are an exercise physiologist reviewing her diabetes and documented weight change before cancer treatment.",
+    "expectedKeyPoints": [
+      "Show the fall from 78 kg in June 2015 to 67 kg and then 66 kg in April 2016, with source dates.",
+      "Show type 2 diabetes and the latest documented HbA1c with its June 2015 date.",
+      "State that a dietary intake assessment or documented cause of the weight loss is not available; do not diagnose malnutrition from the trend alone."
+    ],
+    "sourceDocumentIds": ["12340011", "12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h19",
+    "tier": 3,
+    "title": "Periodontist reviewing bone-health medication",
+    "description": "You are a periodontist reviewing the April oncology discharge list before a dental implant assessment, with attention to bone health and dosing.",
+    "expectedKeyPoints": [
+      "Show alendronate 70 mg once weekly and colecalciferol drops with the recorded morning/evening schedule, attributed to their source list.",
+      "Surface osteoporosis and the documented contrast allergy.",
+      "Do not infer a bone-density value, fracture history or normal renal function from the prescription list."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  },
+  {
+    "id": "h20",
+    "tier": 3,
+    "title": "Rheumatologist reviewing lupus before cancer surgery",
+    "description": "You are a rheumatologist reviewing the available lupus history and medication exposure before her planned breast surgery.",
+    "expectedKeyPoints": [
+      "Show that systemic lupus erythematosus is documented and link it to the source.",
+      "Show the planned breast procedure and the source-labelled discharge medicines without inventing immunosuppressants.",
+      "State that a formal lupus activity score and a specific lupus treatment plan are not documented; do not label the disease active or in remission without evidence."
+    ],
+    "sourceDocumentIds": ["12340012", "12340014", "12340018"]
+  }
 ]
