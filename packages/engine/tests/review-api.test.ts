@@ -22,6 +22,74 @@ describe("review API input validation", () => {
     ).toBe(400);
     expect((await POST(request("POST", { sessionId: "s", action: "invented" }))).status).toBe(400);
   });
+  it.each(["", " ", " padded", "padded "])(
+    "rejects invalid sessions consistently: %j",
+    async (sessionId) => {
+      const query = `?${new URLSearchParams({ sessionId })}`;
+      expect((await GET(request("GET", undefined, query))).status).toBe(400);
+      expect((await DELETE(request("DELETE", undefined, query))).status).toBe(400);
+      expect((await DELETE(request("DELETE", { sessionId }))).status).toBe(400);
+      expect(
+        (
+          await POST(
+            request("POST", {
+              sessionId,
+              targetType: "card",
+              targetId: "card",
+              targetHash: "hash",
+              action: "accept",
+              author: "Clinician",
+            }),
+          )
+        ).status,
+      ).toBe(400);
+    },
+  );
+  it("rejects an empty query session even when the DELETE body has a session", async () => {
+    expect((await DELETE(request("DELETE", { sessionId: "s" }, "?sessionId="))).status).toBe(400);
+  });
+  it("returns a successful empty ledger for synthetic patients", async () => {
+    const response = await GET(
+      new Request("http://localhost/api/review?sessionId=s&patientId=synthetic-a", {
+        headers: { Cookie: "medlyn-patient=synthetic-a" },
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual([]);
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
+  });
+  it.each([GET, POST, DELETE])(
+    "rejects a stale patient cookie before reading or writing",
+    async (handler) => {
+      const response = await handler(
+        new Request("http://localhost/api/review?sessionId=s&patientId=patient-0000-0001", {
+          method: handler.name,
+          headers: { Cookie: "medlyn-patient=synthetic-a" },
+        }),
+      );
+      expect(response.status).toBe(409);
+      expect((await response.json()).error).toContain("patient changed");
+    },
+  );
+  it.each([POST, DELETE])("keeps synthetic writes unavailable", async (handler) => {
+    const response = await handler(
+      new Request("http://localhost/api/review?sessionId=s&patientId=synthetic-a", {
+        method: handler.name,
+        headers: { Cookie: "medlyn-patient=synthetic-a" },
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect((await response.json()).error).toContain("synthetic patients");
+  });
+  it.each([GET, POST, DELETE])("rejects invalid patient identities", async (handler) => {
+    const response = await handler(
+      new Request("http://localhost/api/review?sessionId=s&patientId=invalid/patient", {
+        method: handler.name,
+      }),
+    );
+    expect(response.status).toBe(400);
+  });
   it("rejects corrections without proposed text and dismissals without a reason", async () => {
     const base = {
       sessionId: "s",
