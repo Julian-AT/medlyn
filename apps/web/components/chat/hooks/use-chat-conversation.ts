@@ -21,7 +21,6 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
   const speech = useSpeechOutput();
   const speechEnabled = useRef(false);
   speechEnabled.current = autoSpeak;
-  const started = useRef(false);
   const chat = useChat({
     id,
     messages: initialMessages,
@@ -37,21 +36,26 @@ export function useChatConversation(id: string, initialMessages: UIMessage[]) {
   });
   const { sendMessage } = chat;
   useEffect(() => {
-    if (started.current || initialMessages.length) return;
-    started.current = true;
+    if (initialMessages.length) return;
     const key = `medlyn:chat-draft:${id}`;
+    let draft: z.infer<typeof Draft>;
     try {
       const raw = sessionStorage.getItem(key);
       if (!raw) return;
-      const draft = Draft.parse(JSON.parse(raw));
+      draft = Draft.parse(JSON.parse(raw));
+    } catch (cause) {
+      console.warn("chat_draft_invalid", cause instanceof Error ? cause.name : "Unknown");
+      return;
+    }
+    // Deferred and cancelled on cleanup so Strict Mode's double effect sends the draft exactly once.
+    const timer = window.setTimeout(() => {
       sessionStorage.removeItem(key);
       void sendMessage(
         { text: draft.text },
         { body: { chipId: draft.chipId, lensKey: draft.lensKey } },
       );
-    } catch (cause) {
-      console.warn("chat_draft_invalid", cause instanceof Error ? cause.name : "Unknown");
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [id, initialMessages.length, sendMessage]);
   return {
     ...chat,
