@@ -4,6 +4,7 @@ import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { displayDates } from "./display-dates";
 import { SourceChip } from "./source-chip";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
@@ -16,20 +17,24 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
   return (
     <ToolFrame
       {...props}
+      artifact={props.toolCallId ? { kind: "letter", id: props.toolCallId } : undefined}
       title="GP follow-up letter"
-      description={output ? `Draft · as of ${output.asOf}` : undefined}
+      description={output ? `Draft · as of ${displayDates(output.asOf)}` : undefined}
     >
-      {output?.sections
-        .filter((section) => section.claims.length > 0)
+      {(props.expanded
+        ? output?.sections
+        : output?.sections.filter((section) => section.claims.length > 0).slice(0, 2)
+      )
+        ?.filter((section) => section.claims.length > 0)
         .map((section) => (
           <CardContent key={section.id} className="flex flex-col gap-2 px-0">
             <CardTitle className="text-xs font-medium">{section.title}</CardTitle>
-            {section.claims
+            {(props.expanded ? section.claims : section.claims.slice(0, 1))
               .filter((claim) => ["supported", "exempt"].includes(claim.validation.support))
               .map((claim) => (
                 <CardContent key={claim.id} className="flex flex-col gap-1 px-0">
                   <CardDescription className="whitespace-pre-wrap text-sm text-foreground">
-                    {claim.text}
+                    {displayDates(claim.text)}
                   </CardDescription>
                   {claim.flag ? (
                     <Badge variant="outline">
@@ -43,8 +48,8 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
               ))}
           </CardContent>
         ))}
-      {output?.annotations.length ? (
-        <CardContent className="flex flex-col gap-2 border-t px-0 pt-3">
+      {props.expanded && output?.annotations.length ? (
+        <CardContent className="flex flex-col gap-2 px-0 pt-3">
           <CardTitle className="text-xs">Clinician notes — not from the source documents</CardTitle>
           {output.annotations.map((note) => (
             <CardDescription key={note.id} className="whitespace-pre-wrap text-xs">
@@ -53,9 +58,11 @@ export function LetterPreview(props: ToolProps<UiToolOutputs["draft_letter"]>) {
           ))}
         </CardContent>
       ) : null}
-      <Button asChild variant="outline" size="sm" className="shadow-none">
-        <a href={`/letter?${query}`}>Open GP letter</a>
-      </Button>
+      {props.expanded && (
+        <Button asChild variant="outline" size="sm" className="shadow-none">
+          <a href={`/letter?${query}`}>Open GP letter</a>
+        </Button>
+      )}
     </ToolFrame>
   );
 }
