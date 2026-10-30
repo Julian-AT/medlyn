@@ -107,7 +107,7 @@ def proxy(row):
     result = json.loads(body["choices"][0]["message"]["content"])
     if result["label"] not in LABELS:
         raise ValueError("Invalid proxy label")
-    return result
+    return {**result, "usage": body.get("usage")}
 
 
 def export_real(bridge, out):
@@ -183,6 +183,10 @@ def measured(row, predict):
         "latencyMs": (time.perf_counter() - started) * 1000,
         "mutation": row["mutation"],
         "probability": result.get("probability"),
+        "probabilities": result.get("probabilities"),
+        "usage": result.get("usage"),
+        "patientId": row.get("patientId"),
+        "family": row.get("family"),
     }
 
 
@@ -213,6 +217,15 @@ def subset(rows, limit, seed=37):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    selector = argparse.ArgumentParser(add_help=False)
+    selector.add_argument("--version", type=int, choices=(1, 2), default=2)
+    selected, _ = selector.parse_known_args()
+    if selected.version == 2:
+        from .evaluate_v2 import main as main_v2
+
+        main_v2()
+        return
+    parser.add_argument("--version", type=int, choices=(1,), default=1)
     parser.add_argument("--data", type=Path, default=VERIFIER_DIR / "datasets")
     parser.add_argument("--limit", type=int, default=90)
     parser.add_argument("--proxy", action="store_true")
