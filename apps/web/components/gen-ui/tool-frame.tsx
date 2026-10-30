@@ -49,18 +49,16 @@ export function ToolFrame({
   return (
     <Card
       size="sm"
-      className="w-full min-w-0 gap-5 rounded-2xl border-0 bg-muted/40 shadow-none ring-0 [--card-spacing:--spacing(5)]"
+      className="w-full min-w-0 gap-5 rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0 [--card-spacing:--spacing(5)]"
     >
       <CardHeader className="grid-cols-[auto_1fr] items-center gap-x-3">
         <CardContent
           aria-hidden="true"
-          className={`row-span-2 flex size-9 items-center justify-center rounded-xl p-0 ${title.includes("letter") ? "bg-[image:var(--gradient-3)]" : title.includes("clarify") ? "bg-[image:var(--gradient-4)]" : "bg-[image:var(--gradient-2)]"}`}
+          className="row-span-2 flex size-9 items-center justify-center rounded-xl bg-gray-alpha-100 p-0 text-text-secondary"
         >
           <HugeiconsIcon icon={SparklesIcon} size={18} strokeWidth={2} />
         </CardContent>
-        <CardTitle className="text-sm font-semibold tracking-tight">
-          {displayDates(title)}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">{displayDates(title)}</CardTitle>
         {description ? (
           <CardDescription className="col-start-2 text-xs/relaxed">
             {displayDates(description)}
