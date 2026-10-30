@@ -76,11 +76,11 @@ Prompt: "I'm the anaesthetist, pre-op check before her quadrantectomy on 16 May.
 
 ### 6. Quantum (1:20 to 1:38)
 
-| At   | Show                                                               | Overlay                                             |
-| ---- | ------------------------------------------------------------------ | --------------------------------------------------- |
-| 1:20 | Research › Evaluation, scroll to the quantum research card         | `8-qubit ZZ feature map · QAOA · Qiskit 2`          |
-| 1:25 | IBM Quantum job page, job `dbi5p85ep8hs73an8gmg` on ibm_marrakesh  | `156 qubits · 136 circuits · 1024 shots · 53 s QPU` |
-| 1:31 | Paper quantum appendix: kernel heatmap, simulator next to hardware | `depth ≈ 760 · MAE 0.066 vs simulation`             |
+| At   | Show                                                              | Overlay                                             |
+| ---- | ----------------------------------------------------------------- | --------------------------------------------------- |
+| 1:20 | Research › Evaluation, scroll to the quantum research card        | `8-qubit ZZ feature map · QAOA · Qiskit 2`          |
+| 1:25 | IBM Quantum job page, job `dbi5p85ep8hs73an8gmg` on ibm_marrakesh | `156 qubits · 136 circuits · 1024 shots · 53 s QPU` |
+| 1:31 | Paper Appendix A: the ibm_marrakesh hardware paragraph            | `depth ≈ 760 · MAE 0.066 vs simulation`             |
 
 > "Then we went quantum. An eight-qubit ZZ feature-map kernel for claim verification and QAOA for evidence selection, built in Qiskit and run on IBM's hundred-fifty-six-qubit Marrakesh: one hundred thirty-six circuits, fifty-three seconds of QPU. Simulated, it is on par with a classical SVM. On hardware, circuit depth seven hundred sixty drowns the signal."
 
