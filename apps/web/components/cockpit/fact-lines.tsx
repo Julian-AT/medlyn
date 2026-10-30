@@ -11,7 +11,7 @@ export function FactLines({
   lines,
 }: {
   lines: ClinicalCard["lines"];
-  onSource: (id: string) => void;
+  onSource?: (id: string) => void;
 }) {
   const facts = usePatientFacts();
   const grouped = groupEvidence(
@@ -33,7 +33,7 @@ export function FactLines({
               {line.text}
             </CardDescription>
             <CardContent className="mt-2 flex flex-wrap items-center gap-1.5 px-0">
-              {line.assertion !== "present" && <Badge variant="secondary">{line.assertion}</Badge>}
+              {line.assertion !== "present" && <Badge variant="outline">{line.assertion}</Badge>}
               {line.temporalStatus !== "stated" && (
                 <Badge variant="secondary">{line.temporalStatus.replaceAll("_", " ")}</Badge>
               )}
