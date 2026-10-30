@@ -2,6 +2,7 @@
 
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Dot, Line, LineChart, XAxis, YAxis } from "recharts";
+import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { ClaimLine } from "./claim-line";
@@ -25,6 +26,13 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
       {...props}
       title={output?.measure.replaceAll("_", " ") || "Measurement trend"}
       description={output ? `As of ${output.asOf}` : undefined}
+      action={
+        output && (
+          <Badge variant="secondary" className="font-mono">
+            {output.points.length} points
+          </Badge>
+        )
+      }
     >
       {output?.points.length === 0 ? (
         <CardDescription>
@@ -32,9 +40,9 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
         </CardDescription>
       ) : null}
       {[...groups].map(([label, points]) => (
-        <CardContent key={label} className="space-y-2 px-0">
-          <CardDescription className="text-xs">{label}</CardDescription>
-          <ChartContainer config={config} className="h-44 w-full tabular-nums">
+        <CardContent key={label} className="flex flex-col gap-3 px-0">
+          <CardDescription className="text-xs font-medium">{label}</CardDescription>
+          <ChartContainer config={config} className="h-48 w-full tabular-nums">
             <LineChart data={points} accessibilityLayer>
               <XAxis dataKey="date" tickLine={false} axisLine={false} minTickGap={24} />
               <YAxis tickLine={false} axisLine={false} width={44} domain={["auto", "auto"]} />
@@ -43,7 +51,7 @@ export function LabTrend(props: ToolProps<UiToolOutputs["show_lab_trend"]>) {
                 dataKey="value"
                 type="linear"
                 stroke="var(--color-value)"
-                strokeWidth={1.5}
+                strokeWidth={2}
                 isAnimationActive={false}
                 dot={(dot) => {
                   const point = dot.payload as Point;
