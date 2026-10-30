@@ -2,8 +2,8 @@
 
 import type { Finding } from "@medlyn/engine/contracts";
 import { HighlightDifference } from "@/components/gen-ui/highlight-difference";
+import { DocumentReaderDialog } from "@/components/sources/document-reader-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,7 +16,6 @@ import { ReviewControls, type ReviewHandler } from "./review-controls";
 
 export function FindingComparator({
   finding,
-  onSource,
   onReview,
 }: {
   finding: Finding;
@@ -57,14 +56,7 @@ export function FindingComparator({
               <CardDescription className="text-sm">{passage.claimEn}</CardDescription>
             </CardContent>
             <CardFooter>
-              <Button
-                className="rounded-full"
-                variant="link"
-                size="sm"
-                onClick={() => onSource(passage.segmentId)}
-              >
-                Open in document
-              </Button>
+              <DocumentReaderDialog documentId={passage.documentId} highlight={passage.segmentId} />
             </CardFooter>
           </Card>
         ))}

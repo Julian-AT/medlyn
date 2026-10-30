@@ -1,7 +1,7 @@
 "use client";
 import type { Card as ClinicalCard } from "@medlyn/engine/contracts";
-import { SourceChips } from "@/components/patient/source-chips";
 import { usePatientFacts } from "@/components/patient/use-patient-facts";
+import { SourceChips } from "@/components/sources/source-chips";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { groupEvidence } from "@/lib/group-evidence";
@@ -9,7 +9,6 @@ import { showClaim } from "@/lib/lens-state";
 
 export function FactLines({
   lines,
-  onSource,
 }: {
   lines: ClinicalCard["lines"];
   onSource: (id: string) => void;
@@ -45,7 +44,6 @@ export function FactLines({
                     date: facts.get(entry.factIds[0])?.docDate,
                   })),
                 )}
-                onOpen={onSource}
               />
             </CardContent>
           </CardContent>
