@@ -1,0 +1,10 @@
+\begin{tikzpicture}
+\begin{axis}[paperplot,width=.85\linewidth,height=48mm,xmin=1,xmax=3,
+  ymin=0,ymax=1,xtick={1,2,3},xlabel={QAOA depth p},ylabel={Mean ratio / probability},
+  legend pos=south west]
+\addplot+[mark=square*,color=medink,mark options={fill=medink,draw=medink}] table[x=p,y=ratio] {../ml/quantum/figures/qaoa.dat};
+\addlegendentry{Expected ratio, feasible only}
+\addplot+[mark=*,color=medink,mark options={fill=medink,draw=medink},densely dotted] table[x=p,y=optimal] {../ml/quantum/figures/qaoa.dat};
+\addlegendentry{Optimal set, unconditional}
+\end{axis}
+\end{tikzpicture}
