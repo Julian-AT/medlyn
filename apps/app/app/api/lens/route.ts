@@ -1,5 +1,6 @@
 import type { LensEvent } from "@medlyn/engine/contracts";
 import { mockLensStream } from "@medlyn/engine/lens/mock";
+import { llmErrorDetails } from "@medlyn/engine/llm/client";
 import { PATIENT_ID } from "@medlyn/engine/store";
 import { corpusDocument } from "@/lib/evidence-server";
 import { patientIdFromRequest } from "../../../lib/active-patient.ts";
@@ -42,8 +43,8 @@ export async function POST(request: Request) {
       });
     iterator = stream[Symbol.asyncIterator]();
     const first = await iterator.next();
-    if (first.done || first.value.type === "error")
-      throw new Error("Engine unavailable before first section");
+    if (first.done) throw new Error("Engine unavailable before first section");
+    if (first.value.type === "error") throw new Error(first.value.message);
     const firstEvent = first.value;
     const response = new ReadableStream<Uint8Array>({
       async start(controller) {
@@ -69,10 +70,7 @@ export async function POST(request: Request) {
               retryable: true,
             });
         } catch (error) {
-          console.error(
-            "Lens stream interrupted",
-            error instanceof Error ? error.message : "Unknown error",
-          );
+          console.error("lens_stream_interrupted", llmErrorDetails(error));
           send({
             type: "error",
             message: "The lens was interrupted. Retry to check all sections.",
@@ -99,7 +97,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     await iterator?.return?.();
-    console.warn("lens_unavailable", error instanceof Error ? error.name : "Unknown error");
+    console.warn("lens_unavailable", llmErrorDetails(error));
     return Response.json(
       { error: "The evidence check is unavailable. Retry your situation." },
       { status: 503 },
