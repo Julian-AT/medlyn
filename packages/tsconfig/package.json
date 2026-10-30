@@ -1,0 +1,7 @@
+{
+  "name": "@medlyn/tsconfig",
+  "private": true,
+  "scripts": {
+    "lint": "biome check ."
+  }
+}
