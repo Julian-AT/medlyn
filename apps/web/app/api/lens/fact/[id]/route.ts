@@ -1,5 +1,6 @@
-import { evidenceWindow, loadFacts } from "@medlyn/engine/store";
 import { IsoDate } from "@medlyn/engine/contracts";
+import { evidenceWindow, loadFacts } from "@medlyn/engine/store";
+import { patientIdFromRequest } from "../../../../../lib/active-patient.ts";
 
 export const runtime = "nodejs";
 
@@ -9,7 +10,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (asOf && !IsoDate.safeParse(asOf).success)
     return Response.json({ error: "Invalid evidence date." }, { status: 400 });
   try {
-    const fact = (await loadFacts(await evidenceWindow(asOf))).find((item) => item.id === id);
+    const patientId = patientIdFromRequest(request);
+    const fact = (
+      await loadFacts(await evidenceWindow(asOf, patientId), undefined, patientId)
+    ).find((item) => item.id === id);
     if (!fact)
       return Response.json(
         { error: "This fact is not available in the evidence window." },
