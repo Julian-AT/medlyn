@@ -46,6 +46,13 @@ The components below have implementations in the tree. Their presence does not e
 | Engine: contracts | Shared Zod schemas for facts, claims, screens, streams, reviews and letters. |
 | Web app | Next.js cockpit, source panel, review controls, letter panel and assistant-ui investigation dock; server routes connect them to the engine. |
 | Evaluation | promptfoo answer and grounding checks, citation and contradiction audits, and Playwright visibility and timing checks. |
+| A+ search (approved, in progress) | Gemini Embedding 2 vectors + ParadeDB BM25 in Neon, reciprocal rank fusion, shared evidence window; absence stage (a) and agent search. |
+| A+ multimodal (approved, in progress) | PDF/scan text extraction with page and bounding-box provenance; ordinary quote location and validation; page vectors retrieve sources. |
+| A+ synthetic data (approved, in progress) | 100k code-rendered German patient histories, exact spans and mutation labels; at most 300 LLM rewrites, about 100 patients ingested, 20 fresh sample patients in git. |
+| A+ verifier (approved, in progress) | Claim/passage dataset and MLX quantised-base LoRA on the Mac; optional local semantic backend, promoted only after held-out comparison. |
+| A+ evaluation and paper (approved, in progress) | At least 150 challenges over 50 synthetic patients; separate retrieval/verifier reports; arXiv preprint with tables generated from evaluation outputs. |
+
+[PRD v3](docs/PRD.md) defines the approved A+ scope and three-hour execution cap. The real-patient 15/15 regression and demo keep priority. A+ rows describe delivery targets until the owning lane verifies them. All visible UI uses existing shadcn/ui primitives, preset `b1aIcEuKO` and the `dashboard-01` shell; assistant-ui supplies the dock runtime and structure.
 
 ## How a situation becomes a screen
 
@@ -81,8 +88,12 @@ These are implementation requirements; evaluation checks whether they hold.
 | Neon Postgres + Drizzle | `DATABASE_URL` stores source evidence, facts, findings, validation results, screens, reviews and letters. `DATABASE_URL_DEMO` is reserved for the submission demo database. |
 | fish.audio | `FISH_AUDIO_API_KEY` and `FISH_AUDIO_VOICE_ID` enable TTS of validated answer text. The browser has a speech-synthesis fallback. |
 | Browser speech recognition | Feature-detected push-to-talk sends transcripts through the text path. Unsupported browsers hide voice input; no transcription model or polyfill is required. `MODEL_STT` stays empty. |
+| Gemini Embedding 2 (A+) | `GEMINI_API_KEY` enables text and page/image embeddings; vectors support retrieval and never replace located evidence. |
+| Neon hybrid indexes (A+) | pgvector stores segment vectors; ParadeDB `pg_search` provides BM25 over German/English segments. About 100 synthetic patients enter Neon; the 100k-patient dataset stays local. |
+| Local verifier (A+, optional) | `MEDLYN_VERIFIER=local` selects the trained MLX backend. About 5k examples, one epoch, a ~1.5–1.7B 4-bit Qwen3 base, seq ≤512, ≤45 min training on the M4 Pro Mac. Unset keeps GPT; switch only after equal-or-better held-out results. |
+| Synthetic proxy jobs (A+) | `MEDLYN_LLM_CONCURRENCY` limits requests per process (default 8). Synthetic jobs set it to 3 and yield to real regression work. It does not coordinate limits across processes. |
 
-Engine structured calls use a thin fetch client with JSON-schema output, Zod validation and one retry for malformed output. AI SDK v7 and its OpenAI provider handle the agent's tool loop; assistant-ui supplies the dock. No self-hosted model or H100 inference service is integrated.
+Engine structured calls use a thin fetch client with JSON-schema output, Zod validation and one retry for malformed output. AI SDK v7 and its OpenAI provider handle the agent's tool loop; assistant-ui supplies the dock. The A+ local verifier is an optional backend pending training and held-out evaluation; it is not a default-service change. A+ training does not require the H100.
 
 ## Run locally
 
@@ -105,6 +116,22 @@ Replace `<path>` with the patient directory containing `patient.json`, `document
 Open [localhost:3000](http://localhost:3000). Ingestion currently also warms the configured situations; `pnpm warm` explicitly refreshes them. `pnpm smoke` checks proxy capabilities and latency. `pnpm typecheck` and `pnpm test` run workspace checks.
 
 `pnpm eval` writes machine results under `eval/output/`; browser checks require the web server and Playwright's Chromium to be available. Run the held-out evaluation only after the H+7 checkpoint, and do not inspect or tune against its results beforehand. Human-check results before publishing submission metrics in `METRICS.md`; targets and mock output are not results.
+
+A+ command contract (planned until the implementing lanes report verification):
+
+| Command or CLI operation | Purpose and limit |
+| --- | --- |
+| `pnpm eval --suite real` | Five real-patient regression situations; real blind results stay closed until H+7 |
+| `pnpm eval --suite synthetic` | At least 150 synthetic challenges over 50 ingested patients |
+| `pnpm eval --suite all` | Run eligible suites and emit separate reports; never bypass the real blind gate or pool scores |
+| `uv run python -m synth.generate` / `synth.materialise` | From `ml/`: generate 100k seeded patients and materialise the corpus JSON format |
+| `uv run python -m synth.render_pdf` / `synth.rewrite` | From `ml/`, planned: PDF/scan inputs; prose rewrites for at most 300 patients |
+| `uv run python -m verifier.train` / `verifier.evaluate` | From `ml/`: verifier train/eval within the cap; compare with GPT and rules |
+| `make -C paper` | Build the arXiv preprint with tectonic; tables and figures come from evaluation outputs |
+
+Run Python commands from `ml/` using uv; each module in the table needs the full `uv run python -m` prefix. Build verifier inputs with `uv run python -m verifier.build_dataset` before training. Ruff and pytest are the Python checks; use each module’s `--help` for flags. The synth PDF/rewrite entry points remain planned until delivered by that lane. Set `GEMINI_API_KEY` in the root `.env` before embedding; schema and BM25 setup can proceed without it. Leave `MEDLYN_VERIFIER` unset for GPT. Python jobs must receive the root environment; do not create per-package `.env` files.
+
+Keep bulk synthetic shards, rendered PDFs/scans, weights and adapters local and gitignored; only the fresh 20-patient synthetic sample may be committed. Never use challenge text in templates or training. Split by patient and generation family before rewriting. Real regression, real blind held-out, synthetic pipeline, retrieval and verifier results have separate denominators; no combined score. Paper numbers must be human-checked. The [PRD dependency table](docs/PRD.md#dependencies) records A+ licences, including PyMuPDF's AGPL/commercial terms and the upstream Qwen3 model licence.
 
 ## Data handling
 

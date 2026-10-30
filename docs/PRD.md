@@ -2,9 +2,24 @@
 
 Oct 30, 2026 · @Julian Schmidt
 
-Medlyn gives one clinician the patient facts their task needs on one screen. Every card is rendered from source-linked facts, contradictions and open questions are stated explicitly, and "not documented" appears only after a full check. One GP follow-up letter demonstrates the investigate → review → draft workflow. This is version 2: it consolidates the review decisions, and Part A is the only commitment inside the 12-hour budget.
+Medlyn gives one clinician the patient facts their task needs on one screen. Every card is rendered from source-linked facts, contradictions and open questions are stated explicitly, and "not documented" appears only after a full check. One GP follow-up letter demonstrates the investigate → review → draft workflow. This is version 3: Part A stays the scored deliverable; A+ adds scale and research in a parallel, three-hour execution window. Part B has no build time. The former Part C is folded into A+.
+
+## What changed in v3
+
+- Part A's acceptance criteria stay unchanged. A+ adds multimodal ingestion, hybrid search, 100k synthetic patients, a verifier dataset and our own model, at least 150 synthetic challenges, a technical paper, and the shadcn preset `b1aIcEuKO` with `dashboard-01`.
+- The approved scale-up plan has a hard three-hour limit. All lanes launch in the first 15 minutes; integration at T+1:30, freeze and final evaluation at T+2:30, done at T+3:00. These limits override earlier sequencing and larger sample targets.
+- The real-patient regression and demo keep priority. Changes to the lens, claims or store merge only if the five-situation regression is equal or better; 15/15 remains the target.
+- All 100k patients are code-rendered locally. LLM prose rewrites are capped at 300 patients; about 100 patients enter Neon; 150 challenges cover 50 patients. Bulk data and model artefacts stay out of git; a fresh synthetic sample of 20 patients may be committed.
+- Retrieval combines Gemini Embedding 2 vectors and ParadeDB BM25 in Neon. It replaces stage (a) of the absence check and powers agent search; the full-text absence pass and the one evidence window remain mandatory.
+- PDFs and scans become extracted text with page and bounding-box provenance. Every fact still needs a located quote. Page embeddings retrieve sources; they are never evidence for a clinical claim.
+- Verifier training uses MLX-LM LoRA on a 4-bit Qwen3 base on the Mac: about 5k examples, one epoch, sequences at most 512 tokens, at most 45 minutes. GPT remains the default semantic verifier unless held-out results justify the local backend.
+- Real regression, real blind held-out, synthetic pipeline, retrieval and verifier results are reported separately. No combined score; no challenge data in training or synthetic templates.
+- The paper uses an arXiv preprint layout. Evaluation tables and figures are generated from output files; published numbers are human-checked.
+- All visible UI uses existing shadcn/ui primitives, preset `b1aIcEuKO` and the `dashboard-01` shell. assistant-ui supplies the dock runtime and structure.
 
 ## What changed in v2
+
+Historical changes below describe v2. The v3 scope and execution limits above supersede its budget, retrieval and research decisions.
 
 - Three parts with a budget rule: only Part A spends the 12 hours; Part B is written direction, Part C is capped research.
 - One shared claim boundary for cards, spoken sentences, insights and the letter. Validation results are cached under a full identity: patient, corpus revision, evidence window, validator version.
@@ -19,28 +34,28 @@ Medlyn gives one clinician the patient facts their task needs on one screen. Eve
 
 ## Scope and budget
 
-Only Part A spends the 12 hours. Parts B and C exist so the larger ideas are written down without quietly consuming delivery time.
+Part A keeps its original targets and first claim on the hackathon budget. A+ is an approved parallel deliverable, limited to three hours from its launch. Part B is written direction only. There is no separate Part C or post-H+7 research gate in v3.
 
-| Part                      | What                                                                                                         | Budget                                                        | Rule                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------- |
-| A · Hackathon deliverable | Cockpit, workflow, GP letter, evaluation, submission                                                         | All 12 h                                                      | The only commitment                 |
-| B · Product direction     | Multi-patient worklists, hands-free voice (LiveKit), PDF and scan ingestion (Docling), FHIR, real deployment | 0 build hours                                                 | Written here, not built             |
-| C · Research              | Synthetic patients, labelled benchmark, verifier model on the H100                                           | One person, at most 3 h, only after the H+7 checkpoint passes | Pilot only; stops at the H+9 freeze |
+| Part | What | Budget | Rule |
+| --- | --- | --- | --- |
+| A · Hackathon deliverable | Cockpit, workflow, GP letter, evaluation, submission | Original 12-hour event budget | 15/15 regression and demo take priority |
+| A+ · Scale and research | Multimodal ingestion; semantic + BM25 hybrid search; 100k synthetic patients; verifier dataset + own model; ≥150 synthetic challenges; technical paper; shadcn preset `b1aIcEuKO` + `dashboard-01` | Three hours, all lanes in parallel | Integrate at T+1:30; freeze at T+2:30; done at T+3:00 |
+| B · Product direction | Multi-patient worklists, hands-free voice, FHIR, real deployment | 0 build hours | Written here, not built |
 
-| Constraint         | Status                            | Value                                                                                                     |
-| ------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Time               | Confirmed                         | About 12 h from 03:37 on 30 Oct 2026                                                                      |
-| GPU                | Confirmed                         | One H100 80 GB                                                                                            |
-| Language models    | Confirmed                         | GPT models via a local OpenAI-compatible proxy, in env roles `MODEL_REASONING`, `MODEL_FAST`, `MODEL_STT` |
-| Storage            | Confirmed                         | Neon Postgres, Drizzle ORM; branch `demo` frozen for the video                                            |
-| Voice              | Confirmed                         | fish.audio text-to-speech                                                                                 |
-| UI language        | Confirmed                         | English                                                                                                   |
-| Repo               | Confirmed                         | Turborepo + pnpm                                                                                          |
-| After the event    | Confirmed earlier: hackathon only | Parts B and C keep options open at no cost                                                                |
-| Team               | Assumed                           | 3 people plus coding agents                                                                               |
-| Proxy capabilities | Assumed until the smoke test      | JSON-schema output, tool calls, streaming, transcription, per-model latency                               |
-| H100 access        | Assumed                           | Free now and reachable from the app                                                                       |
-| Data rule          | Challenge rule                    | `data/` and database dumps never in git; a hosted demo sits behind a password                             |
+| Constraint | Status | Value |
+| --- | --- | --- |
+| Time | Confirmed | About 12 h from 03:37 on 30 Oct 2026; A+ has its own three-hour hard limit within the event |
+| Local training | Approved | M4 Pro Mac, 24 GB unified memory, 20-core GPU; MLX with a 4-bit base; no H100 dependency |
+| Language models | Confirmed | GPT models through the proxy; `MODEL_REASONING` and `MODEL_FAST`; no proxy STT model |
+| Embeddings | Approved; key required | Gemini Embedding 2 API, `GEMINI_API_KEY` |
+| Storage | Approved | Neon Postgres + Drizzle; pgvector and `pg_search`; `demo` branch frozen for the video |
+| Dataset | Approved | 100k local patients, at most 300 LLM rewrites, about 100 ingested, 20 fresh sample patients in git |
+| Voice | Confirmed | fish.audio TTS with browser speech-synthesis fallback; feature-detected browser push-to-talk |
+| UI | Approved | English; shadcn/ui only, preset `b1aIcEuKO`, `dashboard-01`, existing primitives and theme variables |
+| Repo and Python | Confirmed / approved | Turborepo + pnpm; Python uses uv in `ml/`, ruff and pytest |
+| Team | Approved plan | Orchestrator handles preset, integration and commits; independent coding lanes start together |
+| Proxy capabilities | Smoke-tested | Chat, JSON-schema output, tool calls and streaming pass; call floor about 1.25 s |
+| Data rule | Challenge rule | Challenge data, bulk synthetic data, model weights, dumps and secrets stay local; hosted demo password-protected |
 
 ## Targets
 
@@ -87,9 +102,11 @@ P0 is the scored core and must run end to end by H+7. P1 is the workflow and is 
 | P2.4 | Hands-free voice via fish.audio realtime speech recognition and a server relay | P2  | —                                                                                                                         |
 | P2.5 | Further draft types, "Surprise me", a custom eval page                         | P2  | —                                                                                                                         |
 
+The v2 Part A table is retained. In v3, hands-free voice (P2.4) is Part B with zero build hours; feature-detected push-to-talk remains P1.3. The optional H100 toggle (P2.3) has no A+ allocation and is separate from the Mac-trained verifier.
+
 ## The cockpit and the workflow
 
-One screen with a dark mission-control theme (light toggle), built for one complete workflow rather than a feature tour.
+One screen with a dark mission-control theme (light toggle), built for one complete workflow rather than a feature tour. V3 uses shadcn preset `b1aIcEuKO` and the `dashboard-01` shell. All visible controls use existing shadcn/ui primitives; Tailwind utilities go on those components, theme changes use CSS variables, and icons use lucide-react. No hand-rolled widgets or custom CSS classes; keep the amber `--warning` token.
 
 **Layout (1440 px wide)**
 
@@ -217,7 +234,7 @@ A qualifying contradiction is two or more passages about the same event or measu
 
 ## Architecture
 
-&#91;embedded content: Medlyn architecture v2 · ingest, store, live path, shared validator, outputs\]
+The v3 additions sit beside the shared evidence and validation path: multimodal extraction before normalisation; hybrid retrieval over stored segments; local synthetic generation and verifier training; separate evaluation suites and a paper generated from their outputs.
 
 Ingest checks every fact once per corpus revision. The live path only parses, selects fact ids, checks absences and renders templates. Every output — screen, agent and letter — passes the same validator, whose results are cached under the full identity; the agent and the letter compose claims that go through it too. Reviews are stored as an overlay and never change machine results.
 
@@ -228,6 +245,7 @@ medlyn/
     db/                Drizzle schema, Neon client
     llm/               proxy client, model roles, smoke test
     ingest/            normalise, segment, medication parser, extract, locate, semantic check, negation list
+    search/            Gemini embeddings, BM25, reciprocal rank fusion, window-scoped retrieval
     findings/          rules, sweep, adjudication, fixtures
     lens/              parse, plan, select, absence check, templates, stream; needs/catalog.ts, needs/profiles.ts
     claims/            claim types, validator, cache identity
@@ -235,16 +253,18 @@ medlyn/
     agent/             tools, system prompt
     letter/            sections and templates
     contracts.ts       Zod schemas shared with the UI
-  eval/                promptfooconfig.yaml, assertions, playwright/
-  ml/                  Part C only: Python generator, label checks, training
-  data/                gitignored, never committed
+  eval/                real and synthetic suites, retrieval/verifier metrics, playwright/
+  ml/                  uv: synthetic generator, label checks, MLX verifier training
+    data/              bulk data gitignored; only the fresh 20-patient sample may be committed
+  paper/               arXiv LaTeX, generated evaluation tables and figures, Makefile
+  data/                challenge data gitignored, never committed
 ```
 
-Commands: `pnpm smoke` (proxy smoke test), `pnpm ingest`, `pnpm warm`, `pnpm eval`. The latency budget sits under the query pipeline.
+Commands: `pnpm smoke` (proxy smoke test), `pnpm ingest`, `pnpm warm`, `pnpm eval --suite real|synthetic|all`; Python synth/verifier commands and `make -C paper` are listed in the build plan. The latency budget sits under the query pipeline.
 
 ## Data model and contracts
 
-Neon Postgres with Drizzle (`packages/engine/db/schema.ts`). No vector search in P0: with 8 short documents, the resolver takes every fact of the relevant kinds. Every table carries `patient_id`.
+Neon Postgres with Drizzle (`packages/engine/db/schema.ts`). The eight-document Part A selector still receives every eligible fact of the relevant kinds. A+ adds hybrid retrieval for absence stage (a) and agent search. Every table carries `patient_id`; all retrieval is constrained by the store's evidence window and corpus revision.
 
 | Table              | Key columns                                                                                                                                                                                             | Notes                                                           |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -259,6 +279,16 @@ Neon Postgres with Drizzle (`packages/engine/db/schema.ts`). No vector search in
 | `reviews`          | id, session_id, target_type, target_id, target_hash, action, reason, proposed_text, support_result, author, created_at                                                                                  | Append-only; never read by evaluation                           |
 | `lens_cache`       | key (patient, revision, window, situation hash, engine version), screen jsonb, timings                                                                                                                  | Pre-warmed for the 5 situations                                 |
 | `letters`          | id, session_id, lens_key, claims jsonb, annotations jsonb, created_at                                                                                                                                   | Claims carry their validation keys                              |
+
+**A+ storage additions**
+
+| Table or index | Key columns | Notes |
+| --- | --- | --- |
+| `segment_embeddings` | segment_id, patient_id, model, dim, vector | pgvector; HNSW cosine index; persist model and dimension; embeddings tied to the segment's corpus revision |
+| `page_assets` | document_id, patient_id, page, kind (pdf/image), uri, embedding, ocr_text, bbox map | Page provenance and text-span-to-box mapping; local protected assets, never committed challenge pages |
+| BM25 index on `segments` | id, patient_id, document_id, text, text_en | ParadeDB `pg_search`; German and English lexical retrieval, joined to eligible documents and revision |
+
+Hybrid search fuses BM25 and vector rankings with reciprocal rank fusion. Neither an embedding nor a high retrieval score makes a fact. A page hit must resolve to extracted text and a located passage before a claim can use it. The full 100k-patient dataset stays outside Neon; only about 100 stratified patients are ingested and embedded. Record row counts, vector dimensions and storage size.
 
 The screen contract lives in `packages/engine/contracts.ts` as Zod schemas; the UI builds against a mock of it from H+0.5.
 
@@ -322,8 +352,9 @@ type Screen = {
 
 ## Ingestion pipeline
 
-`pnpm ingest --data <path>` runs once per patient and writes everything to Neon. Target under 3 minutes for 8 documents, provisional until the smoke test.
+`pnpm ingest --data <path>` runs once per patient and writes its evidence to Neon. Bulk synthetic generation does not run this command for all 100k patients. Target under 3 minutes for 8 documents, provisional until the smoke test.
 
+0. Multimodal input (A+): render PDF pages or load scanned images; extract embedded PDF text where available and use vision extraction for scans, retaining page and bounding boxes. Keep a map from extracted text offsets to page boxes in `page_assets`. Then run the normal pipeline against that extracted text. Page/image embeddings support retrieval only; a page image alone can never satisfy the located-quote rule.
 1. Normalise: `<BR>` to newline, decode entities, keep an offset map to the raw text.
 2. Segment (code): lines, section headers (Diagnosen, Allergien, Anamnese, Erhobene Befunde, Labor, Therapie und Verlauf, Entlassungsmedikation, Weiteres Procedere, Verlauf, Vitalparameter, Befunde, Zusammenfassung, Gesamtbeurteilung, Mikroskopischer Befund, Immunhistologisches Profil, Diagnose) and sentences, with an abbreviation list so "St.p.", "Z.n.", "Vd.a.", "li.", "re.", "bds.", "Pat.", "Dr.", "A.", "Diab. Mell.", "03. April" and "36.6°C" do not split.
 3. Parse medication tables (code): rows between "Entlassungsmedikation:" and "Mit freundlichen Grüßen" become table-row segments and medication facts (brand, strength, route, four schedule columns, unit), including the irregular rows "1 0 1/2 0", "ST 1x/Woche 1 Tabl." and "5mcg 0,5 s.c.". Display follows the medication rule in Definitions 1.
@@ -334,8 +365,11 @@ type Screen = {
 8. Normalise: brand to generic and ATC (curated map for this patient — Thrombo ASS → acetylsalicylic acid, Glucophage → metformin, Zocor → simvastatin, Blopress → candesartan, Oleovit D3 → colecalciferol, Alendronat → alendronic acid, Actos → pioglitazone, Byetta → exenatide, Nitro-Spray → glyceryl trinitrate — with an LLM fallback), diagnoses to English and ICD-10, dates to ISO with precision.
 9. Cluster entities and assign event keys (LLM, one call per fact kind).
 10. Translate every segment to English (`text_en`).
-11. Findings: contradiction candidates, adjudication, storage (see Contradictions).
-12. Bump the corpus revision, clear all caches, pre-warm the lens cache for the 5 situations.
+11. Embed translated segments and source pages with Gemini Embedding 2; persist model and dimension, batch requests, and build the vector and BM25 indexes. Retrieval stays patient-, revision- and window-scoped. The embedding step requires `GEMINI_API_KEY`; schema and BM25 work can start before the key is supplied.
+12. Findings: contradiction candidates, adjudication, storage (see Contradictions).
+13. Publish the complete corpus revision and findings, clear all caches, pre-warm the lens cache for the 5 situations. A partial or failed ingestion must not publish an incomplete revision.
+
+Multimodal acceptance: a synthetic patient's PDF and JSON yield at least 95% fact overlap, and every retained fact has a located quote. Render the eight challenge documents to PDF locally for the demo only; their pages and extracted text remain gitignored.
 
 ## Query pipeline and needs library
 
@@ -344,7 +378,7 @@ A situation becomes a screen in six steps. Only parse, select and the absence ch
 1. Parse (LLM, structured): role, task, setting, procedure and date, as-of date, specific concerns ("iodinated contrast", "dizziness and blurred vision, left eye"). Fix the evidence window.
 2. Plan (code; LLM only without a profile): choose a profile or compose sections from the need catalog, add needs for each concern, always add the critical needs. Record the generalisation tier.
 3. Select (LLM, one call per section, in parallel): the model receives every eligible fact of the relevant kinds (no top-k retrieval) and returns, per need, the selected fact ids, completeness and an optional headline. It writes no card text.
-4. Absence check, for every need with nothing selected: (a) a German and English synonym search over eligible segments (kidney function → Kreatinin, GFR, eGFR, Niere, Nierenfunktion, Harnstoff), and (b) one LLM pass over the full text of the eligible documents asking whether the information appears anywhere. A hit re-runs selection with that passage; both empty → not documented; an error or timeout → unavailable.
+4. Absence check, for every need with nothing selected: (a) hybrid search over eligible segments: German and English synonym-expanded BM25 plus Gemini Embedding 2 vector search, fused by reciprocal rank fusion, and (b) one LLM pass over the full text of the eligible documents asking whether the information appears anywhere. Both stages use the same store-provided evidence window and corpus revision. A hit re-runs selection with that passage; both empty → not documented; an error, missing required retrieval leg or timeout → unavailable. Top-k retrieval alone never proves absence.
 5. Render and validate: templates turn selected facts into card lines (inheriting validation); the headline goes through the code and semantic checks; findings inside the window are attached.
 6. Stream each section as it finishes and store the screen in the lens cache.
 
@@ -382,13 +416,13 @@ Configured tier-2 profiles: medical oncologist, radiation oncologist (IORT), rad
 
 Ask Medlyn investigates one open question at a time and knows only what the fact graph and the eligible documents contain. Every sentence it shows or speaks is a claim and passes the shared validator first.
 
-**Dock.** assistant-ui components with the AI SDK v7 adapter, pinned together (`ai` 7.x, `@assistant-ui/react-ai-sdk` 1.4.x). The cockpit canvas stays custom; only the dock uses assistant-ui.
+**Dock.** assistant-ui components with the AI SDK v7 adapter, pinned together (`ai` 7.x, `@assistant-ui/react-ai-sdk` 1.4.x). All visible cockpit and dock controls use existing shadcn/ui primitives; assistant-ui supplies the dock runtime and structure only.
 
 **Investigate flow.** "Investigate" on an open question starts the agent with that item, the lens and the evidence window. It runs at most 6 tool steps, shows each step live, and ends with a short cited answer plus one proposed next action (for example "Add to the GP letter" or "Leave open").
 
 | Tool                             | What it does                                                                           |
 | -------------------------------- | -------------------------------------------------------------------------------------- |
-| `search_facts(query, kinds?)`    | Facts within the window, with segment ids                                              |
+| `search_facts(query, kinds?)`    | Hybrid-ranked facts within the shared window and revision, with segment ids                                              |
 | `get_passage(segmentId)`         | The German passage, its translation and neighbouring segments                          |
 | `check_documented(concept)`      | The absence check: documented, not documented (with documents searched) or unavailable |
 | `list_findings(topic?)`          | Contradictions and needs-clarification items in the window                             |
@@ -399,7 +433,7 @@ Ask Medlyn investigates one open question at a time and knows only what the fact
 
 UI tools are client-side tool calls, so the agent visibly drives the cockpit.
 
-**Push-to-talk voice.** Hold Space or the orb; the browser records; the server transcribes with `MODEL_STT` on the proxy; the agent streams its answer; each sentence is validated and only then sent to fish.audio streaming text-to-speech (`latency: balanced`, one chosen voice). First audio about 2.5 s, provisional. If fish.audio fails, the browser's speech synthesis takes over; the transcript always shows as text. Hands-free voice is P2 and needs a server relay, because fish.audio's realtime speech recognition must be called from a server.
+**Push-to-talk voice.** Feature-detected browser speech recognition sends its transcript through the typed-text path. Unsupported browsers hide the orb; no polyfill or extra dependency, and `MODEL_STT` stays empty. Each answer sentence passes validation before fish.audio TTS; browser speech synthesis is the fallback and the transcript remains visible. Hands-free voice belongs to Part B and has no build time.
 
 **Guardrails.** Patient facts come only from tool results and are cited. General medical knowledge appears only under a "General knowledge" label. Nothing found means "not documented" plus what was searched. Spoken answers stay at two sentences.
 
@@ -425,7 +459,7 @@ Done when: generated in under 15 s; every factual sentence cited and supported; 
 
 ## Evaluation
 
-`pnpm eval` runs a promptfoo suite against the engine plus a short Playwright script, always with an empty review layer. Its output is the metrics submission after a human check.
+`pnpm eval --suite real|synthetic|all` selects the real and synthetic pipeline suites. Retrieval and verifier suites produce separate reports alongside them; `all` never pools their scores. Pipeline runs use promptfoo plus the relevant browser checks, always with an empty review layer. Its output is the metrics submission after a human check.
 
 | Check                    | How                                                                                                                                                                                                                                       | Pass                                                 |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
@@ -441,36 +475,51 @@ Done when: generated in under 15 s; every factual sentence cited and supported; 
 
 The judge is a model. Before submission a person checks all 15 answers on the real screens, and `METRICS.md` reports the human-checked numbers.
 
-## Part C: synthetic data and the verifier
+**A+ evaluation suites**
 
-This is optional research, capped at one person and 3 hours, starting only after the H+7 checkpoint passes. Inside the event it can produce a pilot: generator v0, 20–50 patients and a dataset spec. Training most likely happens afterwards.
+| Suite | Input and checks | Report |
+| --- | --- | --- |
+| Real regression | The five challenge situations, 15 answers, citation/location/availability/contradiction checks; browser visibility and cold/warm timing | Human-checked 15/15 target; reported separately from held-out |
+| Real blind held-out | The 20 situations written independently of prompt tuning; results stay closed until H+7 | Relevance and grounding by tier; no tuning against results |
+| Synthetic pipeline | At least 150 challenges over 50 ingested patients; five profiles plus tier-2 and tier-3 roles; expected answers from verified final-document labels | Counts and answer quality by tier and challenge type, including gaps and known contradictions |
+| Retrieval | Same held-out synthetic queries and labelled evidence; compare BM25, vector and hybrid within identical windows | recall@k for each retrieval method, plus latency and index size |
+| Verifier | Held-out patients/families, document styles and mutation types; gold subset; real-patient validator decisions as a separate test only | Macro-F1, per-label quality, coverage, latency and cost versus `MODEL_FAST` and rules-only |
+| Multimodal | Synthetic JSON versus rendered PDF/scan through normal extraction and location | ≥95% fact overlap; 100% retained facts with located quotes |
+
+**Never mix.** Real regression, real blind held-out, synthetic pipeline, retrieval and verifier scores have separate denominators and output identities. Do not publish an aggregate across them. Split synthetic data by patient and generation family before rewriting or augmentation; hold out document styles, scenario types and mutation types. Challenge documents and real-patient validator decisions are never training data. The generator's verified labels supply synthetic truth; Medlyn's extractor never labels its own evaluation set. The H+7 restriction still applies to the 20 real blind situations even when `--suite all` is requested earlier.
+
+## A+ · Scale and research
+
+This block replaces the former Part C. It is approved delivery scope, in parallel with Part A, with a hard three-hour limit. Part A regressions and the demo always win shared resources. The numbers below are targets until lane reports and evaluation outputs verify them.
 
 **Generator stages**
 
-1. Structured patient history with stable events and dates (Synthea optional as a backbone).
+1. Seeded structured histories: condition graph, comorbidities, medication schedules, labs, procedures, stable events and dates.
 2. Documentation plan: what each document states, paraphrases, omits or negates.
-3. German documents rendered from the plan. Structured parts (medication tables, vital signs) are rendered by code, so their spans are exact; prose comes from the LLM. Base: the NHS England synthetic clinical notes pipeline (journeys, stage notes, typos and abbreviations), with its two adapter functions pointed at our proxy and German templates added.
-4. Controlled mutations recorded in a ledger: wrong side, dose, date or assertion status.
-5. Labels describing the final documents: supported claims, evidence spans, contradictions and gaps. A value the patient "has" but no document records is labelled "not documented".
+3. Code-render all 100k patients using fresh German templates for discharge letters, findings, histology, consults and outpatient letters. Medication tables and vitals have exact spans; authored prose includes abbreviations, typos and `<BR>` formatting. NHS England's journey/note design is a reference; no challenge prose is copied.
+4. Record controlled mutations in a ledger: wrong side, dose, date, assertion, BMI arithmetic and typo dates.
+5. Derive labels from the final documents: supported claims, located spans, contradictions and gaps. A value the patient has but no document records is "not documented" by rule.
+6. LLM-rewrite prose for at most 300 patients with `MEDLYN_LLM_CONCURRENCY=3` in synthetic job processes. Re-verify every planned value and mutation; if one does not survive, keep the original template text.
+7. Write sharded JSONL/Parquet under gitignored `ml/data/synth-v1/`; materialise the existing patient/document JSON shape for `loadCorpus`. Commit only a fresh 20-patient sample. Ingest and embed about 100 stratified patients; use 50 for the 150-challenge suite. PDF and scanned-image renderers provide multimodal test inputs.
 
-| Label tier | Source                                                                                                                                                       | Used for                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| Intended   | Documentation plan and mutation ledger                                                                                                                       | Starting point                                              |
-| Candidate  | LangExtract or another extractor on a model different from the generator                                                                                     | Finding spans and unplanned content; never truth on its own |
-| Verified   | Intended labels confirmed on the final text: code checks for planned values and mutations, plus an independent check that each planned statement was written | Training and evaluation                                     |
-| Gold       | Human-reviewed subset, about 50 documents                                                                                                                    | Measuring label noise                                       |
+Target: 100k patients in under 30 CPU minutes, with a count, size, seed and split manifest. This is a dataset-scale target, not a claim that 100k patients are searchable in Neon.
 
-If a planned fact never appears in the text, its label becomes "not documented" by rule, not by extractor. Medlyn's own extractor never labels the data it is evaluated on.
+| Label tier | Source | Used for |
+| --- | --- | --- |
+| Intended | Documentation plan and mutation ledger | Starting point |
+| Candidate | Independent extractor or verifier | Finding spans and unplanned content; never truth on its own |
+| Verified | Planned values, exact spans and mutations checked against final text; independent support checks | Training and evaluation after patient/family split |
+| Gold | Human-reviewed subset, about 50 documents | Measuring label noise and checking transfer |
 
-**Leakage.** Split by patient and generation family before any augmentation. Hold out whole document styles, scenario types and mutation types to measure transfer.
+**Verifier dataset and own model.** Inputs are a claim and passage with context; labels are supported, unsupported or contradicted, with assertion and timing sub-labels. Controlled side flips, dose changes, negation and date shifts supply hard negatives. Record source, split, mutation family and span provenance; publish a dataset card and datasheet. Real-patient validator decisions are an extra test set only and remain local.
 
-**First specialised task: claim verification** (supported, unsupported, contradicted, with assertion and timing as sub-labels). It protects every channel through the shared boundary, its labels come cheaply and reliably from mutations, it is narrow enough for a small model, and voice needs it fast. Assertion and timing extraction come second; relevance ranking last, since its labels are subjective. Training uses TRL and PEFT (LoRA on a small open model). Compare against the GPT judge and a rules-only baseline on held-out families and the gold set, reporting quality, coverage, latency and cost together.
+Train MLX-LM LoRA on a 4-bit Qwen3 base of about 1.5–1.7B parameters on the M4 Pro Mac (24 GB unified memory, 20-core GPU). This is quantised-base LoRA on Apple silicon, not a CUDA bitsandbytes run. Budget: about 5k examples, one epoch, sequence length ≤512, training wall time ≤45 minutes. Pin the chosen quantisation and upstream Apache-2.0 Qwen3 licence. Python uses uv in `ml/`, ruff and pytest. Compare with the GPT judge (`MODEL_FAST`) and rules-only baseline; report quality, coverage, latency and cost together. `MEDLYN_VERIFIER=local` selects the optional local layer-2 backend; default remains GPT unless held-out results are equal or better. A failed or incomplete local model never bypasses the shared claim boundary.
 
-**Self-hosted inference.** `gpt-oss-120b` with vLLM on the H100 is described as self-hosted inference, not on-prem: storage and voice remain cloud services. Only measured setup time and latency are reported.
+**Technical paper.** An arXiv preprint layout, single column with natbib, built by tectonic through `make -C paper`. Sections: problem, related work (FactsR, TBFact, LangExtract, NHS synthetic notes, inconsistency detection), architecture and trust invariants, multimodal ingestion, hybrid retrieval, contradiction adjudication, generator, verifier training, evaluation, limitations, ethics and the data rule. Tables and figures are generated from `eval/output/*.json`; human-check numbers before publication. The skeleton starts immediately; results are filled at T+2:30. Missing experiments stay explicitly unmeasured. Do not publish challenge text, private evaluation evidence or model artefacts with the paper.
 
 ## Dependencies
 
-Part A adds two new libraries to the planned stack (Next.js 16, Tailwind, shadcn/ui, Motion, Drizzle, Neon, AI SDK v7). Every integration estimate is provisional until the proxy smoke test and the thin slice have run.
+Part A keeps its stack (Next.js 16, Tailwind, shadcn/ui, Motion, Drizzle, Neon, AI SDK v7). A+ adds the services and tools below. Integration estimates are planning estimates; installed versions, licences and measured results belong in the lane reports.
 
 | Repository                                                                                                                                                                                  | Use              | Exact piece                                                                                           | Licence                 | Estimate                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------- |
@@ -480,25 +529,46 @@ Part A adds two new libraries to the planned stack (Next.js 16, Tailwind, shadcn
 | [healthcare-ai-model-evaluator](https://github.com/microsoft/healthcare-ai-model-evaluator)                                                                                                 | Borrow           | The two TBFact prompts and scoring in `functions/medbench/evaluators/tbfact/`                         | MIT                     | \~1 h to port           |
 | [pynegex](https://github.com/DFKI-NLP/pynegex)                                                                                                                                              | Borrow           | German negation list `triggersets/cotik-de.txt` (512 entries), ported to TypeScript, with attribution | Python-style permissive | \~1 h                   |
 | [json-render](https://github.com/vercel-labs/json-render)                                                                                                                                   | Idea only        | A fixed card-type catalog mapped to registered components                                             | Apache-2.0              | —                       |
-| [synthetic_clinical_notes](https://github.com/nhsengland/synthetic_clinical_notes)                                                                                                          | Part C base      | Journey and note pipeline; adapters `call_llm` and `read_write_data` in `src/processing.py`           | MIT (docs OGL)          | 2–3 h to run in English |
-| [langextract](https://github.com/google/langextract)                                                                                                                                        | Part C           | Candidate annotator; OpenAI provider accepts a configurable endpoint, untested against our proxy      | Apache-2.0              | —                       |
-| [synthea](https://github.com/synthetichealth/synthea)                                                                                                                                       | Part C, optional | Structured patient histories (US-centric)                                                             | Apache-2.0              | Half a day              |
-| [TRL](https://github.com/huggingface/trl), [PEFT](https://github.com/huggingface/peft)                                                                                                      | Part C           | Verifier fine-tuning                                                                                  | Apache-2.0              | —                       |
-| [LiveKit agents-js](https://github.com/livekit/agents-js), [Docling](https://github.com/docling-project/docling), [Open Medical Scribe](https://github.com/BirgerMoell/open-medical-scribe) | Part B           | Hands-free voice; PDF and scan ingestion; transcript review reference                                 | Apache-2.0; MIT; MIT    | —                       |
+| [synthetic_clinical_notes](https://github.com/nhsengland/synthetic_clinical_notes)                                                                                                          | A+ reference     | Journey and note pipeline; adapters `call_llm` and `read_write_data` in `src/processing.py`           | MIT (docs OGL)          | Reference only          |
+| [langextract](https://github.com/google/langextract)                                                                                                                                        | A+ optional      | Candidate annotator; OpenAI provider accepts a configurable endpoint, untested against our proxy      | Apache-2.0              | —                       |
+| [synthea](https://github.com/synthetichealth/synthea)                                                                                                                                       | A+ optional      | Structured patient histories (US-centric)                                                             | Apache-2.0              | Half a day              |
+| [Gemini Embedding 2 API](https://ai.google.dev/gemini-api/docs/embeddings) | A+ | Text and page/image embeddings; `gemini-embedding-2`, model and dimension stored with vectors | Hosted API terms; not an open-weight licence | Within W3 |
+| [pgvector](https://github.com/pgvector/pgvector) | A+ | Neon `vector` extension, HNSW cosine index | PostgreSQL | Within W3 |
+| [ParadeDB pg_search](https://github.com/paradedb/paradedb) | A+ | BM25 over German/English segment text in Neon | AGPL-3.0 community extension | Within W3 |
+| [MLX-LM](https://github.com/ml-explore/mlx-lm) | A+ | LoRA on a 4-bit base on Apple silicon | MIT | Training ≤45 min |
+| [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B) | A+ base model | Small Qwen3 base; pin the selected MLX-community 4-bit conversion and preserve upstream notices | Apache-2.0 upstream weights; verify selected conversion | Within W4 |
+| [reportlab](https://pypi.org/project/reportlab/) | A+ | Synthetic patient PDF generation | BSD | Within W2 |
+| [PyMuPDF](https://pymupdf.io/licensing) | A+ | PDF text/page extraction and rasterisation | AGPL-3.0 or commercial; obligations must be addressed before distribution/deployment | Within W3b |
+| [tectonic](https://github.com/tectonic-typesetting/tectonic) | A+ | LaTeX engine for the arXiv preprint; TeX dependencies downloaded as needed | MIT engine; bundled/downloaded TeX assets have their own licences | Within W6 |
+| [LiveKit agents-js](https://github.com/livekit/agents-js) | Part B | Hands-free voice | Apache-2.0 | 0 build hours |
 | [medspaCy](https://github.com/medspacy/medspacy), [Chatty Notes](https://github.com/synthetichealth/chatty-notes)                                                                           | Not used         | No German rules; a 2023 script on the pre-1.0 OpenAI API                                              | MIT; Apache-2.0         | —                       |
 
-## 12-hour build plan
+## Build plan
 
-&#91;embedded content: 12-hour build plan v2 · 3 lanes, optional lane, 6 checkpoints\]
+The original clock starts at 03:37 on 30 Oct 2026. H+7 is 10:37; H+9 is 12:37. Part A keeps its checkpoints: H+0.5 contract/mock, H+2 thin-slice go/no-go, H+5 integration, H+7 live end to end, H+9 fixes-only freeze. A+ starts in parallel; it no longer waits for H+7. Its three-hour limit supersedes the earlier research schedule and larger targets.
 
-All durations are provisional until the smoke test and the thin slice have run. The checkpoints carry the plan:
+| Lane | Deliverable | Hard cut |
+| --- | --- | --- |
+| W0 · Preset | shadcn preset `b1aIcEuKO`, `dashboard-01` shell, amber warning token; build and screenshot | Orchestrator does this first, about 10 min |
+| W1 · Regression | Six initially failing answers (2.3, 3.2, 3.3, 4.2, 5.1, 5.2), audit gaps, cold <5 s, lipid cache miss, real document titles in letter | Highest proxy priority; no regression accepted |
+| W2 · Synth | 100k code-rendered patients, exact labels/mutations, sample, PDF/scan renderer, prose rewrites | ≤300 rewrites; target <30 CPU min for 100k |
+| W3 · Search | Neon schema, BM25, embeddings, fusion; absence stage (a) and agent tools | About 100 patients ingested/embedded; key gates embeddings only |
+| W3b · Multimodal | PDF/image extraction with page boxes, normal location pipeline, page retrieval assets | ≥95% PDF/JSON fact overlap; every fact located |
+| W4 · Verifier | Dataset first; training once sample exists; held-out comparison and optional local backend | About 5k examples, one epoch, ~1.5–1.7B 4-bit base, seq ≤512, ≤45 min training |
+| W5 · Eval-scale | Separate synthetic, retrieval and verifier reports | ≥150 challenges over 50 patients; never pool with real results |
+| W6 · Paper | arXiv skeleton, generated tables/figures, compiled PDF | Skeleton now; human-checked numbers at T+2:30 |
+| W7 · PRD | PRD v3, agent rules, env example and README additions | Document scope and cuts, never imply unmeasured completion |
 
-- H+0 to H+0.5: proxy smoke test (chat, JSON-schema output, tool calls, streaming, transcription, latency per model), Neon project, screen contract and mock frozen. The `gpt-oss` download starts in the background.
-- H+2 go/no-go: situation 1 renders one template card with one citation through the real pipeline. If it does not, the agent becomes text-only and person C joins the engine.
-- H+5 integration: the real engine replaces the mock for all lenses.
-- H+7 end to end: all 5 situations from the real engine, first eval run, held-out results opened. Anything below 15/15 now outranks every P1 item. Part C may start only from here.
-- H+9 freeze: fixes only; unmerged work is dropped.
-- With 2 people instead of 3: the agent stays text-only, and the letter moves to the UI lane after H+7.
+| Time from A+ launch | Checkpoint |
+| --- | --- |
+| T+0:00–0:15 | Launch every lane; schema/BM25 need no Gemini key; dataset preparation need not wait for training |
+| T+1:30 | Integrate everything that passes its tests and does not regress Part A |
+| T+2:30 | Freeze changes, final evaluation, fill paper numbers from outputs |
+| T+3:00 | Done; stop scope expansion and report missing measurements plainly |
+
+Verification: `pnpm test`, `pnpm typecheck`, `pnpm eval --suite real` (15/15 target), browser visibility and cold timing; generator label/mutation tests, 100k count/size and data scan; retrieval recall@k A/B; multimodal overlap; verifier held-out macro-F1, latency and cost; `make -C paper`. Only human-checked numbers go into `METRICS.md` or the paper. Synthetic LLM processes use `MEDLYN_LLM_CONCURRENCY=3`; reduce or pause them when the shared proxy rate-limits regression work.
+
+A+ command surface: `pnpm eval --suite real|synthetic|all`; uv-managed synth `generate`, `materialise`, `render_pdf`, `rewrite`; verifier `train`, `eval`; paper `make -C paper`. Exact Python entry points follow the implementing lane's CLI; unimplemented commands remain planned in AGENTS and the README.
 
 ## Demo script and submission
 
@@ -534,13 +604,21 @@ The video has 120 seconds and must say what works and what does not. Record on t
 | Voice unreliable on demo day                                | Medium                       | Text input always works; voice recorded in a good take; browser speech fallback                                      |
 | UI and engine drift apart                                   | Medium                       | Contract and mock frozen at H+0.5; thin slice by H+2; integration at H+5                                             |
 | IBM data leaks into the public repo                         | Low                          | gitignore, pre-commit check for `data/` and document ids, no database dumps committed                                |
-| Parts B or C consume Part A time                            | High                         | Budget rule: Part C starts only after H+7 passes, capped; Part B has zero build hours; freeze at H+9 is absolute     |
+| A+ or Part B consumes Part A time | High | A+ hard stop at T+3:00; regression/demo get priority; Part B has zero build hours |
+| Synthetic jobs hit proxy rate limits (429/503) | Observed | Synthetic processes capped at concurrency 3; throttle/pause them before regression work |
+| 100k patients and embeddings exceed Neon size or time | High if all ingested | Bulk dataset stays local; ingest/embed about 100 stratified patients; report size and row counts |
+| Gemini key missing or embedding API unavailable | Medium | Schema and BM25 proceed; report vector/hybrid as unavailable until measured; failed absence checks never become gaps |
+| PyMuPDF licence affects distribution or hosted use | Known AGPL/commercial terms | Preserve notices; address AGPL obligations or obtain a commercial licence before distributing/deploying that integration |
+| Local verifier misses quality or training deadline | Medium | Cap training at 45 min; keep GPT as default; report measured local results without promotion |
+| Paper numbers outrun evidence | Medium | Generate tables from eval outputs, keep suites separate, human-check published results; mark absent experiments unmeasured |
 
 ## Open questions
 
 - [ ] Team size and owners for the engine, UI and agent lanes (the plan assumes 3).
-- [ ] Proxy capabilities and latency per model — answered by the H+0 smoke test.
-- [ ] Is the H100 free now and reachable from the app (needed only for P2 and Part C)?
+- [x] Proxy chat, JSON-schema, tools and streaming smoke-tested; no STT model. Re-run after changing model roles.
+- [x] Training platform chosen: M4 Pro Mac; no H100 dependency for A+.
+- [ ] `GEMINI_API_KEY` supplied and segment/page embedding smoke test passed?
+- [ ] Chosen 4-bit Qwen3 conversion, licence notices and held-out promotion decision recorded?
 - [ ] Which fish.audio voice: a stock voice or a cloned one?
 - [ ] Who writes the 20 held-out situations, and are they written before tuning starts?
 
