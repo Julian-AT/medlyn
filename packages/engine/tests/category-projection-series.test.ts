@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { categoryProjections } from "../../../apps/web/components/categories/category-projections.ts";
+import { categoryProjections } from "../../../apps/app/components/categories/category-projections.ts";
 import { evidenceLine, measurement } from "./label-series-fixtures.ts";
 
 const row = (fact = measurement()) => ({ fact, claim: evidenceLine(fact).line });

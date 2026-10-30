@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@medlyn/app",
+  "regions": ["fra1"],
+  "functions": {
+    "app/api/**/*.ts": { "maxDuration": 60 }
+  }
+}

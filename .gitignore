@@ -56,3 +56,7 @@ __pycache__/
 .husky/_
 
 .design-references/
+
+apps/app/AGENTS.md
+apps/*/reports/
+.next-*/

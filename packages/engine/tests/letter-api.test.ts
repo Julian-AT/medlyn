@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { POST as build } from "../../../apps/web/app/api/letter/route.ts";
-import { POST as edit } from "../../../apps/web/app/api/letter/edit/route.ts";
+import { POST as edit } from "../../../apps/app/app/api/letter/edit/route.ts";
+import { POST as build } from "../../../apps/app/app/api/letter/route.ts";
 
-const request = (body: unknown) => new Request("http://localhost/api/letter", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const request = (body: unknown) =>
+  new Request("http://localhost/api/letter", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
 describe("letter API input validation", () => {
   it("rejects missing session identity or invalid evidence dates", async () => {

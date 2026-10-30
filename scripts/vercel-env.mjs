@@ -39,7 +39,7 @@ export function projectEnvironment(project, source) {
   };
 }
 
-export function environmentProblems(project, environment) {
+export function environmentProblems(_project, environment) {
   const problems = Object.entries(environment)
     .filter(([, value]) => !value)
     .map(([name]) => `${name} is missing`);
@@ -84,8 +84,7 @@ function main() {
     ...(existsSync(envPath) ? parseEnv(readFileSync(envPath, "utf8")) : {}),
     ...process.env,
   };
-  const appDirectory =
-    values["app-dir"] || (existsSync(path.join(repoRoot, "apps/app")) ? "apps/app" : "apps/web");
+  const appDirectory = values["app-dir"] || "apps/app";
   const projects = values.project === "all" ? ["www", "app"] : [values.project];
   const plans = projects.map((project) => {
     const directory = path.resolve(repoRoot, project === "www" ? "apps/www" : appDirectory);

@@ -11,11 +11,11 @@
     "test": "turbo run test",
     "ingest": "pnpm --filter @medlyn/engine ingest",
     "lens": "pnpm --filter @medlyn/engine lens",
-    "dev": "turbo dev --filter=@medlyn/web --filter=@medlyn/www",
+    "dev": "turbo dev --filter=@medlyn/app --filter=@medlyn/www",
     "eval": "pnpm --filter @medlyn/eval eval",
     "warm": "pnpm --filter @medlyn/engine warm",
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "biome check .",
     "format": "biome format --write .",
     "check": "biome check ."
   },
