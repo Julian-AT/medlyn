@@ -40,7 +40,7 @@ export function GapCard(props: Props) {
         ))}
       </CardContent>
       {unavailable ? (
-        <Button type="button" variant="outline" size="sm" onClick={retry}>
+        <Button className="rounded-full" type="button" variant="outline" size="sm" onClick={retry}>
           Retry check
         </Button>
       ) : null}

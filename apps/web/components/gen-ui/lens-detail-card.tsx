@@ -19,7 +19,7 @@ export function LensDetailCard({
     <Card
       size="sm"
       data-card-id={card.id}
-      className={`gap-3 rounded-xl border-0 shadow-none ring-0 ${card.critical ? "bg-destructive/5" : "bg-background/60"}`}
+      className={`gap-3 rounded-xl border bg-card shadow-none ring-0 ${card.critical ? "border-destructive/20" : "border-gray-alpha-150"} ${card.availability === "not_documented" ? "border-dashed" : ""}`}
     >
       <CardHeader>
         {!compact && <CardDescription className="text-xs">{sectionTitle}</CardDescription>}
