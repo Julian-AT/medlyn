@@ -38,21 +38,43 @@ export function modelFor(role: ModelRole): string {
   return model;
 }
 
-async function complete(model: string, messages: Message[], body: object, timeoutMs: number) {
+async function complete(
+  model: string,
+  messages: Message[],
+  body: object,
+  timeoutMs: number,
+  name: string,
+) {
+  const queued = performance.now();
   return withRequestSlot(async () => {
-    const url = `${process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1"}/chat/completions`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ model, messages, ...body }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    const json = await res.json();
-    return json.choices[0].message.content as string;
+    const started = performance.now();
+    let status: number | undefined;
+    try {
+      const url = `${process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1"}/chat/completions`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model, messages, ...body }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      status = res.status;
+      if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      const json = await res.json();
+      return json.choices[0].message.content as string;
+    } finally {
+      if (process.env.MEDLYN_PROFILE_LENS === "1") {
+        console.info("llm_timing", {
+          name,
+          queueMs: Math.round(started - queued),
+          requestMs: Math.round(performance.now() - started),
+          status,
+          concurrency: concurrency(),
+        });
+      }
+    }
   });
 }
 
@@ -74,7 +96,7 @@ export async function structured<T extends z.ZodType>(
   };
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const content = await complete(model, messages, { response_format }, timeoutMs);
+    const content = await complete(model, messages, { response_format }, timeoutMs, name);
     try {
       return schema.parse(JSON.parse(content));
     } catch (error) {
