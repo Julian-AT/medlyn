@@ -1,12 +1,12 @@
 "use client";
 
 import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
-import { ArtifactOpenButton } from "@/components/artifacts/artifact-open-button";
 import { Badge } from "@/components/ui/badge";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { displayDates } from "./display-dates";
 import { FindingsCompare } from "./findings-compare";
 import { LensDetailCard } from "./lens-detail-card";
+import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 type Props = ToolProps<UiToolOutputs["open_lens"], { text?: string; chipId?: string }>;
@@ -17,18 +17,29 @@ export function LensCards(props: Props) {
   const cards = sections.flatMap((section) => section.cards.map((card) => ({ card, section })));
   cards.sort((a, b) => Number(b.card.critical) - Number(a.card.critical));
   return (
-    <ToolFrame {...props} title="Situation lens" description={output?.situation.task}>
-      <CardContent className="flex flex-wrap gap-1.5 px-0" aria-label="Situation sections">
+    <ToolFrame
+      {...props}
+      artifact={props.toolCallId ? { kind: "lens", id: props.toolCallId } : undefined}
+      title="Situation lens"
+      description={output?.situation.task}
+    >
+      <CardContent className="flex flex-wrap gap-1.5 p-0" aria-label="Situation sections">
         {sections.map((section) => (
           <Badge
             variant="secondary"
             key={section.id}
-            className="rounded-full text-[11px] font-normal"
+            className="rounded-control text-xs font-normal"
           >
             {section.title}
           </Badge>
         ))}
       </CardContent>
+      {output && cards.length === 0 ? (
+        <ToolEmpty
+          title="No situation cards to display"
+          description="Try a more specific role and task. This view does not establish absence."
+        />
+      ) : null}
       {(expanded ? cards : cards.slice(0, 3)).map(({ card, section }) => (
         <LensDetailCard
           key={card.id}
@@ -38,9 +49,9 @@ export function LensCards(props: Props) {
         />
       ))}
       {expanded && output?.openQuestions.length ? (
-        <CardContent className="flex flex-col gap-2 px-0">
+        <CardContent className="flex flex-col gap-2 p-0">
           <CardTitle className="text-xs">Open questions</CardTitle>
-          <CardContent role="list" className="space-y-2 px-0">
+          <CardContent role="list" className="space-y-2 p-0">
             {output.openQuestions.map((question) => (
               <CardDescription
                 role="listitem"
@@ -60,9 +71,6 @@ export function LensCards(props: Props) {
           output={{ asOf: output.situation.asOf, findings: output.findings }}
         />
       ) : null}
-      {!expanded && output && props.toolCallId && (
-        <ArtifactOpenButton artifact={{ kind: "lens", id: props.toolCallId }} />
-      )}
     </ToolFrame>
   );
 }
