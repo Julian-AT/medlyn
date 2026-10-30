@@ -11,6 +11,14 @@ const config: NextConfig = {
   transpilePackages: ["@medlyn/engine"],
   turbopack: { root },
   devIndicators: false,
+  headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
 };
 
 export default config;
