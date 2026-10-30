@@ -5,10 +5,12 @@ import { PageShell } from "@/components/categories/page-shell";
 import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { useWorkspace } from "@/components/shell/workspace-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useEvidence } from "@/hooks/use-evidence";
 import { DEFAULT_PATIENT_ID } from "@/lib/active-patient";
 import { LetterPanel } from "./letter-panel";
 
-export function LetterPage() {
+export function LetterPage({ lensKey }: { lensKey?: string }) {
+  const evidence = useEvidence(lensKey);
   const { sessionId, reviews } = useWorkspace();
   const { patient } = useActivePatient();
   return (
@@ -27,9 +29,8 @@ export function LetterPage() {
       ) : (
         <LetterPanel
           sessionId={sessionId}
-          lensKey={reviews.screen?.lensKey ?? null}
+          lensKey={evidence?.lensKey ?? lensKey ?? null}
           reviewVersion={reviews.entries.length}
-          onSource={() => undefined}
         />
       )}
     </PageShell>

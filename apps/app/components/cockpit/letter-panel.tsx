@@ -24,19 +24,17 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useLetter } from "@/hooks/use-letter";
 import { LetterReferences } from "./letter-references";
-import { LetterSentence } from "./letter-sentence";
+import { LetterSection } from "./letter-section";
 
 export function LetterPanel({
   sessionId,
   lensKey,
   reviewVersion,
-  onSource,
   ready = true,
 }: {
   sessionId: string;
   lensKey: string | null;
   reviewVersion: number;
-  onSource?: (id: string) => void;
   ready?: boolean;
 }) {
   const draft = useLetter(sessionId, lensKey, reviewVersion);
@@ -126,27 +124,13 @@ export function LetterPanel({
             {letter.sections
               .filter((section) => section.id !== "clinician_notes")
               .map((section) => (
-                <Card
+                <LetterSection
                   key={section.id}
-                  size="sm"
-                  className="rounded-xl border border-gray-alpha-150 shadow-none ring-0"
-                >
-                  <CardHeader>
-                    <CardTitle>{section.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    {section.claims.map((claim) => (
-                      <LetterSentence
-                        key={claim.id}
-                        claim={claim}
-                        citations={citations}
-                        onSource={onSource}
-                        onSave={draft.save}
-                        busy={busy}
-                      />
-                    ))}
-                  </CardContent>
-                </Card>
+                  section={section}
+                  citations={citations}
+                  onSave={draft.save}
+                  busy={busy}
+                />
               ))}
             <Alert>
               <AlertTitle>Clinician notes — not from the source documents</AlertTitle>
