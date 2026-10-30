@@ -60,7 +60,10 @@ export function ReviewDialog({ mode, targets, busy, onClose, onSave }: Props) {
               <>
                 <Label htmlFor="review-fact">Fact to correct</Label>
                 <Select value={factId} onValueChange={setFactId}>
-                  <SelectTrigger id="review-fact">
+                  <SelectTrigger
+                    className="rounded-xl bg-gray-alpha-100 shadow-none"
+                    id="review-fact"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -77,6 +80,7 @@ export function ReviewDialog({ mode, targets, busy, onClose, onSave }: Props) {
             )}
             <Label htmlFor="review-text">Proposed correction</Label>
             <Textarea
+              className="rounded-xl border-0 bg-gray-alpha-100 shadow-none"
               id="review-text"
               value={text}
               onChange={(event) => setText(event.target.value)}
@@ -86,7 +90,10 @@ export function ReviewDialog({ mode, targets, busy, onClose, onSave }: Props) {
           <>
             <Label htmlFor="review-reason">Reason for dismissal</Label>
             <Select value={reason} onValueChange={(value) => setReason(DismissReason.parse(value))}>
-              <SelectTrigger id="review-reason">
+              <SelectTrigger
+                className="rounded-xl bg-gray-alpha-100 shadow-none"
+                id="review-reason"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -102,10 +109,11 @@ export function ReviewDialog({ mode, targets, busy, onClose, onSave }: Props) {
           </>
         )}
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button className="rounded-full" variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
+            className="rounded-full"
             disabled={busy || (mode === "correct" && !text.trim())}
             onClick={() => onSave(mode === "correct" ? { proposedText: text } : { reason }, factId)}
           >

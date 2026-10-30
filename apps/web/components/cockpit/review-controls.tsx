@@ -68,7 +68,13 @@ export function ReviewControls({
   }
   return (
     <>
-      <Button variant="ghost" size="sm" disabled={busy} onClick={() => act("accept")}>
+      <Button
+        className="rounded-full"
+        variant="ghost"
+        size="sm"
+        disabled={busy}
+        onClick={() => act("accept")}
+      >
         <HugeiconsIcon
           icon={Tick02Icon}
           strokeWidth={2}
@@ -79,7 +85,13 @@ export function ReviewControls({
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" disabled={busy} aria-label="More review actions">
+          <Button
+            className="rounded-full"
+            variant="ghost"
+            size="icon-sm"
+            disabled={busy}
+            aria-label="More review actions"
+          >
             <HugeiconsIcon icon={MoreHorizontalCircle01Icon} strokeWidth={2} aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
