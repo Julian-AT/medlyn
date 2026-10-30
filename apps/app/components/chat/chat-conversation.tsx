@@ -11,7 +11,6 @@ import { ArtifactWorkspace } from "@/components/artifacts/artifact-workspace";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
 import { ChatActivity } from "./chat-activity";
 import { ChatComposer } from "./chat-composer";
 import { ChatMessage } from "./chat-message";
@@ -92,17 +91,10 @@ export function ChatConversation({
             onStop={queue.state?.running ? queue.stop : chat.stop}
           />
         </CardContent>
-        <CardFooter className="mx-auto w-full max-w-3xl shrink-0 flex-wrap justify-between gap-2 bg-background px-5 py-3 sm:px-8">
-          <CardDescription className="text-xs">Answers linked to source documents</CardDescription>
-          <Toggle
-            size="sm"
-            className="h-8 rounded-lg text-xs font-medium data-[state=on]:bg-accent data-[state=on]:text-foreground"
-            pressed={chat.autoSpeak}
-            onPressedChange={chat.setAutoSpeak}
-            aria-label="Speak validated answers"
-          >
-            Speak answers
-          </Toggle>
+        <CardFooter className="mx-auto w-full max-w-3xl shrink-0 justify-center bg-background px-5 py-3 sm:px-8">
+          <CardDescription className="text-center text-xs text-muted-foreground">
+            Medlyn can make mistakes.
+          </CardDescription>
         </CardFooter>
       </Card>
     </ArtifactWorkspace>
