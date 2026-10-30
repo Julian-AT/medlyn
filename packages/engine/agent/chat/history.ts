@@ -46,6 +46,18 @@ export async function loadChat(id: string, patientId = PATIENT_ID) {
   };
 }
 
+export async function deleteChat(id: string, patientId = PATIENT_ID): Promise<boolean> {
+  const db = getDb();
+  const owned = and(eq(chats.id, id), eq(chats.patientId, patientId));
+  const [chat] = await db.select({ id: chats.id }).from(chats).where(owned).limit(1);
+  if (!chat) return false;
+  await db.batch([
+    db.delete(chatMessages).where(eq(chatMessages.chatId, id)),
+    db.delete(chats).where(owned),
+  ]);
+  return true;
+}
+
 // Adapted from vercel/chatbot lib/db/queries.ts (Apache-2.0).
 export async function saveUserMessage(id: string, message: StoredMessage, patientId = PATIENT_ID) {
   const text = message.parts
