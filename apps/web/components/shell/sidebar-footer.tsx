@@ -63,7 +63,7 @@ export function ShellSidebarFooter() {
                 aria-label="Patient and workspace settings"
               >
                 <Avatar className="size-6 shrink-0 rounded-md">
-                  <AvatarFallback className="rounded-md bg-(image:--gradient-4) text-[10px] font-semibold text-foreground/80">
+                  <AvatarFallback className="rounded-md bg-gray-alpha-100 text-[10px] font-medium text-foreground">
                     {patient.displayName
                       .split(/\s+/)
                       .map((part) => part[0])
