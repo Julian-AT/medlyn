@@ -5,15 +5,18 @@ import { useRef } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatGreeting } from "@/components/chat/chat-greeting";
 import { ChatShortcuts } from "@/components/chat/chat-shortcuts";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { Card, CardContent } from "@/components/ui/card";
+import { chatDrafts } from "@/lib/chat-drafts";
 
 export function ChatHome() {
   const router = useRouter();
+  const { patient } = useActivePatient();
   const starting = useRef(false);
   function start(text: string, chipId?: string) {
     if (starting.current) return;
     const id = crypto.randomUUID();
-    sessionStorage.setItem(`medlyn:chat-draft:${id}`, JSON.stringify({ text, chipId }));
+    chatDrafts.save(patient.id, id, { text, chipId });
     starting.current = true;
     router.push(`/chat/${id}`);
   }
