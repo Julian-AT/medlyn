@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  Brain01Icon as BrainIcon,
   ArrowDown01Icon as ChevronDownIcon,
   CircleSmallIcon as DotIcon,
+  Search01Icon as SearchIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
@@ -76,7 +76,7 @@ export const ChainOfThoughtHeader = memo(
           )}
           {...props}
         >
-          <HugeiconsIcon icon={BrainIcon} className="size-4" strokeWidth={2} />
+          <HugeiconsIcon icon={SearchIcon} className="size-4" strokeWidth={2} />
           <span className="flex-1 text-left">{children ?? "Chain of Thought"}</span>
           <HugeiconsIcon
             icon={ChevronDownIcon}
@@ -113,15 +113,7 @@ export const ChainOfThoughtStep = memo(
     };
 
     return (
-      <div
-        className={cn(
-          "flex gap-2 text-sm",
-          statusStyles[status],
-          "fade-in-0 slide-in-from-top-2 animate-in",
-          className,
-        )}
-        {...props}
-      >
+      <div className={cn("flex gap-2 text-sm", statusStyles[status], className)} {...props}>
         <div className="relative mt-0.5">
           <HugeiconsIcon icon={Icon} className="size-4" strokeWidth={2} />
           <div className="-mx-px absolute top-7 bottom-0 left-1/2 w-px bg-border" />

@@ -49,15 +49,19 @@ export function ChatMessage({
     evidence.claims.length > 0 || tools.some((part) => part.state === "output-available");
   return (
     <Message from={message.role} className="border-0">
-      <MessageContent>
+      <MessageContent className="gap-4">
         {message.role === "user" ? (
           <MessageResponse>
             {message.parts.flatMap((part) => (part.type === "text" ? [part.text] : [])).join("\n")}
           </MessageResponse>
         ) : (
           <>
-            {investigate && <InvestigationPlan message={message} busy={busy} />}
-            <ChatToolSteps message={message} factIds={evidence.factIds} busy={busy} />
+            {investigate ? (
+              <InvestigationPlan message={message} busy={busy} />
+            ) : (
+              <ChatToolSteps message={message} factIds={evidence.factIds} busy={busy} />
+            )}
+
             {tools.map((part) => {
               if (part.type === "dynamic-tool") return null;
               if (part.type === "tool-show_source" && "input" in part) {
@@ -66,6 +70,7 @@ export function ChatMessage({
                   <SourceTool
                     key={part.toolCallId}
                     segmentId={input.segmentId}
+                    state={part.state}
                     autoOpen={autoOpenSources}
                   />
                 ) : null;

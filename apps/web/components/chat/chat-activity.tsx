@@ -36,12 +36,12 @@ export function ChatActivity({ message }: { message?: UIMessage }) {
       <CardContent className="flex items-center gap-2 px-0">
         <HugeiconsIcon
           icon={Search01Icon}
-          size={18}
+          size={16}
           strokeWidth={2}
-          className="text-primary"
+          className="text-muted-foreground"
           aria-hidden="true"
         />
-        <Shimmer className="text-sm">{label ?? "Searching source documents…"}</Shimmer>
+        <Shimmer className="text-xs">{label ?? "Searching source documents…"}</Shimmer>
       </CardContent>
     </Card>
   );

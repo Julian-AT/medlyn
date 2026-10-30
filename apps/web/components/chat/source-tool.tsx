@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { SourcePopover } from "@/components/sources/source-popover";
-import { Button } from "@/components/ui/button";
+import { SourceChip } from "@/components/gen-ui/source-chip";
+import { ToolFrame } from "@/components/gen-ui/tool-frame";
 
 function showSource(segmentId: string) {
   window.dispatchEvent(new CustomEvent("medlyn:show-source", { detail: { segmentId } }));
@@ -11,9 +11,11 @@ function showSource(segmentId: string) {
 export function SourceTool({
   segmentId,
   autoOpen = false,
+  state,
 }: {
   segmentId: string;
   autoOpen?: boolean;
+  state: string;
 }) {
   useEffect(() => {
     if (!autoOpen) return;
@@ -26,6 +28,12 @@ export function SourceTool({
     };
   }, [segmentId, autoOpen]);
   return (
-    <SourcePopover segmentId={segmentId} trigger={<Button variant="ghost">Open source</Button>} />
+    <ToolFrame
+      state={state === "output-error" || state === "output-denied" ? state : "output-available"}
+      output={{ segmentId }}
+      title="Source passage"
+    >
+      <SourceChip segmentId={segmentId} />
+    </ToolFrame>
   );
 }

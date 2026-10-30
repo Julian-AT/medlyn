@@ -25,7 +25,7 @@ export function ChatToolSteps({
   const active = busy ? steps.findLast((step) => step.status === "active") : undefined;
   return (
     <ChainOfThought className="w-full max-w-none space-y-2">
-      <ChainOfThoughtHeader className="w-fit max-w-full text-xs [&>svg:first-child]:hidden">
+      <ChainOfThoughtHeader className="w-fit max-w-full text-xs">
         {busy ? (
           <Shimmer as="span">{active?.label ?? "Checking answer against sources…"}</Shimmer>
         ) : (
