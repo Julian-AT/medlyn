@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { Badge } from "@/components/ui/badge";
 
 export function HighlightDifference({ text, other }: { text: string; other: string }) {
   const comparison = new Set(other.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []);
@@ -8,6 +9,17 @@ export function HighlightDifference({ text, other }: { text: string; other: stri
     const key = `${offset}:${part}`;
     offset += part.length;
     const differs = /^[\p{L}\p{N}]+$/u.test(part) && !comparison.has(part.toLocaleLowerCase());
-    return differs ? <mark key={key}>{part}</mark> : <Fragment key={key}>{part}</Fragment>;
+    return differs ? (
+      <Badge
+        key={key}
+        asChild
+        variant="outline"
+        className="inline rounded-sm border-0 bg-warning/10 p-0 text-sm font-normal text-foreground whitespace-pre-wrap"
+      >
+        <mark>{part}</mark>
+      </Badge>
+    ) : (
+      <Fragment key={key}>{part}</Fragment>
+    );
   });
 }
