@@ -9,8 +9,8 @@ function siteOrigin(value: string): URL {
 }
 
 export const siteName = "Medlyn";
-export const siteUrl = siteOrigin(process.env.NEXT_PUBLIC_SITE_URL || "https://example.com");
-export const appUrl = siteOrigin(process.env.NEXT_PUBLIC_APP_URL || "https://app.example.com");
+export const siteUrl = siteOrigin(process.env.NEXT_PUBLIC_SITE_URL || "https://medlyn.health");
+export const appUrl = siteOrigin(process.env.NEXT_PUBLIC_APP_URL || "https://app.medlyn.health");
 export const siteTitle = "Source-linked patient summaries · Medlyn";
 export const siteDescription =
   "Medlyn is a clinical documentation AI prototype that gives clinicians task-focused patient summaries, with each fact linked to its source in the patient record.";
