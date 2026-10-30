@@ -1,112 +1,59 @@
-# Verifier dataset
+# MedlynBench-synth v1 dataset card
 
-Sources: `ml/data/sample`, `ml/data/synth-v1`. Sampling seed: 37. Input manifest hashes are recorded in datasets/manifest.json.
+Version: verifier builder v2, seed 37. Task: classify an English claim against located German
+passages as supported, unsupported or contradicted; assertion and timing are training sublabels.
 
-Synthetic final-document facts rendered with engine templates; German source segments, section headings and immediate neighbours. Labels are intended plus exact-span checked, not independently verified or human gold. No real-patient text is used for training.
+## Composition and provenance
 
-```json
-{
-  "train": {
-    "rows": 5001,
-    "labels": {
-      "supported": 1667,
-      "unsupported": 1667,
-      "contradicted": 1667
-    },
-    "patients": 104,
-    "families": [
-      "compact:cardiac_followup",
-      "compact:metabolic_review",
-      "compact:renal_review",
-      "compact:vascular_workup",
-      "consultation:metabolic_review",
-      "consultation:pulmonary_review",
-      "consultation:renal_review",
-      "consultation:vascular_workup",
-      "narrative:cardiac_followup",
-      "narrative:metabolic_review",
-      "narrative:oncology_treatment",
-      "narrative:pulmonary_review",
-      "narrative:vascular_workup",
-      "problem_list:cardiac_followup",
-      "problem_list:metabolic_review",
-      "problem_list:oncology_treatment",
-      "problem_list:renal_review"
-    ],
-    "mutations": {
-      "none": 1667,
-      "unsupported_addition": 1434,
-      "date_shift": 974,
-      "wrong_passage": 233,
-      "dose_change": 156,
-      "number_change": 369,
-      "side_flip": 160,
-      "timing_flip": 8
-    }
-  },
-  "valid": {
-    "rows": 600,
-    "labels": {
-      "unsupported": 200,
-      "contradicted": 200,
-      "supported": 200
-    },
-    "patients": 35,
-    "families": [
-      "compact:primary_care_transfer",
-      "compact:pulmonary_review",
-      "compact:rheumatology_review",
-      "consultation:cardiac_followup",
-      "consultation:primary_care_transfer",
-      "narrative:renal_review",
-      "narrative:rheumatology_review",
-      "problem_list:primary_care_transfer",
-      "problem_list:pulmonary_review",
-      "problem_list:rheumatology_review"
-    ],
-    "mutations": {
-      "unsupported_addition": 170,
-      "wrong_passage": 30,
-      "date_shift": 111,
-      "number_change": 51,
-      "none": 200,
-      "side_flip": 20,
-      "dose_change": 15,
-      "timing_flip": 3
-    }
-  },
-  "test": {
-    "rows": 900,
-    "labels": {
-      "contradicted": 300,
-      "supported": 300,
-      "unsupported": 300
-    },
-    "patients": 36,
-    "families": [
-      "compact:oncology_treatment",
-      "consultation:oncology_treatment",
-      "dictated:geriatric_transition",
-      "dictated:oncology_surveillance",
-      "problem_list:vascular_workup",
-      "structured:geriatric_transition",
-      "structured:oncology_surveillance"
-    ],
-    "mutations": {
-      "date_shift": 94,
-      "none": 300,
-      "number_change": 41,
-      "unsupported_addition": 253,
-      "wrong_passage": 47,
-      "date_typo": 89,
-      "assertion_flip": 37,
-      "side_flip": 20,
-      "dose_change": 19
-    }
-  }
-}
-```
+The local `verifier/runs/data-v2` preview contains 24,000 training, 3,000 validation and 3,000 test
+examples, balanced equally across the three labels. Source patients come from the independently
+rendered synth-v1 corpus. Generator labels and mutation ledgers supply truth; the Medlyn extractor
+does not label this benchmark. Quotes are checked against final normalised document text using
+UTF-16 offsets and actual engine segmentation. English claims use the engine's fact templates.
 
-Patients and generation families are assigned before augmentation by SHA-256 of family. Source-declared validation/test patients are never moved into training. Manifest held-out styles, scenarios, families and mutation types are honoured. Held-out mutation types: assertion_flip, date_typo. Source manifests and assignments are recorded in datasets/manifest.json. Repeated sample/shard patients and exact input duplicates across splits are removed. Prepared documents/facts and original-row hashes are frozen in source-snapshots.jsonl so concurrent source rewrites cannot invalidate span checks. Test inputs take precedence over validation, then training. Each split is downsampled to equal classes.
+The manifest records source hashes, patients, generation families, mutation counts, assignments,
+label tier and frozen test hashes. Prepared source snapshots are local and frozen alongside inputs.
+`audit_dataset` checks all selected spans, source identities and split boundaries. No challenge
+text is present in synthetic templates or training inputs.
 
-Supported claims come from final facts. Contradictions change explicit numeric, side, assertion or timing fields; unsupported additions assert a concept absent from the displayed context. This narrow perturbation distribution is a limitation and may inflate performance. No claim of clinical generalisation is justified. Dataset files and real-patient exports are ignored by git. Real cached letter claims are test-only weak labels, never gold.
+## Splits and mutations
+
+Patient and generation-family assignments precede mutation and rewriting. Source-declared
+validation/test assignments and held-out styles/scenarios/families are respected. Exact prompts
+are reserved for test before validation and training. The current source holds assertion flips
+and typo dates out of train and validation. Other negatives include same-kind number swaps,
+precise numeric/dose changes, side flips, negation scope, temporal shifts and wrong-document
+citations. Unsupported additions remain in the distribution; the model may learn their shortcut.
+
+A separate rewritten-prose test suite currently contains 900 examples from **30** eligible test
+patients, not 300. The existing corpus rewrote 300 patients across all splits (240 train, 30
+validation, 30 test); those train/validation rewrites are excluded by v2. `prepare_rewrites`
+copies 300 untouched test patients before calling the bounded existing rewriter. Rejected rewrites
+retain original text and are not claimed as rewritten patients. Build a new frozen output directory
+after that command; never replace a published test file in place. Rewritten patient documents can
+contain unchanged template spans, so this suite does not establish wholly free-form prose transfer.
+
+The preview's test and rewritten hashes are in `results.json.v2DataStatus.frozenTests`. Test files
+are immutable once `frozen-test.json` exists. A subsequent build refuses that output directory.
+
+## Real-text transfer set
+
+`real-gold-manifest.json` records 100 claims: 50 positives from located facts with supported ingest
+verdicts and 50 side/number/negation rule negatives. Real text exists only in ignored
+`verifier/runs/real/real-gold.examples.jsonl`. Public metadata contains counts, opaque ids and source
+UTF-16 offsets. Source corpus revision must match the database; eligibility comes exclusively from
+`store.evidenceWindow`. No review overlay is used.
+
+These are **rule labels with human review pending**. Positives inherit the engine judge's support
+verdict and are not independent semantic gold. The set has two classes and one patient: macro-F1
+still averages all three classes (ceiling 2/3 for a perfect prediction). Claim bootstrap intervals
+are conditional on this patient and do not estimate transfer to other patients. The older cached
+letter set is separately reported as weak labels; it is never pooled with this set.
+
+## Limitations and access
+
+Synthetic German styles, fixed English templates and artificial negatives differ from clinical
+practice. Rule-checked spans do not establish semantic correctness. Label noise, shortcuts,
+correlated claims and unrepresented institutions can inflate scores. No clinical efficacy or
+population generalisation claim is supported. Bulk data, source text, predictions, adapters and
+failure exports stay local and ignored; this card releases metadata and reproducible code only.
