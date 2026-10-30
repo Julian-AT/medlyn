@@ -22,6 +22,7 @@ export async function OverviewPage() {
   return (
     <PageShell>
       <PageHeading
+        category="overview"
         title="Patient overview"
         description={
           data
@@ -29,7 +30,7 @@ export async function OverviewPage() {
             : "A source-linked view of the patient record."
         }
         action={
-          <Button asChild>
+          <Button className="rounded-full" asChild>
             <Link href="/situations">Open a situation</Link>
           </Button>
         }

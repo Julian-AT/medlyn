@@ -1,11 +1,4 @@
 import {
-  Calendar03Icon,
-  CheckmarkCircle02Icon,
-  File02Icon,
-  Medicine01Icon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
   Card,
   CardAction,
   CardContent,
@@ -13,36 +6,40 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CategoryAccent, type CategoryAccentKey } from "./category-accent";
 import type { PatientData } from "./patient-data";
 
 export function OverviewStats({ data }: { data: PatientData }) {
-  const stats = [
-    { label: "Source documents", value: data.documents.length, icon: File02Icon },
-    { label: "Verified entries", value: data.rows.length, icon: CheckmarkCircle02Icon },
+  const stats: { label: string; value: number; category: CategoryAccentKey }[] = [
+    { label: "Source documents", value: data.documents.length, category: "documents" },
+    { label: "Verified entries", value: data.rows.length, category: "verified" },
     {
       label: "Medication sources",
       value: new Set(
         data.facts.filter((fact) => fact.kind === "medication").map((fact) => fact.documentId),
       ).size,
-      icon: Medicine01Icon,
+      category: "medications",
     },
     {
       label: "Planned entries",
       value: data.rows.filter(({ fact }) => fact.temporalStatus === "planned").length,
-      icon: Calendar03Icon,
+      category: "procedures",
     },
   ];
   return (
     <CardContent className="grid gap-4 px-0 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map(({ label, value, icon }) => (
-        <Card key={label} className="gap-3 rounded-2xl border shadow-none ring-0">
+      {stats.map(({ label, value, category }) => (
+        <Card
+          key={label}
+          className="gap-3 rounded-2xl border border-gray-alpha-150 bg-card shadow-xs ring-0"
+        >
           <CardHeader className="gap-3">
             <CardDescription className="font-medium">{label}</CardDescription>
-            <CardTitle className="font-mono text-3xl font-semibold tracking-tight text-primary">
+            <CardTitle className="text-3xl font-medium tabular-nums text-foreground">
               {value}
             </CardTitle>
-            <CardAction className="text-foreground/80">
-              <HugeiconsIcon icon={icon} size={20} strokeWidth={1.75} aria-hidden="true" />
+            <CardAction>
+              <CategoryAccent category={category} className="size-9" />
             </CardAction>
           </CardHeader>
         </Card>
