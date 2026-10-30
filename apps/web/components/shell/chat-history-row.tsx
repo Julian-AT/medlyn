@@ -64,8 +64,10 @@ export function ChatHistoryRow({
           aria-current={pathname === href ? "page" : undefined}
           onClick={() => setOpenMobile(false)}
         >
-          <HugeiconsIcon icon={BubbleChatIcon} strokeWidth={2} />
-          <span>{chat.title}</span>
+          <span className="-mx-0.5 flex h-8 min-w-5 shrink-0 items-center justify-center">
+            <HugeiconsIcon icon={BubbleChatIcon} strokeWidth={2} />
+          </span>
+          <span className="truncate">{chat.title}</span>
         </Link>
       </SidebarMenuButton>
       <DropdownMenu>

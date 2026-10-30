@@ -34,7 +34,7 @@ export function SidebarNavItem({
         isActive={active}
         tooltip={item.title}
         className={cn(
-          "h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-muted-foreground hover:text-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground",
+          "h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-sidebar-foreground hover:text-foreground [&_svg]:size-[18px] [&_svg]:text-sidebar-foreground",
           "data-active:bg-sidebar-accent data-active:text-foreground data-active:[&_svg]:text-foreground",
           warning && count !== undefined && "pr-10",
         )}
@@ -44,13 +44,15 @@ export function SidebarNavItem({
           aria-current={active ? "page" : undefined}
           onClick={() => setOpenMobile(false)}
         >
-          <HugeiconsIcon icon={item.icon} strokeWidth={2} />
-          <span>{item.title}</span>
+          <span className="-mx-0.5 flex h-8 min-w-5 shrink-0 items-center justify-center">
+            <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+          </span>
+          <span className="truncate">{item.title}</span>
         </Link>
       </SidebarMenuButton>
       {warning && count !== undefined && (
         <SidebarMenuBadge
-          className={cn("text-muted-foreground", warning && "bg-warning text-warning-foreground")}
+          className={cn("text-muted-foreground", warning && "bg-warning/10 text-warning")}
         >
           {count}
         </SidebarMenuBadge>
