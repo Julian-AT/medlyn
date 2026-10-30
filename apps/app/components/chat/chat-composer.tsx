@@ -13,16 +13,9 @@ import {
 import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { Badge } from "@/components/ui/badge";
 import { InputGroupAddon } from "@/components/ui/input-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSituationVoice } from "@/hooks/use-situation-voice";
-import { appendDictation, speechLanguage } from "./hooks/use-speech-state";
+import { appendDictation } from "./hooks/use-speech-state";
 
 export function ChatComposer({
   onSubmit,
@@ -35,7 +28,6 @@ export function ChatComposer({
 }) {
   const { patient } = useActivePatient();
   const [text, setText] = useState("");
-  const [language, setLanguage] = useState("en-US");
   const dictationBase = useRef("");
   const latestText = useRef(text);
   latestText.current = text;
@@ -46,12 +38,8 @@ export function ChatComposer({
     onStart: () => {
       dictationBase.current = latestText.current;
     },
-    language,
     keyboard: false,
   });
-  useEffect(() => {
-    setLanguage(speechLanguage(navigator.language));
-  }, []);
   const busy = status === "submitted" || status === "streaming";
   useEffect(() => {
     if (busy) voice.cancel();
@@ -100,19 +88,6 @@ export function ChatComposer({
                     : "Listening…"}
               </Badge>
             )}
-            <Select value={language} disabled={busy || voice.listening} onValueChange={setLanguage}>
-              <SelectTrigger
-                aria-label="Dictation language"
-                size="sm"
-                className="h-8 w-auto gap-1 border-0 px-2 text-xs shadow-none"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en-US">EN</SelectItem>
-                <SelectItem value="de-DE">DE</SelectItem>
-              </SelectContent>
-            </Select>
             <Tooltip>
               <TooltipTrigger asChild>
                 <PromptInputButton
