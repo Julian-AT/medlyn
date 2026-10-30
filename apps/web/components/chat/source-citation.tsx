@@ -1,7 +1,5 @@
 "use client";
 
-import { File02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDate } from "@medlyn/engine/dates";
 import { useState } from "react";
 import {
@@ -23,16 +21,15 @@ export function SourceCitation({ segmentId, index }: { segmentId: string; index:
       <InlineCitationCard open={open} onOpenChange={setOpen}>
         <HoverCardTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-7 gap-1.5 rounded-lg bg-background px-2 text-xs font-medium text-primary shadow-none hover:bg-primary/5 hover:text-primary"
+            className="mx-0.5 inline-flex h-5 min-w-5 rounded-md px-1 align-baseline text-[11px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label={`Open source ${index + 1}`}
             onClick={() =>
               window.dispatchEvent(new CustomEvent("medlyn:show-source", { detail: { segmentId } }))
             }
           >
-            <HugeiconsIcon icon={File02Icon} size={14} strokeWidth={1.75} aria-hidden="true" />
-            Source {index + 1}
+            [{index + 1}]
           </Button>
         </HoverCardTrigger>
         <InlineCitationCardBody className="w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-border shadow-sm">
@@ -55,12 +52,20 @@ export function SourceCitation({ segmentId, index }: { segmentId: string; index:
                 </Button>
               </CardDescription>
             ) : passage ? (
-              <CardDescription
-                lang="de"
-                className="line-clamp-5 whitespace-pre-wrap text-sm/relaxed text-foreground"
-              >
-                {passage.segment.text}
-              </CardDescription>
+              <CardContent className="space-y-3 px-0">
+                <CardDescription
+                  lang="de"
+                  className="line-clamp-3 whitespace-pre-wrap text-sm/relaxed text-foreground"
+                >
+                  {passage.segment.text}
+                </CardDescription>
+                <CardDescription
+                  lang="en"
+                  className="line-clamp-3 whitespace-pre-wrap text-xs/relaxed"
+                >
+                  {passage.segment.textEn ?? "English translation unavailable."}
+                </CardDescription>
+              </CardContent>
             ) : (
               <Skeleton aria-label="Loading source passage" className="h-20 w-full rounded-lg" />
             )}

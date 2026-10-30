@@ -7,10 +7,25 @@ function showSource(segmentId: string) {
   window.dispatchEvent(new CustomEvent("medlyn:show-source", { detail: { segmentId } }));
 }
 
-export function SourceTool({ segmentId }: { segmentId: string }) {
-  useEffect(() => showSource(segmentId), [segmentId]);
+export function SourceTool({
+  segmentId,
+  autoOpen = false,
+}: {
+  segmentId: string;
+  autoOpen?: boolean;
+}) {
+  useEffect(() => {
+    if (!autoOpen) return;
+    let active = true;
+    queueMicrotask(() => {
+      if (active) showSource(segmentId);
+    });
+    return () => {
+      active = false;
+    };
+  }, [segmentId, autoOpen]);
   return (
-    <Button variant="outline" onClick={() => showSource(segmentId)}>
+    <Button variant="ghost" onClick={() => showSource(segmentId)}>
       Open source
     </Button>
   );

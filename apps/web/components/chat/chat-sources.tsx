@@ -1,32 +1,45 @@
-import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+"use client";
+
+import { CheckmarkCircle02Icon, File02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SourceCitation } from "@/components/chat/source-citation";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Sources, SourcesTrigger } from "@/components/ai-elements/sources";
+import { Button } from "@/components/ui/button";
+import { CardContent, CardDescription } from "@/components/ui/card";
 
 export function ChatSources({ segmentIds, checked }: { segmentIds: string[]; checked: boolean }) {
   if (!segmentIds.length && !checked) return null;
   return (
-    <Card className="gap-0 rounded-none bg-transparent py-1 shadow-none ring-0">
-      <CardContent className="flex flex-wrap items-center gap-2 px-0">
-        {checked && (
-          <Badge
-            variant="secondary"
-            className="h-7 gap-1.5 rounded-lg bg-primary/10 px-2 text-xs font-medium text-primary"
-          >
-            <HugeiconsIcon
-              icon={CheckmarkCircle02Icon}
-              size={14}
-              strokeWidth={1.75}
-              aria-hidden="true"
-            />
-            Source checked
-          </Badge>
-        )}
-        {segmentIds.map((id, index) => (
-          <SourceCitation key={id} segmentId={id} index={index} />
-        ))}
-      </CardContent>
-    </Card>
+    <CardContent className="flex flex-wrap items-center gap-3 p-0">
+      {segmentIds.length > 0 && (
+        <Sources className="mb-0">
+          <SourcesTrigger count={segmentIds.length} asChild>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-7 gap-1.5 rounded-full px-2.5 text-xs font-medium"
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("medlyn:show-source", { detail: { segmentId: segmentIds[0] } }),
+                )
+              }
+            >
+              <HugeiconsIcon icon={File02Icon} size={13} strokeWidth={2} aria-hidden="true" />
+              {segmentIds.length} {segmentIds.length === 1 ? "source" : "sources"}
+            </Button>
+          </SourcesTrigger>
+        </Sources>
+      )}
+      {checked && (
+        <CardDescription className="flex items-center gap-1 text-[11px]">
+          <HugeiconsIcon
+            icon={CheckmarkCircle02Icon}
+            size={13}
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+          Source checked
+        </CardDescription>
+      )}
+    </CardContent>
   );
 }
