@@ -1,4 +1,4 @@
-import { appUrl, faqQuestions, siteDescription, siteName, siteUrl } from "@/lib/seo";
+import { appUrl, faqQuestions, githubUrl, siteDescription, siteName, siteUrl } from "@/lib/seo";
 
 type FaqEntry = { question: string; answer: string };
 
@@ -15,6 +15,7 @@ export function StructuredData({ questions = faqQuestions }: { questions?: reado
         name: siteName,
         url: siteUrl.href,
         logo: new URL("/images/apple-touch-icon.png", siteUrl).href,
+        sameAs: [githubUrl],
       },
       {
         "@type": "WebSite",
@@ -33,6 +34,8 @@ export function StructuredData({ questions = faqQuestions }: { questions?: reado
         url: appUrl.href,
         description: siteDescription,
         applicationCategory: "HealthApplication",
+        sameAs: [githubUrl],
+        codeRepository: githubUrl,
         operatingSystem: "Web",
         isAccessibleForFree: true,
         publisher: { "@id": organizationId },

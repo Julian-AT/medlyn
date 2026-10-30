@@ -18,6 +18,8 @@ export function HeroActions({ className }: { className?: string }) {
     >
       <a
         href={APP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
         className="group/button relative isolate inline-flex h-full shrink-0 cursor-pointer text-body-sm outline-hidden"
       >
         <span
@@ -33,7 +35,7 @@ export function HeroActions({ className }: { className?: string }) {
       <a
         href={GITHUB_URL}
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className="group/button relative isolate inline-flex h-full shrink-0 cursor-pointer text-body-sm outline-hidden"
       >
         <span

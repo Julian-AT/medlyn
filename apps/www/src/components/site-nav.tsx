@@ -14,7 +14,7 @@ import {
 import { cn } from "./cn";
 import { LogoMark, Wordmark } from "./icons";
 import { DURATION, EASE, gsap, isTouchDevice } from "./motion";
-import { APP_URL, GITHUB_URL } from "./site-config";
+import { APP_URL, GITHUB_URL, HACKATHON_URL } from "./site-config";
 
 // Width of the wordmark slot next to the logo mark (58px text + 6px gap).
 const WORDMARK_WIDTH = 64;
@@ -69,6 +69,7 @@ function NavItem({
       href={href}
       aria-label={ariaLabel}
       target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
       className="group relative h-10 cursor-pointer outline-hidden hover:no-underline"
       style={ITEM_THEMES[theme]}
       onMouseEnter={handlers.onMouseEnter}
@@ -234,7 +235,7 @@ function DesktopNav({
 }
 
 const MOBILE_LINKS = [
-  { label: "Track", href: "#how-it-works" },
+  { label: "Track", href: HACKATHON_URL },
   { label: "GitHub", href: GITHUB_URL },
 ];
 
@@ -367,7 +368,7 @@ function MobileNav() {
                 href={link.href}
                 {...(link.href.startsWith("#")
                   ? { onClick: toggle }
-                  : { target: "_blank", rel: "noreferrer" })}
+                  : { target: "_blank", rel: "noopener noreferrer" })}
               >
                 <p>{link.label}</p>
               </a>
@@ -375,6 +376,8 @@ function MobileNav() {
             <a
               className="group/button relative isolate mt-[2rem] inline-flex h-11.5 cursor-pointer text-body-sm outline-hidden"
               href={APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <span className="z-10 flex w-full items-center justify-center rounded-ctas-button border-2 border-transparent bg-orange-500 px-[1.4rem] text-text-invert-primary transition-colors group-hover/button:bg-surface-tertiary group-active:bg-black-500">
                 <p>Get started</p>
@@ -419,13 +422,13 @@ export function SiteNav() {
         withLogo
         className="left-1/2 -translate-x-1/2"
         items={[
-          { label: "Track", href: "#how-it-works" },
+          { label: "Track", href: HACKATHON_URL, external: true },
           { label: "GitHub", href: GITHUB_URL, external: true },
         ]}
       />
       <DesktopNav
         className="right-5.5"
-        items={[{ label: "Get started", href: APP_URL, theme: "orange" }]}
+        items={[{ label: "Get started", href: APP_URL, theme: "orange", external: true }]}
       />
       <MobileNav />
     </>

@@ -6,7 +6,7 @@ const LINK_GROUPS = [
     title: "Project",
     className: "min-w-[49%] tablet:min-w-0",
     links: [
-      { label: "Get started", href: APP_URL },
+      { label: "Get started", href: APP_URL, external: true },
       { label: "GitHub", href: GITHUB_URL, external: true },
     ],
   },
@@ -37,6 +37,8 @@ export function Footer() {
             <a
               className="group/button relative isolate inline-flex h-10 cursor-pointer text-body-sm outline-hidden tablet:h-10.5"
               href={APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <span className="z-10 flex w-full items-center rounded-ctas-button border-2 border-transparent bg-surface-tertiary px-[1.4rem] text-text-tertiary transition-colors group-focus-visible/button:border-blue-500 group-focus-visible/button:shadow-[0_0_0_3px_rgba(66,181,220,0.30)] group-active:bg-black-500">
                 Get started
@@ -60,6 +62,9 @@ export function Footer() {
                         className={linkClassName}
                         href={link.href}
                         target={"external" in link && link.external ? "_blank" : undefined}
+                        rel={
+                          "external" in link && link.external ? "noopener noreferrer" : undefined
+                        }
                       >
                         {link.label}
                       </a>
