@@ -1,12 +1,9 @@
 "use client";
 
-import { Claim } from "@medlyn/engine/contracts";
 import type { UIMessage } from "ai";
-import { z } from "zod";
+import { messageEvidence } from "@/components/chat/message-evidence";
 import { SourceCitation } from "@/components/chat/source-citation";
 import { CardContent, CardDescription } from "@/components/ui/card";
-
-const Validated = z.object({ claims: z.array(Claim) });
 
 export function ArtifactSources({
   messages,
@@ -17,15 +14,7 @@ export function ArtifactSources({
 }) {
   const sources =
     messages
-      .map((message) => [
-        ...new Set(
-          message.parts.flatMap((part) => {
-            if (part.type !== "data-validated") return [];
-            const parsed = Validated.safeParse(part.data);
-            return parsed.success ? parsed.data.claims.flatMap((claim) => claim.segmentIds) : [];
-          }),
-        ),
-      ])
+      .map((message) => messageEvidence(message).sources)
       .findLast((ids) => ids.includes(segmentId)) ?? [];
   if (sources.length < 2) return null;
   return (
