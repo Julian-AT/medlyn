@@ -23,14 +23,14 @@ export function MedicationTable(props: ToolProps<UiToolOutputs["show_medications
       {output?.lists.length ? (
         <Tabs defaultValue={listKey(output.lists[0])} className="min-w-0 gap-5">
           <TabsList
-            className="h-auto max-w-full flex-wrap justify-start gap-1 rounded-xl"
+            className="h-auto max-w-full flex-wrap justify-start gap-1 rounded-full bg-gray-alpha-100"
             aria-label="Medication source lists"
           >
             {output.lists.map((list) => (
               <TabsTrigger
                 key={listKey(list)}
                 value={listKey(list)}
-                className="h-8 max-w-full rounded-lg text-xs"
+                className="h-8 max-w-full rounded-full text-xs"
               >
                 {displayDates(list.listLabel)}
               </TabsTrigger>

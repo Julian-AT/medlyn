@@ -20,7 +20,7 @@ export function MedicationChanges({
       {changes.map((change) => (
         <CardContent
           key={`${change.from.factId}:${change.to.factId}`}
-          className="flex flex-col gap-3 rounded-xl bg-background/60 p-4"
+          className="flex flex-col gap-3 rounded-xl bg-background p-4"
         >
           <CardDescription className="font-mono text-xs">
             {displayDates(change.fromDate)} → {displayDates(change.toDate)}
