@@ -38,7 +38,12 @@ Dates below are 30 October 2026. These rows were moved from the root agent guide
 | 30 Oct 2026 | Use `apps/app`, workspace `@medlyn/app`, on port 3000 at `app.example.com`. `apps/www` is the root-domain landing page on port 3001. The integration sweep aligns filesystem, package, scripts and documentation. These domains are configuration examples.                                                                                                                                                                      |
 | 30 Oct 2026 | Gemini quota failures must not disable an otherwise complete absence proof. Vector search is supplemental: missing configuration/coverage, HTTP 429 or a four-second deadline records `lexical_fallback`. Exhaustive bilingual synonym/lexical checking and a successful full-document LLM pass over every eligible document remain mandatory. Lexical/full-text failure stays `unavailable`; top-k results never prove absence. |
 | 30 Oct 2026 | Confirm `pg_search` is unavailable on the configured Neon host despite being listed: extension installation is rejected. Use actual in-process BM25 over the store-provided evidence window, fused with pgvector results when available. Keep the ParadeDB migration for compatible hosts; do not describe this deployment as running ParadeDB.                                                                                  |
+| 30 Oct 2026 | The hosted app is public without a demo password (user decision). Risk acknowledged: challenge document text served from Neon becomes readable by anyone with the URL; the challenge rule only forbids publishing the data folder in the repo. The app keeps noindex and X-Robots-Tag.                                                                                                                                           |
 
-Append a dated entry whenever approved behavior departs from the PRD. Distinguish a
-design decision from verified delivery; a decision never marks a checkpoint done.
-| 30 Oct | The hosted app is public without a demo password (user decision). Risk acknowledged: challenge document text served from Neon becomes readable by anyone with the URL; the challenge rule only forbids publishing the data folder in the repo. The app keeps noindex and X-Robots-Tag. |
+## Submission evidence policy
+
+The final submission brief authorises agent review under the existing reviewer
+wording, without implying clinician review. We publish frozen numeric aggregates,
+remove unmeasured paper rows/panels and keep primary cold checks separate from repeat
+and cached failures. The cascade remains research only; projected offline GPT savings
+are not production savings. No engine behavior or frozen contract changes in this lane.

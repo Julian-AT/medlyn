@@ -132,20 +132,20 @@ structure; shadcn primitives render clinical views. Nine registered tools cover
 lens, patient summary, medications, lab trends, timeline, findings, passage,
 documentation check and letter draft. Server-side patient/window checks constrain
 their evidence. Model prose is buffered and gated before release; raw model
-reasoning is not displayed. Canonical persisted history supplies validated message
-parts rather than trusting client-supplied assistant/tool evidence.
+reasoning is not displayed. Browser-local history retains validated message parts. The server revalidates
+evidence instead of trusting client-supplied assistant/tool content.
 
-Chat tables are patient-scoped, but this does not establish complete multi-patient
-product support. Active-patient UI/API threading is undergoing integration; older
-engine UI tools retain default-patient restrictions. Research pages are publication
-slots rather than verified cohort dashboards. Patient switching, engine isolation
-and synthetic evaluation require their own acceptance checks.
+Chat history is browser-local and scoped by device and patient; legacy Neon chat
+tables remain in the schema. Patient switching and synthetic isolation require their
+own acceptance checks. Research pages display aggregate reports, not clinical cohort
+validation.
 
 Speech uses signed receipts for validated text before fish.audio TTS, with browser
 speech synthesis as fallback. Feature-detected browser recognition sends dictated
 text through the typed path; no proxy STT model is configured. Local verifier
 training and comparison are research outputs. Its HTTP client is not wired into
-the shared semantic gate, and its measured quality is below GPT; GPT stays default.
+the shared semantic gate, and it trails GPT on real text. The cascade improves synthetic macro-F1 in
+offline replay, which is not measured live call reduction; GPT stays default.
 
 ## Reviews, letters and deployment boundary
 
@@ -161,8 +161,9 @@ citations and clinician-note separation preserve the evidence distinction.
 
 The public site is indexable; patient metadata/routes use noindex/nofollow,
 disallow-all robots and response headers. These are crawler controls, not access
-control. Hosted demos need actual authentication/password protection;
-`DEMO_PASSWORD` alone is not implemented enforcement. Root `.env` serves engine
+control. The hosted hackathon demo is public without authentication by user decision;
+`DEMO_PASSWORD` does not enforce access. A clinical deployment requires a separate
+access-control design. Root `.env` serves engine
 scripts/the app; landing-page public origins must be exported before build.
 
 Evaluation uses an empty review layer and separate denominators for real regression,
