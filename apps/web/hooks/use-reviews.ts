@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { ReviewEntry, type ReviewRequest, type Screen } from "@medlyn/engine/contracts";
 import {
   activeReviews,
@@ -11,7 +9,9 @@ import {
   reviewMatches,
   reviewTargetHash,
 } from "@medlyn/engine/review/overlay";
-import type { ReviewHandler } from "@/components/cockpit/ReviewControls";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import type { ReviewHandler } from "@/components/cockpit/review-controls";
 
 export function useReviews(raw: Screen | null, sessionId: string) {
   const [entries, setEntries] = useState<ReviewEntry[]>([]);

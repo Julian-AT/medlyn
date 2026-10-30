@@ -1,29 +1,29 @@
 "use client";
 
+import { FileEditIcon, PrinterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { PrinterIcon, FileEditIcon } from "@hugeicons/core-free-icons";
 import { formatDate } from "@medlyn/engine/dates";
-import { useLetter } from "@/hooks/use-letter";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Empty,
-  EmptyHeader,
-  EmptyTitle,
   EmptyDescription,
+  EmptyHeader,
   EmptyMedia,
+  EmptyTitle,
 } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
-import { LetterSentence } from "./LetterSentence";
+import { useLetter } from "@/hooks/use-letter";
+import { LetterSentence } from "./letter-sentence";
 
 export function LetterPanel({
   sessionId,

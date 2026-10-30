@@ -1,18 +1,18 @@
 "use client";
 
-import { LayoutGroup } from "motion/react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ShieldAlertIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Annotation, Screen } from "@medlyn/engine/contracts";
-import type { LensState } from "@/lib/lens-state";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { LayoutGroup } from "motion/react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FactCard } from "./FactCard";
-import type { ReviewHandler } from "./ReviewControls";
+import type { LensState } from "@/lib/lens-state";
+import { FactCard } from "./fact-card";
+import type { ReviewHandler } from "./review-controls";
 
 type Props = {
   screen: Screen | null;
@@ -44,11 +44,12 @@ export function LensCanvas({
     activeFindingIds: screen?.findings.map((finding) => finding.id) ?? [],
   };
   return (
-    <section
+    <Card
+      role="region"
       aria-label="Clinical lens"
       aria-busy={loading}
       data-lens-state={loading ? "loading" : "done"}
-      className="flex min-w-0 flex-col gap-4 print:hidden"
+      className="min-w-0 gap-4 rounded-none bg-transparent py-0 shadow-none ring-0 print:hidden"
     >
       {state.error && (
         <Alert variant="destructive">
@@ -71,11 +72,11 @@ export function LensCanvas({
                 Review the safety-critical facts and their attached sources.
               </AlertDescription>
             </Alert>
-            <div className="grid gap-3 md:grid-cols-2">
+            <CardContent className="grid gap-3 px-0 md:grid-cols-2">
               {critical.map((card) => (
                 <FactCard key={card.needId} card={card} {...props} />
               ))}
-            </div>
+            </CardContent>
           </>
         )}
         {!screen && (
@@ -141,6 +142,6 @@ export function LensCanvas({
         </Alert>
       )}
       <Separator />
-    </section>
+    </Card>
   );
 }

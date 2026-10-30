@@ -1,17 +1,18 @@
 "use client";
 
 import type { Finding } from "@medlyn/engine/contracts";
+import { HighlightDifference } from "@/components/gen-ui/highlight-difference";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
-import { ReviewControls, type ReviewHandler } from "./ReviewControls";
+import { ReviewControls, type ReviewHandler } from "./review-controls";
 
 export function FindingComparator({
   finding,
@@ -32,18 +33,28 @@ export function FindingComparator({
         <CardDescription>{finding.explanation}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
-        {finding.passages.map((passage, index) => (
-          <Card key={`${passage.segmentId}-${index}`} size="sm">
+        {finding.passages.map((passage) => (
+          <Card
+            key={`${passage.segmentId}:${passage.start}:${passage.end}`}
+            size="sm"
+            className="rounded-xl border shadow-none ring-0"
+          >
             <CardHeader>
               <CardDescription className="break-all font-mono text-xs">
                 {passage.documentId}@{passage.start}–{passage.end}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-              <p lang="de" className="text-sm leading-relaxed">
-                {highlight(passage.quote, finding)}
-              </p>
-              <p className="text-sm text-muted-foreground">{highlight(passage.claimEn, finding)}</p>
+              <CardDescription lang="de" className="text-sm leading-relaxed text-foreground">
+                <HighlightDifference
+                  text={passage.quote}
+                  other={finding.passages
+                    .filter((other) => other !== passage)
+                    .map((other) => other.quote)
+                    .join(" ")}
+                />
+              </CardDescription>
+              <CardDescription className="text-sm">{passage.claimEn}</CardDescription>
             </CardContent>
             <CardFooter>
               <Button variant="link" size="sm" onClick={() => onSource(passage.segmentId)}>
@@ -71,22 +82,4 @@ export function FindingComparator({
       </CardFooter>
     </Card>
   );
-}
-
-function highlight(text: string, finding: Finding) {
-  return text
-    .split(/(rechts|links|right|left|\d+(?:[.,]\d+)?(?:%|\.\d+\.\d+)?)/gi)
-    .map((token, index) => {
-      if (!/^(rechts|links|right|left|\d)/i.test(token)) return token;
-      const shared = finding.passages.every((passage) =>
-        `${passage.quote} ${passage.claimEn}`.toLowerCase().includes(token.toLowerCase()),
-      );
-      return shared ? (
-        token
-      ) : (
-        <mark className="rounded bg-warning/20 px-0.5 text-warning" key={index}>
-          {token}
-        </mark>
-      );
-    });
 }

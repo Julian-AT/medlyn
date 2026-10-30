@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import { DocumentView, type PassageView } from "@medlyn/engine/contracts";
-import { fetchPassage } from "@/components/cockpit/SourceChip";
+import { useEffect, useRef, useState } from "react";
+import { fetchPassage } from "@/components/cockpit/source-chip";
 
 export function useEvidence(segmentId: string | null, comparing: boolean) {
   const [language, setLanguage] = useState("de");
@@ -11,6 +11,7 @@ export function useEvidence(segmentId: string | null, comparing: boolean) {
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const selected = useRef<HTMLParagraphElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt re-runs the fetch on retry
   useEffect(() => {
     if (!segmentId || comparing) return;
     let alive = true;
@@ -38,6 +39,7 @@ export function useEvidence(segmentId: string | null, comparing: boolean) {
       alive = false;
     };
   }, [segmentId, comparing, attempt]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: language change re-centres the highlighted passage
   useEffect(() => {
     if (passage && !loading)
       selected.current?.scrollIntoView({

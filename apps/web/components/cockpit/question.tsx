@@ -1,18 +1,18 @@
 "use client";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Finding, OpenQuestion } from "@medlyn/engine/contracts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardContent,
-  CardFooter,
-  CardDescription,
 } from "@/components/ui/card";
-import { ReviewControls, reviewLabel, type ReviewHandler } from "./ReviewControls";
+import { ReviewControls, type ReviewHandler, reviewLabel } from "./review-controls";
 export function Question({
   question,
   finding,

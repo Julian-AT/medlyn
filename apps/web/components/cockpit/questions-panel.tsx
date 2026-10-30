@@ -1,13 +1,13 @@
 "use client";
 
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
-import type { Finding, OpenQuestion, ReviewEntry, Screen } from "@medlyn/engine/contracts";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type { ReviewEntry, Screen } from "@medlyn/engine/contracts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
-import type { ReviewHandler } from "./ReviewControls";
-import { Question } from "./Question";
+import { Question } from "./question";
+import type { ReviewHandler } from "./review-controls";
 
 type Props = {
   screen: Screen | null;

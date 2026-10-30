@@ -1,33 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { ArrowUpRight01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { File02Icon, ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
-import { PassageView, type PassageView as Passage } from "@medlyn/engine/contracts";
+import { type PassageView as Passage, PassageView } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { CardDescription } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const passages = new Map<string, Promise<Passage>>();
-export function fetchPassage(segmentId: string): Promise<Passage> {
-  const existing = passages.get(segmentId);
-  if (existing) return existing;
-  const request = fetch(`/api/passage/${encodeURIComponent(segmentId)}`)
-    .then(async (response) => {
-      if (!response.ok) {
-        const body = await response.json();
-        throw new Error(body.error ?? "Passage unavailable");
-      }
-      return PassageView.parse(await response.json());
-    })
-    .catch((error) => {
-      passages.delete(segmentId);
-      throw error;
-    });
-  passages.set(segmentId, request);
-  return request;
+export async function fetchPassage(segmentId: string): Promise<Passage> {
+  const response = await fetch(`/api/passage/${encodeURIComponent(segmentId)}`, {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const body = await response.json();
+    throw new Error(body.error ?? "Passage unavailable");
+  }
+  return PassageView.parse(await response.json());
 }
 
 export function SourceChip({
@@ -73,9 +65,9 @@ export function SourceChip({
         {preview ? (
           <>
             <strong>{preview.document.titleEn}</strong>
-            <p className="font-mono text-xs text-muted-foreground">
+            <CardDescription className="font-mono text-xs">
               {formatDate(preview.document.docDate)} · German source
-            </p>
+            </CardDescription>
             <p lang="de">{preview.segment.text}</p>
             <Separator />
             <p>{preview.segment.textEn ?? "English translation unavailable for this passage."}</p>

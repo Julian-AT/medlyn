@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Tick02Icon,
-  Clock01Icon,
-  MoreHorizontalCircle01Icon,
-  Edit02Icon,
   Cancel01Icon,
+  Clock01Icon,
+  Edit02Icon,
+  MoreHorizontalCircle01Icon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";
-import { toast } from "sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReviewRequest } from "@medlyn/engine/contracts";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ReviewDialog } from "./ReviewDialog";
+import { ReviewDialog } from "./review-dialog";
 
 export type ReviewHandler = (
   targetType: ReviewRequest["targetType"],

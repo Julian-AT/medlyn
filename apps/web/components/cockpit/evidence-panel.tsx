@@ -1,32 +1,32 @@
 "use client";
 
-import { useEvidence } from "@/hooks/use-evidence";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { FileSearchIcon } from "@hugeicons/core-free-icons";
-import { type Finding, type Screen } from "@medlyn/engine/contracts";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type { Finding, Screen } from "@medlyn/engine/contracts";
 import { formatDate } from "@medlyn/engine/dates";
-import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { FindingComparator } from "./FindingComparator";
-import type { ReviewHandler } from "./ReviewControls";
+import { useEvidence } from "@/hooks/use-evidence";
+import { cn } from "@/lib/utils";
+import { FindingComparator } from "./finding-comparator";
+import type { ReviewHandler } from "./review-controls";
 
 type Props = {
   segmentId: string | null;

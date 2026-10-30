@@ -1,17 +1,16 @@
 "use client";
+import { File02Icon, NoteEditIcon, Task01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { File02Icon, Task01Icon, NoteEditIcon } from "@hugeicons/core-free-icons";
-import type { useLens } from "@/hooks/use-lens";
-import type { useReviews } from "@/hooks/use-reviews";
-import { AskMedlynDock } from "@/components/dock/AskMedlynDock";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EvidencePanel } from "./EvidencePanel";
-import { LetterPanel } from "./LetterPanel";
-import { QuestionsPanel } from "./QuestionsPanel";
+import type { useLens } from "@/hooks/use-lens";
+import type { useReviews } from "@/hooks/use-reviews";
+import { EvidencePanel } from "./evidence-panel";
+import { LetterPanel } from "./letter-panel";
+import { QuestionsPanel } from "./questions-panel";
 
 type Props = {
   lens: ReturnType<typeof useLens>;
@@ -35,8 +34,8 @@ export function EvidenceWorkspace({
 }: Props) {
   const { screen } = reviews;
   return (
-    <aside
-      className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-4 xl:self-start"
+    <Card
+      className="min-w-0 gap-4 rounded-none bg-transparent py-0 shadow-none ring-0 xl:sticky xl:top-6 xl:self-start"
       aria-label="Evidence and investigation"
     >
       <Card className="gap-0 py-0">
@@ -58,7 +57,7 @@ export function EvidenceWorkspace({
               </TabsTrigger>
             </TabsList>
           </CardHeader>
-          <ScrollArea className="h-[420px] rounded-b-xl print:h-auto">
+          <ScrollArea className="h-[620px] rounded-b-xl print:h-auto">
             <TabsContent value="evidence" className="mt-0">
               <EvidencePanel
                 segmentId={segmentId}
@@ -94,11 +93,6 @@ export function EvidenceWorkspace({
           <AlertDescription>{reviews.error}</AlertDescription>
         </Alert>
       )}
-      <Card className="gap-0 overflow-hidden py-0 print:hidden">
-        <CardContent className="px-0">
-          <AskMedlynDock lensKey={screen?.lensKey ?? null} sessionId={lens.sessionId} />
-        </CardContent>
-      </Card>
-    </aside>
+    </Card>
   );
 }

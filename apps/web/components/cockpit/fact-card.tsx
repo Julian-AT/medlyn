@@ -1,38 +1,37 @@
 "use client";
 
-import { motion } from "motion/react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
   ArrowRight02Icon,
   DashedLineCircleIcon,
   ShieldAlertIcon,
 } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Card as ClinicalCard } from "@medlyn/engine/contracts";
-import { formatDate } from "@medlyn/engine/dates";
-import { showClaim } from "@/lib/lens-state";
-import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Empty,
-  EmptyHeader,
-  EmptyTitle,
   EmptyDescription,
+  EmptyHeader,
   EmptyMedia,
+  EmptyTitle,
 } from "@/components/ui/empty";
-import { FactLines } from "./FactLines";
-import { ReviewControls, reviewLabel, type ReviewHandler } from "./ReviewControls";
+import { showClaim } from "@/lib/lens-state";
+import { cn } from "@/lib/utils";
+import { FactLines } from "./fact-lines";
+import { ReviewControls, type ReviewHandler, reviewLabel } from "./review-controls";
 
 const MotionCard = motion.create(Card);
 type Props = {
@@ -52,6 +51,7 @@ export function FactCard({
   onReview,
   activeFindingIds,
 }: Props) {
+  const absence = card.lines.find((line) => line.kind === "absence" && showClaim(line));
   const conflict = card.findingIds.find((id) => activeFindingIds.includes(id));
   const corrections = card.lines
     .filter((line) => line.factIds.length === 1)
@@ -67,7 +67,7 @@ export function FactCard({
       data-card-id={card.id}
       data-need-id={card.needId}
       className={cn(
-        "h-full",
+        "h-full rounded-xl border shadow-none ring-0",
         card.availability === "not_documented" && "border border-dashed ring-0",
       )}
     >
@@ -86,30 +86,26 @@ export function FactCard({
       <CardContent className="flex flex-1 flex-col gap-3">
         {card.conflict !== "none" && conflict && (
           <Badge asChild variant="outline" className="w-fit border-warning/40 text-warning">
-            <button onClick={() => onFinding(conflict)}>
+            <button type="button" onClick={() => onFinding(conflict)}>
               {card.conflict === "contradicted" ? "Contradiction" : "Needs clarification"}
               <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} aria-hidden="true" />
             </button>
           </Badge>
         )}
-        {card.headline && showClaim(card.headline) && <p>{card.headline.text}</p>}
-        {card.availability === "not_documented" ? (
+        {card.headline && showClaim(card.headline) && (
+          <CardDescription className="text-foreground">{card.headline.text}</CardDescription>
+        )}
+        {card.availability === "not_documented" && absence ? (
           <Empty className="p-2">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <HugeiconsIcon icon={DashedLineCircleIcon} strokeWidth={2} aria-hidden="true" />
               </EmptyMedia>
-              <EmptyTitle>
-                Not documented as of {formatDate(card.searched?.asOf ?? "2016-04-15")}
-              </EmptyTitle>
-              {card.searched && (
-                <EmptyDescription>
-                  searched {card.searched.eligible} of {card.searched.total} eligible documents
-                </EmptyDescription>
-              )}
+              <EmptyTitle>Evidence gap</EmptyTitle>
+              <EmptyDescription data-claim-id={absence.id}>{absence.text}</EmptyDescription>
             </EmptyHeader>
           </Empty>
-        ) : card.availability === "unavailable" ? (
+        ) : card.availability === "unavailable" || card.availability === "not_documented" ? (
           <Alert>
             <HugeiconsIcon icon={AlertCircleIcon} strokeWidth={2} aria-hidden="true" />
             <AlertTitle>Couldn't check</AlertTitle>
