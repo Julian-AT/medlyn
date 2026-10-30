@@ -10,6 +10,7 @@ async function run(
   parts: Record<string, unknown>[] | AsyncIterable<Record<string, unknown>>,
   signal?: AbortSignal,
   knownClaimIds: string[] = [],
+  classifyText: (text: string) => Promise<string | null> = async () => null,
 ) {
   const chunks: Chunk[] = [];
   const writer: Writer = {
@@ -42,11 +43,119 @@ async function run(
     knownClaimIds,
     "synthetic-patient",
     signal,
+    classifyText,
   );
   return chunks;
 }
 
 describe("validated chat stream", () => {
+  it("publishes tool-free help without a patient validation payload", async () => {
+    const chunks = await run(
+      [{ type: "text-delta", text: "I can help explore source documents." }],
+      undefined,
+      [],
+      async (text) => text,
+    );
+    expect(chunks).toContainEqual({
+      type: "text-delta",
+      id: "answer-0",
+      delta: "I can help explore source documents.",
+    });
+    expect(chunks.some((chunk) => chunk.type === "data-validated")).toBe(false);
+    expect(JSON.stringify(chunks)).not.toContain("Couldn't produce");
+  });
+
+  it("releases completed non-patient sentences while the stream is still running", async () => {
+    let checked = false;
+    async function* live() {
+      yield { type: "text-delta", text: "I can help with source documents. Choose a topic" };
+      expect(checked).toBe(true);
+      yield { type: "text-delta", text: " to explore." };
+    }
+    const chunks = await run(live(), undefined, [], async (text) => {
+      checked = true;
+      return text;
+    });
+    expect(chunks.filter((chunk) => chunk.type === "text-delta")).toHaveLength(2);
+  });
+
+  it("keeps trailing citation tokens with their sentence until the citation is complete", async () => {
+    const checked: string[] = [];
+    async function* live() {
+      yield { type: "text-delta", text: "A synthetic statement. [synthetic-" };
+      expect(checked).toEqual([]);
+      yield { type: "text-delta", text: "fact] Next sentence" };
+      expect(checked).toEqual(["A synthetic statement [synthetic-fact]."]);
+    }
+    await run(live(), undefined, [], async (text) => {
+      checked.push(text);
+      return null;
+    });
+  });
+
+  it("never uses the non-patient path after a patient tool call", async () => {
+    const chunks = await run(
+      [
+        { type: "tool-call", toolCallId: "search", toolName: "search_facts", input: {} },
+        {
+          type: "tool-result",
+          toolCallId: "search",
+          toolName: "search_facts",
+          output: { facts: [] },
+        },
+        { type: "text-delta", text: "Invented patient statement." },
+      ],
+      undefined,
+      [],
+      async () => {
+        throw new Error("Must not classify patient tool prose");
+      },
+    );
+    expect(JSON.stringify(chunks)).not.toContain("Invented patient statement");
+    expect(JSON.stringify(chunks)).toContain("Couldn't produce a supported answer");
+  });
+
+  it("fails closed and offers a retry when non-patient classification fails", async () => {
+    const chunks = await run(
+      [{ type: "text-delta", text: "Unclassified statement." }],
+      undefined,
+      [],
+      async () => {
+        throw new Error("private classifier failure");
+      },
+    );
+    expect(chunks).toContainEqual({ type: "data-response-status", data: { status: "error" } });
+    expect(JSON.stringify(chunks)).not.toContain("Unclassified statement");
+    expect(JSON.stringify(chunks)).not.toContain("private classifier failure");
+  });
+
+  it("offers a retry after an unavailable tool check", async () => {
+    const chunks = await run([
+      { type: "tool-call", toolCallId: "check", toolName: "check_documented", input: {} },
+      {
+        type: "tool-result",
+        toolCallId: "check",
+        toolName: "check_documented",
+        output: { status: "unavailable" },
+      },
+    ]);
+    expect(chunks).toContainEqual({ type: "data-response-status", data: { status: "error" } });
+  });
+
+  it.each(["error", "length"])(
+    "offers a retry after provider finish reason %s",
+    async (finishReason) => {
+      const chunks = await run([{ type: "finish", finishReason }]);
+      expect(chunks).toContainEqual({ type: "data-response-status", data: { status: "error" } });
+    },
+  );
+
+  it("settles provider aborts with a retry status", async () => {
+    const chunks = await run([{ type: "abort", reason: "private abort" }]);
+    expect(chunks).toContainEqual({ type: "data-response-status", data: { status: "error" } });
+    expect(JSON.stringify(chunks)).not.toContain("private abort");
+  });
+
   it("never forwards unsupported model text or reasoning across steps", async () => {
     const chunks = await run([
       { type: "start-step" },
