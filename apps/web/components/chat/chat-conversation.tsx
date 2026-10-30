@@ -10,7 +10,7 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { Reasoning, ReasoningTrigger } from "@/components/ai-elements/reasoning";
+import { ChatActivity } from "@/components/chat/chat-activity";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { EvidenceSheet } from "@/components/chat/evidence-sheet";
@@ -71,9 +71,9 @@ export function ChatConversation({
   }, [id, initialMessages.length, sendMessage]);
   const busy = status === "submitted" || status === "streaming";
   return (
-    <Card className="mx-auto h-[calc(100svh-7rem)] w-full max-w-3xl gap-0 bg-transparent py-0 ring-0">
-      <Conversation>
-        <ConversationContent className="px-4 py-8 sm:px-6">
+    <Card className="mx-auto flex h-[calc(100svh-4rem)] min-h-0 w-full max-w-3xl gap-0 overflow-visible rounded-none bg-transparent py-0 shadow-none ring-0">
+      <Conversation className="min-h-0">
+        <ConversationContent className="gap-8 px-4 py-8 sm:px-8">
           {!messages.length && (
             <ConversationEmptyState
               title="Ask about Anna Musterfrau"
@@ -83,17 +83,13 @@ export function ChatConversation({
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
-          {busy && (
-            <Reasoning isStreaming>
-              <ReasoningTrigger getThinkingMessage={() => "Checking source evidence…"} />
-            </Reasoning>
-          )}
+          {busy && <ChatActivity message={messages.at(-1)} />}
         </ConversationContent>
         <ConversationScrollButton aria-label="Scroll to latest message" />
       </Conversation>
-      <CardContent className="px-4 sm:px-6">
+      <CardContent className="sticky bottom-0 z-10 shrink-0 space-y-3 bg-background px-4 pt-3 sm:px-8">
         {error && (
-          <Alert>
+          <Alert variant="destructive" role="alert">
             <AlertDescription>
               Couldn't complete this response.{" "}
               <Button
@@ -117,10 +113,11 @@ export function ChatConversation({
           }}
         />
       </CardContent>
-      <CardFooter className="justify-between px-4 py-3 sm:px-6">
-        <CardDescription>Answers linked to source documents</CardDescription>
+      <CardFooter className="shrink-0 flex-wrap justify-between gap-2 bg-background px-4 py-3 sm:px-8">
+        <CardDescription className="text-xs">Answers linked to source documents</CardDescription>
         <Toggle
           size="sm"
+          className="h-8 rounded-lg text-xs font-medium data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
           pressed={speak}
           onPressedChange={(value) => {
             setSpeak(value);
