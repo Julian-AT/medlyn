@@ -8,7 +8,11 @@ export async function getDocument(documentId: string): Promise<DocumentView> {
   const db = getDb();
   const [documents, segments] = await Promise.all([
     db.select().from(t.documents).where(eq(t.documents.id, documentId)).limit(1),
-    db.select().from(t.segments).where(eq(t.segments.documentId, documentId)).orderBy(asc(t.segments.ordinal)),
+    db
+      .select()
+      .from(t.segments)
+      .where(eq(t.segments.documentId, documentId))
+      .orderBy(asc(t.segments.ordinal)),
   ]);
   if (!documents[0]) throw new Error(`Document not found: ${documentId}`);
   return DocumentView.parse({ document: documents[0], segments });
@@ -26,8 +30,11 @@ export function passageContext(document: DocumentView, segmentId: string): Passa
 }
 
 export async function getPassage(segmentId: string): Promise<PassageView> {
-  const [segment] = await getDb().select({ documentId: t.segments.documentId }).from(t.segments)
-    .where(eq(t.segments.id, segmentId)).limit(1);
+  const [segment] = await getDb()
+    .select({ documentId: t.segments.documentId })
+    .from(t.segments)
+    .where(eq(t.segments.id, segmentId))
+    .limit(1);
   if (!segment) throw new Error(`Segment not found: ${segmentId}`);
   return passageContext(await getDocument(segment.documentId), segmentId);
 }

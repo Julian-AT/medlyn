@@ -1,10 +1,16 @@
+import { required } from "../required.ts";
+
 const BASE = process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1";
 const KEY = process.env.OPENAI_API_KEY ?? "";
 const headers = { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
-
-type Result = { model: string; check: string; ok: boolean; ms: number; note: string };
+type Result = {
+  model: string;
+  check: string;
+  ok: boolean;
+  ms: number;
+  note: string;
+};
 const results: Result[] = [];
-
 async function timed(model: string, check: string, fn: () => Promise<string>) {
   const t0 = performance.now();
   try {
@@ -15,13 +21,15 @@ async function timed(model: string, check: string, fn: () => Promise<string>) {
     results.push({ model, check, ok: false, ms: Math.round(performance.now() - t0), note });
   }
 }
-
 async function post(path: string, body: unknown) {
-  const res = await fetch(`${BASE}${path}`, { method: "POST", headers, body: JSON.stringify(body) });
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   return res;
 }
-
 async function chat(model: string) {
   const res = await post("/chat/completions", {
     model,
@@ -30,7 +38,6 @@ async function chat(model: string) {
   const json = await res.json();
   return json.choices[0].message.content.trim();
 }
-
 async function jsonSchema(model: string) {
   const res = await post("/chat/completions", {
     model,
@@ -53,7 +60,6 @@ async function jsonSchema(model: string) {
   if (parsed.strengthMg !== 100) throw new Error(`unexpected ${JSON.stringify(parsed)}`);
   return JSON.stringify(parsed);
 }
-
 async function toolCall(model: string) {
   const res = await post("/chat/completions", {
     model,
@@ -77,7 +83,6 @@ async function toolCall(model: string) {
   if (!call) throw new Error("no tool call returned");
   return `${call.function.name}(${call.function.arguments})`;
 }
-
 async function stream(model: string) {
   const t0 = performance.now();
   const res = await post("/chat/completions", {
@@ -85,7 +90,7 @@ async function stream(model: string) {
     stream: true,
     messages: [{ role: "user", content: "Count from 1 to 10, comma separated." }],
   });
-  const reader = res.body!.getReader();
+  const reader = required(res.body).getReader();
   let firstMs = 0;
   let chunks = 0;
   for (;;) {
@@ -97,7 +102,6 @@ async function stream(model: string) {
   if (chunks < 2) throw new Error("response was not streamed");
   return `first chunk ${firstMs} ms, ${chunks} events`;
 }
-
 function silentWav(seconds = 1, rate = 16000) {
   const samples = seconds * rate;
   const buf = Buffer.alloc(44 + samples * 2);
@@ -115,7 +119,6 @@ function silentWav(seconds = 1, rate = 16000) {
   buf.writeUInt32LE(samples * 2, 40);
   return buf;
 }
-
 async function transcribe(model: string) {
   const form = new FormData();
   form.append("model", model);
@@ -128,7 +131,6 @@ async function transcribe(model: string) {
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   return `text: ${JSON.stringify((await res.json()).text)}`;
 }
-
 const listed = await fetch(`${BASE}/models`, { headers });
 if (!listed.ok) {
   console.error(`Cannot reach ${BASE}/models: ${listed.status} ${await listed.text()}`);
@@ -136,7 +138,6 @@ if (!listed.ok) {
 }
 const available: string[] = (await listed.json()).data.map((m: { id: string }) => m.id);
 console.log(`Proxy at ${BASE} lists ${available.length} models:\n  ${available.join("\n  ")}\n`);
-
 const textModels = [
   ...new Set(
     [process.env.MODEL_REASONING, process.env.MODEL_FAST, ...process.argv.slice(2)].filter(
@@ -148,7 +149,6 @@ if (textModels.length === 0) {
   console.error("Set MODEL_REASONING / MODEL_FAST in .env or pass model ids as arguments.");
   process.exit(1);
 }
-
 await Promise.all(
   textModels.flatMap((m) => [
     timed(m, "chat", () => chat(m)),
@@ -161,6 +161,5 @@ if (process.env.MODEL_STT) {
   const stt = process.env.MODEL_STT;
   await timed(stt, "transcription", () => transcribe(stt));
 }
-
 console.table(results.map(({ model, check, ok, ms, note }) => ({ model, check, ok, ms, note })));
 process.exit(results.every((r) => r.ok) ? 0 : 1);
