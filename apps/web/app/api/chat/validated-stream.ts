@@ -12,6 +12,7 @@ export async function writeValidatedStream(
   evidence: AgentEvidence,
   window: EvidenceWindow,
   knownClaimIds: string[],
+  patientId = PATIENT_ID,
 ) {
   let text = "";
   let step = 0;
@@ -34,7 +35,7 @@ export async function writeValidatedStream(
       window,
       (claims) =>
         validateClaims(claims, {
-          patientId: PATIENT_ID,
+          patientId,
           window,
           facts,
           segments: loadSegmentsForValidation,
@@ -61,7 +62,7 @@ export async function writeValidatedStream(
     writer.write({ type: "text-delta", id, delta: claims.map((claim) => claim.text).join("\n\n") });
     writer.write({ type: "text-end", id });
   };
-  const loadSegmentsForValidation = await loadSegments(window);
+  const loadSegmentsForValidation = await loadSegments(window, patientId);
   for await (const part of stream) {
     if (part.type === "start-step") writer.write({ type: "start-step" });
     if (part.type === "text-delta") text += part.text;

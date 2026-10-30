@@ -1,15 +1,14 @@
 import type { AgentEvidence } from "@medlyn/engine/agent/tools";
-import type { EvidenceWindow } from "@medlyn/engine/contracts";
 import { AbsenceResult } from "@medlyn/engine/contracts";
-import { loadFacts, loadSegments } from "@medlyn/engine/store";
 import type { ToolSet } from "ai";
+import { type patientEvidence, titleOutput } from "@/lib/patient-evidence";
 
 /** Only evidence actually returned by a UI tool is eligible for a composed answer. */
 export function trackUiEvidence(
   tools: ToolSet,
   evidence: AgentEvidence,
-  window: EvidenceWindow,
-  chip?: { id: string; text: string },
+  chip: { id: string; text: string } | undefined,
+  sources: Awaited<ReturnType<typeof patientEvidence>>,
 ) {
   const collect = async (output: unknown) => {
     const ids = new Set<string>();
@@ -21,7 +20,7 @@ export function trackUiEvidence(
     visit(output);
     const absence = AbsenceResult.safeParse(output);
     if (absence.success) evidence.absences.push(absence.data);
-    const [facts, segments] = await Promise.all([loadFacts(window), loadSegments(window)]);
+    const { facts, segments } = sources;
     for (const fact of facts) {
       if (ids.has(fact.id) && fact.locationOk && fact.support === "supported") {
         evidence.facts.set(fact.id, fact);
@@ -46,7 +45,7 @@ export function trackUiEvidence(
               ) => {
                 const selectedInput =
                   name === "open_lens" && chip ? { text: chip.text, chipId: chip.id } : input;
-                const output = await execute(selectedInput, options);
+                const output = await titleOutput(await execute(selectedInput, options), sources);
                 await collect(output);
                 return output;
               },

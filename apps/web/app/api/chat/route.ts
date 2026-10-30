@@ -5,11 +5,9 @@ import {
   saveAssistantMessage,
   saveUserMessage,
 } from "@medlyn/engine/agent/chat/history";
-import { agentContext } from "@medlyn/engine/agent/context";
 import { agentPrompt } from "@medlyn/engine/agent/prompt";
-import { uiTools } from "@medlyn/engine/agent/ui-tools";
+import { getDb } from "@medlyn/engine/db/client";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
-import { PATIENT_ID } from "@medlyn/engine/store";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
@@ -19,7 +17,11 @@ import {
   type ToolSet,
 } from "ai";
 import { z } from "zod";
+import { patientEvidence } from "@/lib/patient-evidence";
+import { patientIdFromRequest } from "../../../lib/active-patient.ts";
 import { trackUiEvidence } from "./evidence";
+import { chatContext } from "./patient-context";
+import { patientUiTools } from "./patient-ui-tools";
 import { evidenceTools } from "./tools";
 import { writeValidatedStream } from "./validated-stream";
 
@@ -27,7 +29,10 @@ export const runtime = "nodejs";
 export const maxDuration = 120;
 const Input = z.object({
   id: z.string().uuid(),
-  patientId: z.literal(PATIENT_ID).default(PATIENT_ID),
+  patientId: z
+    .string()
+    .regex(/^[a-zA-Z0-9_-]{1,100}$/)
+    .optional(),
   chipId: z.string().max(100).optional(),
   lensKey: z.string().max(300).nullable().optional(),
   messages: z
@@ -46,9 +51,11 @@ const Input = z.object({
     .max(100),
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    return Response.json(await recentChats(), { headers: { "Cache-Control": "no-store" } });
+    return Response.json(await recentChats(patientIdFromRequest(request)), {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.warn("recent_chats_unavailable", {
       reason: error instanceof Error ? error.name : "Unknown",
@@ -61,7 +68,13 @@ export async function GET() {
 export async function POST(request: Request) {
   const parsed = Input.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Invalid chat request" }, { status: 400 });
-  const { id, patientId, messages } = parsed.data;
+  const { id, messages } = parsed.data;
+  const patientId = patientIdFromRequest(request);
+  if (parsed.data.patientId && parsed.data.patientId !== patientId)
+    return Response.json(
+      { error: "The active patient changed. Start a new conversation." },
+      { status: 409 },
+    );
   const chip = CHIPS.find((entry) => entry.id === parsed.data.chipId);
   const last = messages.at(-1);
   const question = last?.parts
@@ -76,22 +89,34 @@ export async function POST(request: Request) {
   if (!model || !process.env.OPENAI_BASE_URL)
     return Response.json({ error: "Chat model unavailable" }, { status: 503 });
   try {
-    const history = await loadChat(id);
+    const owner = await getDb().query.chats.findFirst({
+      where: (chat, { eq }) => eq(chat.id, id),
+      columns: { patientId: true },
+    });
+    if (owner && owner.patientId !== patientId)
+      return Response.json({ error: "Chat not found for this patient" }, { status: 404 });
+    const history = await loadChat(id, patientId);
     const savedContext = history?.messages
       .flatMap((message) => message.parts)
       .findLast((part) => part.type === "data-evidence-context");
     const context = z.object({ lensKey: z.string().nullable() }).safeParse(savedContext?.data);
     const lensKey = parsed.data.lensKey ?? (context.success ? context.data.lensKey : null);
-    const { window, claimIds } = await agentContext(lensKey);
+    const { window, claimIds } = await chatContext(lensKey, patientId);
     await saveUserMessage(
       id,
       { id: last.id, role: "user", parts: [{ type: "text", text: question }] },
       patientId,
     );
-    const { tools: agentTools, evidence } = evidenceTools(window);
+    const sources = await patientEvidence(patientId, window);
+    const { tools: agentTools, evidence } = evidenceTools(window, patientId);
     const tools: ToolSet = {
       ...agentTools,
-      ...trackUiEvidence(uiTools({ patientId, window, sessionId: id }), evidence, window, chip),
+      ...trackUiEvidence(
+        patientUiTools({ patientId, window, sessionId: id }),
+        evidence,
+        chip,
+        sources,
+      ),
     };
     const provider = createOpenAI({
       baseURL: process.env.OPENAI_BASE_URL,
@@ -128,7 +153,7 @@ Use UI tools to show data visually; prefer showing over telling. For role/task r
           abortSignal: AbortSignal.any([request.signal, AbortSignal.timeout(105_000)]),
           maxOutputTokens: 1600,
         });
-        await writeValidatedStream(result.stream, writer, evidence, window, claimIds);
+        await writeValidatedStream(result.stream, writer, evidence, window, claimIds, patientId);
         writer.write({ type: "finish", finishReason: "stop" });
       },
       onFinish: async ({ responseMessage }) => {

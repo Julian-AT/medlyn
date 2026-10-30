@@ -1,11 +1,11 @@
-import { createAgentTools } from "@medlyn/engine/agent/tools";
 import type { EvidenceWindow } from "@medlyn/engine/contracts";
 import { AgentTools, FactKind } from "@medlyn/engine/contracts";
 import { tool } from "ai";
 import { z } from "zod";
+import { createPatientAgentTools } from "./patient-agent-tools";
 
-export function evidenceTools(window: EvidenceWindow) {
-  const { implementations: execute, evidence } = createAgentTools(window);
+export function evidenceTools(window: EvidenceWindow, patientId: string) {
+  const { implementations: execute, evidence } = createPatientAgentTools(window, patientId);
   const tools = {
     search_facts: tool({
       description: "Search facts within this evidence window",
