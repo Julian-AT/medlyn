@@ -7,6 +7,7 @@ import * as schema from "../db/schema.ts";
 import { computeFindings } from "../findings/index.ts";
 import type { FindingRecord } from "../findings/types.ts";
 import { segment } from "../ingest/segment.ts";
+import { required } from "../required.ts";
 import {
   assertWindowCurrent,
   loadDocuments,
@@ -19,7 +20,6 @@ import {
 
 let database: Db;
 vi.mock("../db/client.ts", () => ({ getDb: () => database }));
-
 const window: EvidenceWindow = {
   asOf: "2025-01-01",
   corpusRevision: "revision-old",
@@ -28,10 +28,12 @@ const window: EvidenceWindow = {
 let current = true;
 let missing = false;
 let replaceDuringRead = false;
-let queries: { sql: string; params: unknown[] }[];
+let queries: {
+  sql: string;
+  params: unknown[];
+}[];
 let findingData: FindingRecord | undefined;
 let documentText: string;
-
 beforeEach(() => {
   current = true;
   missing = false;
@@ -67,7 +69,7 @@ beforeEach(() => {
     if (sql.includes('from "finding_passages"') && findingData) {
       return {
         rows: findingData.passages.map((passage) => [
-          findingData!.id,
+          required(findingData).id,
           PATIENT_ID,
           passage.segmentId,
           passage.factId,
@@ -118,7 +120,6 @@ beforeEach(() => {
   };
   database = drizzle({ client: client as unknown as NeonQueryFunction<false, false>, schema });
 });
-
 describe("evidence revision reads", () => {
   it.each([loadDocuments, loadSegments, loadFacts, loadFindings, loadEvidence])(
     "rejects a replaced revision before reading evidence (%#)",
@@ -128,7 +129,6 @@ describe("evidence revision reads", () => {
       expect(queries).toHaveLength(1);
     },
   );
-
   it("rejects missing document ids and stale empty windows", async () => {
     missing = true;
     await expect(assertWindowCurrent(window)).rejects.toThrow("stale or incomplete");
@@ -137,7 +137,6 @@ describe("evidence revision reads", () => {
       "stale or incomplete",
     );
   });
-
   it.each([loadDocuments, loadSegments, loadFacts, loadFindings, loadEvidence])(
     "rejects replacement between the evidence query and its return (%#)",
     async (load) => {
@@ -145,7 +144,6 @@ describe("evidence revision reads", () => {
       await expect(load(window)).rejects.toThrow("stale or incomplete");
     },
   );
-
   it("pins document, segment and fact reads through documents.revision_id", async () => {
     expect(await loadDocuments(window)).toHaveLength(1);
     expect(await loadSegments(window)).toEqual([]);
@@ -159,7 +157,6 @@ describe("evidence revision reads", () => {
     expect(reads[1].sql).toContain('inner join "documents"');
     expect(reads[2].sql).toContain('inner join "documents"');
   });
-
   it("revalidates stored prose before returning a finding, including passage English", async () => {
     documentText = "Height: 182 cm\nWeight: 83 kg\nBMI: 31.2";
     const [original] = await computeFindings(
@@ -200,7 +197,9 @@ describe("evidence revision reads", () => {
     expect(display.passages.map((passage) => passage.claimEn)).toEqual(
       original.passages.map((passage) => passage.claimEn),
     );
-    const passageQuery = queries.find(({ sql }) => sql.includes('from "finding_passages"'))!;
+    const passageQuery = required(
+      queries.find(({ sql }) => sql.includes('from "finding_passages"')),
+    );
     expect(passageQuery.sql).toContain('inner join "documents"');
     expect(passageQuery.params).toContain(window.corpusRevision);
   });
@@ -218,10 +217,10 @@ describe("evidence revision reads", () => {
       expect(params).not.toContain(PATIENT_ID);
       expect(params).toContain(window.corpusRevision);
     }
-    expect(reads.find(({ sql }) => sql.includes('from "facts"'))!.sql).toMatch(
+    expect(required(reads.find(({ sql }) => sql.includes('from "facts"'))).sql).toMatch(
       /"facts"\."patient_id" = \$\d/,
     );
-    expect(reads.find(({ sql }) => sql.includes('from "segments"'))!.sql).toMatch(
+    expect(required(reads.find(({ sql }) => sql.includes('from "segments"'))).sql).toMatch(
       /"segments"\."patient_id" = \$\d/,
     );
   });

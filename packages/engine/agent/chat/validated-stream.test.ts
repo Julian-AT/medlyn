@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { writeValidatedStream } from "../../../../apps/web/app/api/chat/validated-stream.ts";
+import { writeValidatedStream } from "../../../../apps/app/app/api/chat/validated-stream.ts";
 import { evidenceWindow } from "../../store.ts";
 import type { AgentEvidence } from "../tools.ts";
 

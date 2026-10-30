@@ -6,10 +6,10 @@ import { documents as documentTable, facts as factTable } from "../db/schema.ts"
 import { CHIPS } from "../lens/needs/profiles.ts";
 import { screenFromEvents } from "../lens/screen.ts";
 import { streamLens } from "../lens/stream.ts";
+import { required } from "../required.ts";
 import { evidenceWindow, loadEvidence, PATIENT_ID } from "../store.ts";
 
 const live = process.env.MEDLYN_LIVE_ISOLATION === "1" && Boolean(process.env.DATABASE_URL);
-
 describe.skipIf(!live)("live synthetic patient isolation", () => {
   it("never includes another patient's evidence in a synthetic lens", async () => {
     const available = await getDb().selectDistinct({ id: factTable.patientId }).from(factTable);
@@ -47,7 +47,7 @@ describe.skipIf(!live)("live synthetic patient isolation", () => {
       ).toBeGreaterThan(0);
       expect(screen.patient.id).toBe(patientId);
       expect(screen.window).toEqual(window);
-      expect(ownSegments.has(screen.patient.birthDateSegmentId!)).toBe(true);
+      expect(ownSegments.has(required(screen.patient.birthDateSegmentId))).toBe(true);
       for (const card of screen.sections.flatMap((section) => section.cards)) {
         for (const claim of [...card.lines, ...(card.headline ? [card.headline] : [])]) {
           expect(claim.factIds.every((id) => ownFacts.has(id) && !otherFacts.has(id))).toBe(true);
@@ -65,5 +65,5 @@ describe.skipIf(!live)("live synthetic patient isolation", () => {
         screen.window.eligibleDocumentIds.some((id) => realDocuments.some((doc) => doc.id === id)),
       ).toBe(false);
     }
-  }, 90_000);
+  }, 90000);
 });

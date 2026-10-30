@@ -6,7 +6,8 @@ describe.sequential("optional local verifier", () => {
   let server: Server;
   let status = 200;
   let payload: unknown = {
-    label: "supported", probability: 0.8,
+    label: "supported",
+    probability: 0.8,
     probabilityKind: "uncalibrated_closed_set_sequence_score",
   };
   const previous = process.env.MEDLYN_VERIFIER;
@@ -36,8 +37,7 @@ describe.sequential("optional local verifier", () => {
 
   it("returns a validated verdict from the local HTTP service", async () => {
     process.env.MEDLYN_VERIFIER = "local";
-    expect(await localVerify({ text: "Claim" }, [{ text: "Synthetic evidence" }]))
-      .toEqual(payload);
+    expect(await localVerify({ text: "Claim" }, [{ text: "Synthetic evidence" }])).toEqual(payload);
   });
 
   it("fails closed on missing evidence", async () => {
@@ -46,13 +46,11 @@ describe.sequential("optional local verifier", () => {
 
   it("rejects malformed probability values", async () => {
     payload = { label: "supported", probability: 1.1 };
-    await expect(localVerify("Claim", [{ text: "Evidence" }]))
-      .rejects.toThrow("Malformed");
+    await expect(localVerify("Claim", [{ text: "Evidence" }])).rejects.toThrow("Malformed");
   });
 
   it("propagates service failures", async () => {
     status = 503;
-    await expect(localVerify("Claim", [{ text: "Evidence" }]))
-      .rejects.toThrow("unavailable (503)");
+    await expect(localVerify("Claim", [{ text: "Evidence" }])).rejects.toThrow("unavailable (503)");
   });
 });
