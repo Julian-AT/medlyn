@@ -82,9 +82,7 @@ export function useSituationVoice(onTranscript: (text: string) => void) {
     function down(event: KeyboardEvent) {
       if (
         event.target instanceof HTMLElement &&
-        event.target.closest(
-          "input,textarea,select,button,[contenteditable],#ask-medlyn-dock,[role=dialog]",
-        )
+        event.target.closest("input,textarea,select,button,[contenteditable],[role=dialog]")
       )
         return;
       if (event.code === "Space" && supported && !event.repeat) {
