@@ -38,9 +38,20 @@ export function patientQuestions(
   const dismissed: OpenQuestion[] = [];
   const visible = questions.flatMap((question) => {
     const target = findings.find((finding) => finding.id === question.findingId) ?? question;
-    const entry = active.findLast((entry) => entry.targetId === target.id);
+    const entry = active.findLast(
+      (entry) =>
+        (entry.targetType === (question.findingId ? "finding" : "open_question") &&
+          entry.targetId === target.id) ||
+        (entry.targetType === "card" && entry.targetId === question.cardId),
+    );
     if (!entry) return [question];
-    const matches = reviewMatches(entry, target);
+    const reviewed =
+      entry.targetType === "card"
+        ? lens?.sections
+            .flatMap((section) => section.cards)
+            .find((card) => card.id === question.cardId)
+        : target;
+    const matches = reviewMatches(entry, reviewed);
     if (matches && entry.action === "dismiss") {
       dismissed.push(question);
       return [];
