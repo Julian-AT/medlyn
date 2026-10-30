@@ -1,0 +1,120 @@
+"use client";
+
+import { useState } from "react";
+import { Check, Clock3, MoreHorizontal, Pencil, X } from "lucide-react";
+import { toast } from "sonner";
+import type { ReviewRequest } from "@medlyn/engine/contracts";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ReviewDialog } from "./ReviewDialog";
+
+export type ReviewHandler = (
+  targetType: ReviewRequest["targetType"],
+  targetId: string,
+  action: ReviewRequest["action"],
+  extras?: Pick<ReviewRequest, "reason" | "proposedText">,
+) => Promise<void>;
+type Props = {
+  targetId: string;
+  targetType: ReviewRequest["targetType"];
+  onReview: ReviewHandler;
+  allowDismiss?: boolean;
+  allowCorrect?: boolean;
+  correctionTargets?: { id: string; label: string }[];
+};
+
+export function ReviewControls({
+  targetId,
+  targetType,
+  onReview,
+  allowDismiss = false,
+  allowCorrect = false,
+  correctionTargets = [],
+}: Props) {
+  const [mode, setMode] = useState<"correct" | "dismiss" | null>(null);
+  const [busy, setBusy] = useState(false);
+  async function act(
+    action: ReviewRequest["action"],
+    extras?: Pick<ReviewRequest, "reason" | "proposedText">,
+    factId?: string,
+  ) {
+    setBusy(true);
+    try {
+      await onReview(
+        action === "correct" ? "fact" : targetType,
+        action === "correct" ? (factId ?? targetId) : targetId,
+        action,
+        extras,
+      );
+      setMode(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Review could not be saved. Retry.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <Button variant="ghost" size="sm" disabled={busy} onClick={() => act("accept")}>
+        <Check data-icon="inline-start" />
+        Accept
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon-sm" disabled={busy} aria-label="More review actions">
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuGroup>
+            {allowCorrect && (
+              <DropdownMenuItem onSelect={() => setMode("correct")}>
+                <Pencil />
+                Correct
+              </DropdownMenuItem>
+            )}
+            {allowDismiss && (
+              <DropdownMenuItem onSelect={() => setMode("dismiss")}>
+                <X />
+                Dismiss with reason
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onSelect={() => act("leave_open")}>
+              <Clock3 />
+              Leave open
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {mode && (
+        <ReviewDialog
+          mode={mode}
+          targets={correctionTargets}
+          busy={busy}
+          onClose={() => setMode(null)}
+          onSave={(extras, factId) => act(mode, extras, factId)}
+        />
+      )}
+    </>
+  );
+}
+
+export function reviewLabel(action: string) {
+  return (
+    (
+      {
+        accepted: "Confirmed",
+        corrected: "Corrected",
+        dismissed: "Dismissed",
+        left_open: "Acknowledged, unresolved",
+        needs_rereview: "Needs re-review",
+      } as Record<string, string>
+    )[action] ?? action
+  );
+}

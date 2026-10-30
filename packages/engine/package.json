@@ -3,14 +3,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./contracts": "./contracts.ts",
-    "./db/schema": "./db/schema.ts",
-    "./lens/mock": "./lens/mock.ts",
-    "./lens/stream": "./lens/stream.ts",
-    "./evidence/passage": "./evidence/passage.ts",
-    "./dates": "./dates.ts",
-    "./store": "./store.ts",
-    "./llm/client": "./llm/client.ts"
+    "./*": "./*.ts"
   },
   "scripts": {
     "smoke": "node --env-file=../../.env --experimental-strip-types llm/smoke.ts",

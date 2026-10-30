@@ -1,0 +1,15 @@
+description: Medlyn — runtime challenge regression and blind held-out evaluation
+prompts:
+  - '{{situationText}}'
+providers:
+  - id: file://provider.ts
+    config:
+      noCache: true
+tests: file://cases.ts
+sharing: false
+writeLatestResults: false
+evaluateOptions:
+  cache: false
+  maxConcurrency: 3
+  showProgressBar: false
+  silent: true
