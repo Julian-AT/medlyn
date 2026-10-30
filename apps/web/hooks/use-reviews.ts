@@ -9,21 +9,27 @@ import {
   reviewMatches,
   reviewTargetHash,
 } from "@medlyn/engine/review/overlay";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ReviewHandler } from "@/components/cockpit/review-controls";
 
 export function useReviews(raw: Screen | null, sessionId: string) {
   const [entries, setEntries] = useState<ReviewEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const activeSession = useRef(sessionId);
+  activeSession.current = sessionId;
+  const version = useRef(0);
   useEffect(() => {
+    setEntries([]);
+    setError(null);
     if (!sessionId) return;
     let alive = true;
+    const initialVersion = version.current;
     fetch(`/api/review?sessionId=${encodeURIComponent(sessionId)}`)
       .then(async (response) => {
         if (!response.ok) throw new Error("Saved reviews could not be loaded.");
         const values = ReviewEntry.array().parse(await response.json());
-        if (alive) setEntries(values);
+        if (alive && initialVersion === version.current) setEntries(values);
       })
       .catch((cause) => {
         if (alive) setError(cause instanceof Error ? cause.message : "Review service unavailable.");
@@ -45,7 +51,7 @@ export function useReviews(raw: Screen | null, sessionId: string) {
     return [...dismissedItems(raw, entries), ...questions];
   }, [raw, entries]);
   const onReview: ReviewHandler = async (targetType, targetId, action, extras) => {
-    if (!raw) throw new Error("Open a lens before reviewing.");
+    if (!raw || !sessionId) throw new Error("Open a lens before reviewing.");
     let targetHash: string;
     if (targetType === "fact") {
       const response = await fetch(
@@ -73,6 +79,8 @@ export function useReviews(raw: Screen | null, sessionId: string) {
       author: "Clinician",
       ...extras,
     };
+    if (activeSession.current !== sessionId)
+      throw new Error("The patient changed. Review the selected patient's lens.");
     const response = await fetch("/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -80,6 +88,8 @@ export function useReviews(raw: Screen | null, sessionId: string) {
     });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error ?? "The review could not be saved.");
+    if (activeSession.current !== sessionId) return;
+    version.current++;
     setEntries((previous) => [...previous, ReviewEntry.parse(body)]);
     setError(null);
     toast.success(action === "leave_open" ? "Acknowledged, unresolved" : "Review saved");
@@ -90,10 +100,13 @@ export function useReviews(raw: Screen | null, sessionId: string) {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("The review layer could not be reset.");
+      if (activeSession.current !== sessionId) return;
+      version.current++;
       setEntries([]);
       setError(null);
       toast.success("Review layer reset");
     } catch (cause) {
+      if (activeSession.current !== sessionId) return;
       toast.error(cause instanceof Error ? cause.message : "Review reset unavailable.");
     }
   }
