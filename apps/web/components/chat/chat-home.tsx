@@ -16,7 +16,7 @@ export function ChatHome() {
     router.push(`/chat/${id}`);
   }
   return (
-    <Card className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-3xl justify-center gap-8 overflow-visible bg-transparent px-4 py-10 shadow-none ring-0 sm:px-8 sm:py-16">
+    <Card className="mx-auto flex min-h-[calc(100svh-50px)] w-full max-w-3xl justify-center gap-8 overflow-visible border-0 bg-transparent px-4 py-10 shadow-none ring-0 sm:px-8 sm:py-16">
       <ChatGreeting />
       <CardContent className="flex min-w-0 flex-col gap-7 px-0">
         <ChatComposer onSubmit={(text) => start(text)} />
