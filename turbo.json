@@ -1,7 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NEXT_PUBLIC_APP_URL", "MEDLYN_MOCK"],
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
     "typecheck": {},
-    "test": {}
+    "test": {},
+    "lint": {}
   }
 }
