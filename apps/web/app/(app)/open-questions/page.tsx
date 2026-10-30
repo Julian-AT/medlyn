@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { WorkflowPage } from "@/components/shell/workflow-page";
+import { PatientQuestionsPage } from "@/components/cockpit/patient-questions-page";
 export const metadata: Metadata = { title: "Open questions · Medlyn" };
 
 export default function Page() {
-  return <WorkflowPage view="questions" />;
+  return <PatientQuestionsPage />;
 }
