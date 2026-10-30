@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { SituationsWorkspace } from "@/components/cockpit/situations-workspace";
+export const metadata: Metadata = { title: "Situations · Medlyn" };
+
 export default async function Page({
   searchParams,
 }: {
