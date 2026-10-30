@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ArrowUpRight01Icon,
-  CheckmarkCircle02Icon,
-  Copy01Icon,
-  File02Icon,
-} from "@hugeicons/core-free-icons";
+import { CheckmarkCircle02Icon, Copy01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { UIMessage } from "ai";
 import { useRef, useState } from "react";
@@ -20,17 +15,12 @@ import {
   ArtifactHeader,
   ArtifactTitle,
 } from "@/components/ai-elements/artifact";
-import { useSourcePassage } from "@/components/chat/hooks/use-source-passage";
 import { CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArtifactContent } from "./artifact-content";
-import { ArtifactSources } from "./artifact-sources";
-import { type Artifact, openArtifact } from "./artifact-state";
+import type { Artifact } from "./artifact-state";
 
 const titles = {
-  passage: "Source passage",
-  document: "Full document",
-  findings: "Compare findings",
   lens: "Situation lens",
   letter: "GP follow-up letter",
   chart: "Measurement trend",
@@ -47,7 +37,6 @@ export function ArtifactPanel({
 }) {
   const body = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const { passage } = useSourcePassage(artifact.kind === "passage" ? artifact.id : null);
   const key = `${artifact.kind}:${artifact.id}`;
   return (
     <ArtifactFrame
@@ -64,35 +53,18 @@ export function ArtifactPanel({
           aria-hidden="true"
         />
         <CardContent className="min-w-0 flex-1 space-y-1 p-0">
-          <ArtifactTitle className="truncate">
-            {passage?.document.titleEn ?? titles[artifact.kind]}
-          </ArtifactTitle>
+          <ArtifactTitle className="truncate">{titles[artifact.kind]}</ArtifactTitle>
           <ArtifactDescription>{titles[artifact.kind]}</ArtifactDescription>
         </CardContent>
         <ArtifactActions>
-          {passage && (
-            <ArtifactAction
-              tooltip="Open full document"
-              icon={ArrowUpRight01Icon}
-              onClick={() =>
-                openArtifact({
-                  kind: "document",
-                  id: passage.document.id,
-                  segmentId: passage.segment.id,
-                })
-              }
-            />
-          )}
           <ArtifactAction
             tooltip={copied === key ? "Copied" : "Copy content"}
             icon={copied === key ? CheckmarkCircle02Icon : Copy01Icon}
             onClick={async () => {
-              const text =
-                passage?.segment.text ??
-                Array.from(body.current?.querySelectorAll("p") ?? [])
-                  .map((node) => node.textContent?.trim())
-                  .filter(Boolean)
-                  .join("\n\n");
+              const text = Array.from(body.current?.querySelectorAll("p") ?? [])
+                .map((node) => node.textContent?.trim())
+                .filter(Boolean)
+                .join("\n\n");
               if (!text) return;
               try {
                 await navigator.clipboard.writeText(text);
@@ -112,9 +84,6 @@ export function ArtifactPanel({
       <ArtifactBody className="overflow-hidden p-0">
         <ScrollArea className="h-full">
           <CardContent ref={body} className="px-5 pb-8 pt-5">
-            {artifact.kind === "passage" && (
-              <ArtifactSources messages={messages} segmentId={artifact.id} />
-            )}
             <ArtifactContent key={key} artifact={artifact} messages={messages} />
           </CardContent>
         </ScrollArea>

@@ -24,22 +24,13 @@ export function useArtifact() {
     } catch (error) {
       console.warn("artifact_width_unavailable", error instanceof Error ? error.name : "Unknown");
     }
-    const source = (event: Event) => {
-      const detail = (event as CustomEvent<{ segmentId?: unknown }>).detail;
-      if (typeof detail?.segmentId === "string") {
-        const next = parseArtifact(`passage:${detail.segmentId}`);
-        if (next) select(next);
-      }
-    };
     const open = (event: Event) => {
       const detail = (event as CustomEvent<Artifact>).detail;
       const next = detail && parseArtifact(`${detail.kind}:${detail.id}`, detail.segmentId);
       if (next) select(next);
     };
-    window.addEventListener("medlyn:show-source", source);
     window.addEventListener("medlyn:open-artifact", open);
     return () => {
-      window.removeEventListener("medlyn:show-source", source);
       window.removeEventListener("medlyn:open-artifact", open);
     };
   }, [select]);

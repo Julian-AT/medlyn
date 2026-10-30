@@ -1,11 +1,4 @@
-export const artifactKinds = [
-  "passage",
-  "document",
-  "findings",
-  "lens",
-  "letter",
-  "chart",
-] as const;
+export const artifactKinds = ["lens", "letter", "chart"] as const;
 export type ArtifactKind = (typeof artifactKinds)[number];
 export type Artifact = { kind: ArtifactKind; id: string; segmentId?: string };
 
@@ -23,6 +16,18 @@ export function parseArtifact(value: string | null, segmentId?: string | null): 
   };
 }
 
-export function openArtifact(artifact: Artifact) {
+export function openArtifact(
+  artifact: Artifact | { kind: "passage" | "document"; id: string; segmentId?: string },
+) {
+  if (artifact.kind === "passage") {
+    window.dispatchEvent(
+      new CustomEvent("medlyn:show-source", { detail: { segmentId: artifact.id } }),
+    );
+    return;
+  }
+  if (artifact.kind === "document") {
+    window.dispatchEvent(new CustomEvent("medlyn:show-document", { detail: artifact }));
+    return;
+  }
   window.dispatchEvent(new CustomEvent("medlyn:open-artifact", { detail: artifact }));
 }

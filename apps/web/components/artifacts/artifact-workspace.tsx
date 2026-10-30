@@ -3,6 +3,7 @@
 import type { UIMessage } from "ai";
 import { type ReactNode, useEffect, useRef } from "react";
 import type { GroupImperativeHandle } from "react-resizable-panels";
+import { SourceNavigationDialog } from "@/components/sources/source-navigation-dialog";
 import { Card } from "@/components/ui/card";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import {
@@ -33,6 +34,7 @@ export function ArtifactWorkspace({
   }, [split, width]);
   return (
     <Card className="h-[calc(100svh-50px)] min-h-0 w-full gap-0 rounded-none border-0 bg-transparent p-0 shadow-none ring-0">
+      <SourceNavigationDialog />
       <ResizablePanelGroup
         orientation="horizontal"
         groupRef={group}
@@ -67,7 +69,7 @@ export function ArtifactWorkspace({
             <SheetHeader className="sr-only">
               <SheetTitle>Chat artifact</SheetTitle>
               <SheetDescription>
-                Source documents and expanded views from this conversation.
+                Expanded situation lenses, letters and charts from this conversation.
               </SheetDescription>
             </SheetHeader>
             {artifact && <ArtifactPanel artifact={artifact} messages={messages} onClose={close} />}

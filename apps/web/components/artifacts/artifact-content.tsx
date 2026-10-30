@@ -4,12 +4,9 @@ import { isToolUIPart, type UIMessage } from "ai";
 import { renderToolPart } from "@/components/gen-ui/registry";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import type { Artifact } from "./artifact-state";
-import { DocumentArtifact } from "./document-artifact";
-import { PassageArtifact } from "./passage-artifact";
 
 const toolTypes = {
   lens: "tool-open_lens",
-  findings: "tool-show_findings",
   letter: "tool-draft_letter",
   chart: "tool-show_lab_trend",
 };
@@ -21,9 +18,6 @@ export function ArtifactContent({
   artifact: Artifact;
   messages: UIMessage[];
 }) {
-  if (artifact.kind === "passage") return <PassageArtifact segmentId={artifact.id} />;
-  if (artifact.kind === "document")
-    return <DocumentArtifact documentId={artifact.id} segmentId={artifact.segmentId} />;
   const part = messages
     .flatMap((message) => message.parts)
     .find(

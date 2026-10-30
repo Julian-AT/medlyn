@@ -19,7 +19,6 @@ export function PassageCard(props: ToolProps<UiToolOutputs["show_passage"]>) {
   return (
     <ToolFrame
       {...props}
-      artifact={output ? { kind: "passage", id: output.segment.id } : undefined}
       title={output?.document.titleEn || "Source passage"}
       description={
         output

@@ -13,7 +13,6 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
   return (
     <ToolFrame
       {...props}
-      artifact={props.toolCallId ? { kind: "findings", id: props.toolCallId } : undefined}
       title="Findings to clarify"
       description={output ? `As of ${displayDates(output.asOf)}` : undefined}
     >
