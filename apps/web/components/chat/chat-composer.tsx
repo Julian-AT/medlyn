@@ -12,6 +12,7 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
+import { useActivePatient } from "@/components/patient/active-patient-provider";
 import { CardDescription } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSituationVoice } from "@/hooks/use-situation-voice";
@@ -25,6 +26,7 @@ export function ChatComposer({
   status?: ChatStatus;
   onStop?: () => void;
 }) {
+  const { patient } = useActivePatient();
   const [text, setText] = useState("");
   const voice = useSituationVoice((transcript) =>
     setText((value) => `${value} ${transcript}`.trim()),
@@ -36,7 +38,7 @@ export function ChatComposer({
   return (
     <PromptInput
       maxFiles={0}
-      className="[&>[data-slot=input-group]]:rounded-2xl [&>[data-slot=input-group]]:border-border [&>[data-slot=input-group]]:bg-card [&>[data-slot=input-group]]:shadow-xs"
+      className="[&>[data-slot=input-group]]:rounded-2xl [&>[data-slot=input-group]]:border-0 [&>[data-slot=input-group]]:bg-card [&>[data-slot=input-group]]:shadow-[0_2px_20px_-5px_color-mix(in_srgb,var(--foreground)_16%,transparent)] [&>[data-slot=input-group]]:ring-1 [&>[data-slot=input-group]]:ring-foreground/5"
       onSubmit={async () => {
         if (busy || !text.trim()) return;
         await onSubmit(text.trim());
@@ -44,8 +46,8 @@ export function ChatComposer({
       }}
     >
       <PromptInputTextarea
-        aria-label="Ask about Anna Musterfrau"
-        placeholder="Ask about Anna’s care…"
+        aria-label={`Ask about ${patient.displayName}`}
+        placeholder={`Ask about ${patient.displayName.split(" ")[0]}’s care…`}
         className="min-h-24 px-5 pt-4 pb-2 text-base leading-relaxed md:text-base"
         value={text}
         maxLength={6000}
