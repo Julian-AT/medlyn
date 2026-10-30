@@ -4,6 +4,7 @@ import type { UiToolOutputs } from "@medlyn/engine/agent/ui-tools";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { displayDates } from "./display-dates";
 import { MedicationChanges } from "./medication-changes.tsx";
 import { MedicationList } from "./medication-list.tsx";
 import { ToolFrame, type ToolProps } from "./tool-frame";
@@ -16,7 +17,7 @@ export function MedicationTable(props: ToolProps<UiToolOutputs["show_medications
     <ToolFrame
       {...props}
       title="Medication lists"
-      description={output ? `Source-dated lists · As of ${output.asOf}` : undefined}
+      description={output ? `Source-dated lists · As of ${displayDates(output.asOf)}` : undefined}
       action={output && <Badge variant="secondary">{output.lists.length} sources</Badge>}
     >
       {output?.lists.length ? (
@@ -31,7 +32,7 @@ export function MedicationTable(props: ToolProps<UiToolOutputs["show_medications
                 value={listKey(list)}
                 className="h-8 max-w-full rounded-lg text-xs"
               >
-                {list.listLabel}
+                {displayDates(list.listLabel)}
               </TabsTrigger>
             ))}
           </TabsList>
