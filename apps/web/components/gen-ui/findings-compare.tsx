@@ -5,16 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { displayDates } from "./display-dates";
 import { HighlightDifference } from "./highlight-difference";
+import { useToolPreview } from "./hooks/use-tool-preview";
 import { SourceChip } from "./source-chip";
 import { ToolEmpty } from "./tool-empty";
 import { ToolFrame, type ToolProps } from "./tool-frame";
 
 export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>) {
   const { output } = props;
+  const preview = useToolPreview(output?.findings.length ?? 0, props.expanded, 2);
   return (
     <ToolFrame
       {...props}
       layout="compare"
+      action={preview.toggle}
       title="Findings to clarify"
       description={output ? `As of ${displayDates(output.asOf)}` : undefined}
     >
@@ -24,7 +27,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
           description="No adjudicated findings match this view. Try a different topic."
         />
       ) : null}
-      {(props.expanded ? output?.findings : output?.findings.slice(0, 2))?.map((finding) => (
+      {output?.findings.slice(0, preview.limit)?.map((finding) => (
         <Card
           key={finding.id}
           size="sm"
@@ -40,7 +43,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
               <Badge variant="secondary">{finding.severity}</Badge>
             </CardContent>
           </CardHeader>
-          <CardContent className="grid gap-4 p-0 sm:grid-cols-2">
+          <CardContent className="grid gap-4 p-0">
             {finding.passages.map((passage, index) => (
               <CardContent
                 key={`${passage.segmentId}:${passage.start}`}
@@ -52,11 +55,7 @@ export function FindingsCompare(props: ToolProps<UiToolOutputs["show_findings"]>
                     other={finding.passages[index === 0 ? 1 : 0]?.quote ?? ""}
                   />
                 </CardDescription>
-                <SourceChip
-                  segmentId={passage.segmentId}
-                  label={passage.documentId}
-                  quote={passage.quote}
-                />
+                <SourceChip segmentId={passage.segmentId} quote={passage.quote} />
               </CardContent>
             ))}
           </CardContent>
