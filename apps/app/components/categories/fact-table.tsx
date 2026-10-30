@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { groupEvidence } from "@/lib/group-evidence";
 import { CategoryEmpty } from "./category-empty";
+import { ClaimText } from "./claim-text";
 import { type FactFilter, filterRows } from "./fact-filters.ts";
 import { FactToolbar } from "./fact-toolbar.tsx";
 import type { PatientRow } from "./patient-data";
@@ -45,7 +46,7 @@ export function FactTable({
   const visible = grouped.filter((group) => group.sources.some((row) => filtered.has(row.fact.id)));
   if (!rows.length) return <CategoryEmpty />;
   return (
-    <Card className="gap-5 rounded-none border-0 bg-transparent py-0 shadow-none ring-0">
+    <Card className="@container/facts min-w-0 gap-5 rounded-none border-0 bg-transparent py-0 shadow-none ring-0">
       <CardHeader className="px-0">
         <CardTitle className="font-semibold tracking-tight">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -60,16 +61,29 @@ export function FactTable({
         <Table className="table-fixed [&_th]:whitespace-normal">
           <TableHeader className="sticky top-0 z-10 bg-muted [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-head]]:text-muted-foreground">
             <TableRow>
-              <TableHead className="w-3/5">Documented fact</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Source</TableHead>
+              <TableHead>Documented fact</TableHead>
+              <TableHead className="hidden w-28 @xl/facts:table-cell">Date</TableHead>
+              <TableHead className="hidden w-28 @xl/facts:table-cell">Source</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visible.map(({ item: { fact, claim }, sources }) => (
               <TableRow key={claim.id} data-claim-id={claim.id}>
-                <TableCell className="max-w-xl whitespace-normal py-4">
-                  <CardDescription className="text-foreground">{claim.text}</CardDescription>
+                <TableCell className="min-w-0 whitespace-normal py-4 align-top">
+                  <ClaimText claim={claim} />
+                  <CardContent className="flex flex-col items-start gap-2 px-0 pt-2 @xl/facts:hidden">
+                    <CardDescription className="whitespace-nowrap font-mono text-xs tabular-nums">
+                      {formatDate(fact.eventDate ?? fact.docDate, fact.datePrecision)}
+                    </CardDescription>
+                    <SourceChips
+                      sources={sources.map(({ fact }) => ({
+                        segmentId: fact.segmentId,
+                        documentId: fact.documentId,
+                        label: "Source",
+                        date: fact.docDate,
+                      }))}
+                    />
+                  </CardContent>
                   <CardContent className="flex flex-wrap gap-1 p-0">
                     {fact.assertion !== "present" && (
                       <Badge variant="outline" className="mt-2">
@@ -95,13 +109,15 @@ export function FactTable({
                     )}
                   </CardContent>
                 </TableCell>
-                <TableCell className="font-mono text-xs">
+                <TableCell className="hidden whitespace-nowrap py-4 align-top font-mono text-xs tabular-nums @xl/facts:table-cell">
                   {formatDate(fact.eventDate ?? fact.docDate, fact.datePrecision)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden py-4 align-top @xl/facts:table-cell">
                   <SourceChips
                     sources={sources.map(({ fact }) => ({
                       segmentId: fact.segmentId,
+                      documentId: fact.documentId,
+                      label: "Source",
                       date: fact.docDate,
                     }))}
                   />
