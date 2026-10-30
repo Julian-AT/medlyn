@@ -8,6 +8,7 @@ import {
   type Section,
   type Situation,
 } from "../contracts.ts";
+import { withLensPriority } from "../llm/client.ts";
 import {
   assertWindowCurrent,
   evidenceWindow,
@@ -17,18 +18,20 @@ import {
 } from "../store.ts";
 import { type AbsenceOptions, checkDocumented, containsSynonym } from "./absence.ts";
 import { batchCandidateSearch, batchDocumentSearch } from "./absence-search.ts";
-import { getCache, lensCacheKey, putCache } from "./cache.ts";
-import { parseSituation } from "./parse.ts";
+import { getCache, getRequestCache, lensCacheKey, putCache } from "./cache.ts";
+import { NEEDS } from "./needs/catalog.ts";
+import { CRITICAL_NEED_IDS } from "./needs/profiles.ts";
+import { parseAndPlan } from "./parse-plan.ts";
 import {
   absenceConcept,
   completionCandidates,
   followupNeeds,
   type PlannedSection,
-  plan,
 } from "./plan.ts";
 import { type RenderContext, type RenderedCard, renderCard } from "./render.ts";
 import { openQuestions, patientView, screenEvents, screenFromEvents } from "./screen.ts";
-import { emptySelection, selectSection } from "./select.ts";
+import { emptySelection, type NeedSelection, selectSection } from "./select.ts";
+import { withDocumentTitles } from "./templates.ts";
 import { type LensTrace, lensTrace } from "./timing.ts";
 
 type CompletedSection = {
@@ -51,26 +54,96 @@ export async function* asCompleted<T>(jobs: Promise<T>[]): AsyncGenerator<T> {
 export async function* streamLens(
   req: LensRequest & { chipId?: string; patientId?: string },
 ): AsyncGenerator<LensEvent> {
+  const iterator = buildLens(req);
+  try {
+    while (true) {
+      const next = await withLensPriority(() => iterator.next());
+      if (next.done) return;
+      yield next.value;
+    }
+  } finally {
+    await iterator.return(undefined);
+  }
+}
+
+async function* buildLens(
+  req: LensRequest & { chipId?: string; patientId?: string },
+): AsyncGenerator<LensEvent> {
   const started = performance.now();
   const trace = lensTrace(started);
   try {
     RequestSchema.parse(req);
     const patientId = req.patientId ?? PATIENT_ID;
     if (!patientId.trim()) throw new Error("Patient id must not be empty");
+    if (!req.noCache) {
+      const cached = await trace("cache_request", () => getRequestCache(req)).catch(
+        (error: unknown) => {
+          console.warn("lens_cache_read_failed", {
+            reason: error instanceof Error ? error.name : "Error",
+          });
+          return null;
+        },
+      );
+      if (cached) {
+        const elapsed = performance.now() - started;
+        cached.timings = {
+          planMs: elapsed,
+          firstSectionMs: elapsed,
+          totalMs: elapsed,
+          cached: true,
+        };
+        for (const event of screenEvents(cached)) yield event;
+        return;
+      }
+    }
     const initialWindow = await trace("window", () => evidenceWindow(req.asOf, patientId));
-    const situation = await trace("parse", () =>
-      parseSituation(req.text, req.asOf, req.chipId, initialWindow.asOf),
+    const initialSources = trace("evidence", () => loadEvidence(initialWindow, patientId));
+    const initialFindings = trace("findings", () =>
+      loadFindings(initialWindow, patientId, initialSources),
+    );
+    void initialFindings.catch(() => undefined);
+    const safetyJob = initialSources.then(({ facts }) =>
+      trace(
+        "select",
+        () =>
+          selectSection(
+            {
+              id: "critical",
+              title: "Critical safety",
+              needs: CRITICAL_NEED_IDS.map((id) => NEEDS[id]),
+            },
+            {
+              role: "Clinician",
+              task: "Critical safety",
+              concerns: [],
+              profileId: null,
+              tier: 3,
+              asOf: initialWindow.asOf,
+            },
+            facts,
+          ),
+        "critical_early",
+      ),
+    );
+    void safetyJob.catch(() => undefined);
+    const { situation, planned } = await trace("parse_plan", () =>
+      parseAndPlan(req.text, req.asOf, req.chipId, initialWindow.asOf),
     );
     const window =
       situation.asOf === initialWindow.asOf
         ? initialWindow
         : await trace("window_cutoff", () => evidenceWindow(situation.asOf, patientId));
-    const sourcesJob = trace("evidence", () => loadEvidence(window, patientId));
-    const findingsJob = trace("findings", () => loadFindings(window, patientId, sourcesJob));
+    const sameWindow = window === initialWindow;
+    const sourcesJob = sameWindow
+      ? initialSources
+      : trace("evidence_cutoff", () => loadEvidence(window, patientId));
+    const findingsJob = sameWindow
+      ? initialFindings
+      : trace("findings_cutoff", () => loadFindings(window, patientId, sourcesJob));
     const background = Promise.allSettled([sourcesJob, findingsJob]);
-    const planned = await trace("plan", () => plan(situation));
     situation.tier = planned.tier;
-    const { facts, segments, documents, total } = await sourcesJob;
+    const { facts: rawFacts, segments, documents, total } = await sourcesJob;
+    const facts = withDocumentTitles(rawFacts, documents);
     const lensKey = lensCacheKey(situation, window, facts, segments, patientId);
     if (!req.noCache) {
       const cached = await trace("cache_read", () => getCache(lensKey, patientId)).catch(
@@ -113,7 +186,22 @@ export async function* streamLens(
       findings: [],
       validatedLines: new Map(),
     };
-    const search = batchDocumentSearch();
+    const completedNeeds = new Set<string>();
+    const prepared = planned.sections.map((section) => {
+      const extra = followupNeeds(section, facts).filter((need) => {
+        if (completedNeeds.has(need.id)) return false;
+        completedNeeds.add(need.id);
+        return true;
+      });
+      return { ...section, needs: [...section.needs, ...extra] };
+    });
+    const search = batchDocumentSearch(
+      prepared.flatMap((section) =>
+        section.needs
+          .filter((need) => potentialGap(need, facts))
+          .map((need) => ({ concept: absenceConcept(need), synonyms: need.synonyms })),
+      ),
+    );
     const candidateSearch = batchCandidateSearch(window, undefined, patientId);
     const absenceSources: AbsenceOptions = {
       patientId,
@@ -135,15 +223,6 @@ export async function* streamLens(
       absenceChecks.set(need.id, result);
       return result;
     };
-    const completedNeeds = new Set<string>();
-    const prepared = planned.sections.map((section) => {
-      const extra = followupNeeds(section, facts).filter((need) => {
-        if (completedNeeds.has(need.id)) return false;
-        completedNeeds.add(need.id);
-        return true;
-      });
-      return { ...section, needs: [...section.needs, ...extra] };
-    });
     const work = new Map(
       prepared.map((section) => {
         const kinds = new Set(section.needs.flatMap((need) => need.kinds));
@@ -155,8 +234,20 @@ export async function* streamLens(
     );
     // Start larger selections first so the final queued sections are the cheaper ones.
     const jobs = [...prepared]
-      .sort((a, b) => work.get(b.id)! - work.get(a.id)!)
-      .map((section) => completeSection(section, situation, ctx, check, findingsJob, trace));
+      .sort((a, b) => (work.get(b.id) ?? 0) - (work.get(a.id) ?? 0))
+      .map((section) =>
+        completeSection(
+          section,
+          situation,
+          ctx,
+          check,
+          findingsJob,
+          trace,
+          sameWindow && section.needs.every((need) => CRITICAL_NEED_IDS.includes(need.id))
+            ? safetyJob
+            : undefined,
+        ),
+      );
     const finished: CompletedSection[] = [];
     let firstSectionMs: number | undefined;
     for await (const result of asCompleted(jobs)) {
@@ -199,7 +290,7 @@ export async function* streamLens(
     };
     const done: LensEvent = { type: "done", timings };
     if (!req.noCache) {
-      await trace("cache_write", () => putCache(screenFromEvents([...events, done]))).catch(
+      await trace("cache_write", () => putCache(screenFromEvents([...events, done]), req)).catch(
         (error: unknown) => {
           console.warn("lens_cache_write_failed", {
             reason: error instanceof Error ? error.name : "Error",
@@ -224,17 +315,10 @@ async function completeSection(
   check: (need: PlannedSection["needs"][number]) => Promise<AbsenceResult>,
   findings: Promise<RenderContext["findings"]>,
   trace: LensTrace,
+  earlySelection?: Promise<NeedSelection[]>,
 ): Promise<CompletedSection> {
   for (const need of section.needs) {
-    const candidates = completionCandidates(need, ctx.facts);
-    const quantitativeLab = need.kinds.includes("lab") && need.requiredFields?.includes("value");
-    const specificCheck =
-      quantitativeLab || "afterDocumentDate" in need || need.id.endsWith("_exam");
-    if (
-      !candidates.length ||
-      (specificCheck &&
-        !candidates.some((fact) => containsSynonym(`${fact.labelEn} ${fact.quote}`, need.synonyms)))
-    ) {
+    if (needsAbsenceCheck(need, ctx.facts)) {
       void check(need).catch(() => undefined);
     }
   }
@@ -243,7 +327,7 @@ async function completeSection(
   let failed = false;
   const selections = await trace(
     "select",
-    () => selectSection(section, situation, ctx.facts),
+    () => earlySelection ?? selectSection(section, situation, ctx.facts),
     section.id,
   ).catch((error: unknown) => {
     failed = true;
@@ -305,4 +389,28 @@ async function completeSection(
       claim: headline.catch(() => undefined),
     })),
   };
+}
+
+function needsAbsenceCheck(
+  need: PlannedSection["needs"][number],
+  facts: RenderContext["facts"],
+): boolean {
+  const specific =
+    (need.kinds.includes("lab") && need.requiredFields?.includes("value")) ||
+    "afterDocumentDate" in need ||
+    need.id.endsWith("_exam");
+  return (
+    !completionCandidates(need, facts).length || (Boolean(specific) && potentialGap(need, facts))
+  );
+}
+
+function potentialGap(
+  need: PlannedSection["needs"][number],
+  facts: RenderContext["facts"],
+): boolean {
+  const candidates = completionCandidates(need, facts);
+  return (
+    !candidates.length ||
+    !candidates.some((fact) => containsSynonym(`${fact.labelEn} ${fact.quote}`, need.synonyms))
+  );
 }
