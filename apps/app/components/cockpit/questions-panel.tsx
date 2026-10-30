@@ -5,7 +5,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReviewEntry, Screen } from "@medlyn/engine/contracts";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Question } from "./question";
 import type { ReviewHandler } from "./review-controls";
@@ -67,8 +73,13 @@ export function QuestionsPanel({
                 <HugeiconsIcon icon={Search01Icon} strokeWidth={2} aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle>
-                {loading ? "Checking eligible documents…" : "No open questions in this lens"}
+                {loading ? "Checking eligible documents…" : "No open questions for this situation"}
               </EmptyTitle>
+              {!loading && (
+                <EmptyDescription>
+                  Choose another situation to check a different task, or open a source from Facts.
+                </EmptyDescription>
+              )}
             </EmptyHeader>
           </Empty>
         )}
