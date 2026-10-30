@@ -20,6 +20,10 @@ const message = (...parts) => ({
 });
 
 describe("chat evidence scope", () => {
+  it("hides a context-only window on a tool-free reply", () => {
+    expect(evidenceScope(message({ type: "text", text: "Hello!" }))).toBeNull();
+  });
+
   it("uses the server window and deduplicates returned facts and documents", () => {
     const result = evidenceScope(
       message(
@@ -56,14 +60,13 @@ describe("chat evidence scope", () => {
       { status: "not_documented", searched: { ...searched, asOf: "2019-01-01" } },
       { status: "not_documented", searched: { ...searched, eligible: 1 } },
     ])
-      expect(evidenceScope(message(tool("check_documented", output))).searched).toBeNull();
+      expect(evidenceScope(message(tool("check_documented", output)))?.searched ?? null).toBeNull();
   });
   it("ignores unfinished and failed tool outputs", () => {
     for (const state of ["input-streaming", "input-available", "output-error", "output-denied"])
       expect(
-        evidenceScope(message(tool("search_facts", { facts: [{ id: "a" }] }, state)))
-          .retrievedFacts,
-      ).toBe(0);
+        evidenceScope(message(tool("search_facts", { facts: [{ id: "a" }] }, state))),
+      ).toBeNull();
   });
   it("counts evidence in nested display objects without counting claim ids", () => {
     expect(

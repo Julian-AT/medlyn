@@ -5,6 +5,11 @@ import { record, toolSteps } from "./tool-progress";
 /** Counts returned evidence separately from a successful full-document check. */
 export function evidenceScope(message: UIMessage) {
   if (message.role !== "assistant") return null;
+  const steps = toolSteps(message.parts);
+  const usedEvidence = steps.some(
+    (step) => step.name !== "add_to_letter" && step.status === "complete" && !step.failed,
+  );
+  if (!usedEvidence) return null;
   const context = message.parts.findLast((part) => part.type === "data-evidence-context");
   if (!context || !("data" in context)) return null;
   const parsed = EvidenceWindow.safeParse(record(context.data)?.window);
@@ -35,7 +40,7 @@ export function evidenceScope(message: UIMessage) {
       }
     Object.values(item).forEach(visit);
   };
-  for (const step of toolSteps(message.parts)) {
+  for (const step of steps) {
     if (step.status !== "complete" || step.failed) continue;
     visit(step.output);
     if (step.name !== "check_documented") continue;
