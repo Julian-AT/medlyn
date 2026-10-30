@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { GITHUB_URL, HACKATHON_URL, SITE_URL } from "@/lib/site-links";
 import { PatientSwitcher } from "./patient-switcher";
 import { useWorkspace } from "./workspace-provider";
 
@@ -106,6 +107,18 @@ export function ShellSidebarFooter() {
                 <HugeiconsIcon icon={RotateLeft01Icon} strokeWidth={2} />
                 {resetting ? "Resetting reviews…" : "Reset review layer"}
               </Button>
+              <Separator />
+              {[
+                { label: "About Medlyn", href: SITE_URL },
+                { label: "GitHub repository", href: GITHUB_URL },
+                { label: "Hackathon track documentation", href: HACKATHON_URL },
+              ].map((link) => (
+                <Button key={link.href} variant="ghost" className="justify-start" asChild>
+                  <a href={link.href} target="_blank" rel="noopener noreferrer">
+                    {link.label}
+                  </a>
+                </Button>
+              ))}
             </PopoverContent>
           </Popover>
         </SidebarMenuItem>

@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { SITE_URL } from "@/lib/site-links";
 import { BrandMark } from "./brand-mark";
 
 export function ShellSidebarHeader() {
@@ -18,10 +19,15 @@ export function ShellSidebarHeader() {
         <SidebarMenuItem>
           <SidebarMenuButton
             asChild
-            tooltip="Medlyn home"
+            tooltip="About Medlyn"
             className="h-8 gap-2 px-2 text-base font-semibold tracking-normal text-foreground hover:bg-transparent active:bg-transparent"
           >
-            <Link href="/" onClick={() => setOpenMobile(false)}>
+            <Link
+              href={SITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpenMobile(false)}
+            >
               <BrandMark />
               <span>Medlyn</span>
             </Link>
