@@ -34,8 +34,8 @@ export function SidebarNavItem({
         isActive={active}
         tooltip={item.title}
         className={cn(
-          "h-8 rounded-[10px] text-sm font-medium [&_svg]:size-[18px] [&_svg]:text-foreground/80",
-          "data-active:bg-primary/10 data-active:text-primary data-active:[&_svg]:text-primary",
+          "h-8 gap-2 rounded-[10px] px-2 text-sm/5 font-medium text-sidebar-foreground [&_svg]:size-[18px] [&_svg]:text-foreground/70",
+          "data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:[&_svg]:text-sidebar-accent-foreground",
           count !== undefined && "pr-12",
         )}
       >
@@ -44,7 +44,7 @@ export function SidebarNavItem({
           aria-current={active ? "page" : undefined}
           onClick={() => setOpenMobile(false)}
         >
-          <HugeiconsIcon icon={item.icon} strokeWidth={1.75} />
+          <HugeiconsIcon icon={item.icon} strokeWidth={1.5} />
           <span>{item.title}</span>
         </Link>
       </SidebarMenuButton>
