@@ -213,7 +213,7 @@ export async function loadEvidence(
 }
 
 /** Findings are computed once at ingest; one is shown only when every passage is eligible. */
-export async function loadFindings(
+async function loadFindingsUncached(
   window: EvidenceWindow,
   patientId = PATIENT_ID,
   sources?: Promise<Pick<EvidenceData, "documents" | "segments">>,
@@ -311,4 +311,25 @@ export async function loadFindings(
 
 export async function latestDocDate(patientId = PATIENT_ID): Promise<string> {
   return (await evidenceWindow(undefined, patientId)).asOf;
+}
+
+// Findings are fixed per corpus revision; only the revision guard needs to run on every call.
+const findingsByWindow = new Map<string, Promise<Finding[]>>();
+
+export async function loadFindings(
+  window: EvidenceWindow,
+  patientId = PATIENT_ID,
+  sources?: Promise<Pick<EvidenceData, "documents" | "segments">>,
+): Promise<Finding[]> {
+  await assertWindowCurrent(window, patientId);
+  const key = `${patientId}|${window.corpusRevision}|${window.asOf}|${window.eligibleDocumentIds.join(",")}`;
+  let findings = findingsByWindow.get(key);
+  if (!findings) {
+    findings = loadFindingsUncached(window, patientId, sources);
+    findings.catch(() => findingsByWindow.delete(key));
+    findingsByWindow.set(key, findings);
+    if (findingsByWindow.size > 50)
+      findingsByWindow.delete(findingsByWindow.keys().next().value as string);
+  }
+  return findings;
 }
