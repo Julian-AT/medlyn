@@ -89,6 +89,7 @@ export function ChatMessage({
               />
             )}
             {evidence.unavailable && <CardDescription>{UNSUPPORTED_ANSWER}</CardDescription>}
+            {evidence.notice && <CardDescription>{evidence.notice}</CardDescription>}
             <CardDescription className="flex min-h-7 flex-wrap items-center gap-2">
               <ChatSources segmentIds={evidence.sources} checked={evidence.checked} />
               <EvidenceContext message={message} />
