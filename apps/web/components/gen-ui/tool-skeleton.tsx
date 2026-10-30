@@ -17,7 +17,7 @@ export function ToolSkeleton({
     <CardContent
       role="status"
       aria-label={`Loading ${title}`}
-      className="flex h-80 flex-col gap-4 p-0"
+      className="flex min-h-40 flex-col gap-4 p-0"
     >
       <CardDescription className="text-xs">
         {pendingInput ? "Preparing this view…" : "Checking eligible sources…"}
