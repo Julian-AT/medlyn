@@ -1012,7 +1012,6 @@ export const PromptInputSpeechButton = ({
       base.current = controller?.textInput.value ?? textareaRef?.current?.value ?? "";
     },
     onInterim: update,
-    language: props.lang,
     keyboard: false,
   });
   useEffect(() => {
