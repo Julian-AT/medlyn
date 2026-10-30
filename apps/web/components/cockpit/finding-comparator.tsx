@@ -19,7 +19,7 @@ export function FindingComparator({
   onReview,
 }: {
   finding: Finding;
-  onSource: (id: string) => void;
+  onSource?: (id: string) => void;
   onReview: ReviewHandler;
 }) {
   return (
