@@ -8,14 +8,58 @@ export function sha256(s: string): string {
 function stable(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => [k, stable(v)]));
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+        .map(([k, v]) => [k, stable(v)]),
+    );
   }
   return value;
 }
 
-export function contentHash(f: Pick<Fact, "segmentId" | "kind" | "labelEn" | "attrs" | "assertion" | "temporalStatus" | "eventDate" | "quote" | "start" | "end">): string {
-  const { segmentId, kind, labelEn, attrs, assertion, temporalStatus, eventDate, quote, start, end } = f;
-  return sha256(JSON.stringify(stable({ segmentId, kind, labelEn, attrs, assertion, temporalStatus, eventDate, quote, start, end })));
+export function contentHash(
+  f: Pick<
+    Fact,
+    | "segmentId"
+    | "kind"
+    | "labelEn"
+    | "attrs"
+    | "assertion"
+    | "temporalStatus"
+    | "eventDate"
+    | "quote"
+    | "start"
+    | "end"
+  >,
+): string {
+  const {
+    segmentId,
+    kind,
+    labelEn,
+    attrs,
+    assertion,
+    temporalStatus,
+    eventDate,
+    quote,
+    start,
+    end,
+  } = f;
+  return sha256(
+    JSON.stringify(
+      stable({
+        segmentId,
+        kind,
+        labelEn,
+        attrs,
+        assertion,
+        temporalStatus,
+        eventDate,
+        quote,
+        start,
+        end,
+      }),
+    ),
+  );
 }
 
 export function factId(hash: string): string {

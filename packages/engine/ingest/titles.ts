@@ -9,5 +9,8 @@ const TITLES: [RegExp, string][] = [
 ];
 
 export function titleEn(title: string, docType = ""): string {
-  return TITLES.find(([pattern]) => pattern.test(title) || pattern.test(docType))?.[1] ?? "Clinical report";
+  return (
+    TITLES.find(([pattern]) => pattern.test(title) || pattern.test(docType))?.[1] ??
+    "Clinical report"
+  );
 }

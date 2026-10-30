@@ -14,8 +14,21 @@ export function deriveDueDate(docDate: string, phrase: string | null): DerivedDu
     const value = `${absolute[3]}-${absolute[2].padStart(2, "0")}-${absolute[1].padStart(2, "0")}`;
     return validDate(value) ? { dueDate: value, datePrecision: "day" } : null;
   }
-  const words: Record<string, number> = { ein: 1, eine: 1, einer: 1, einem: 1, einen: 1, zwei: 2, drei: 3, vier: 4, sechs: 6, zwölf: 12 };
-  const match = text.match(/\b(?:in|nach|innerhalb(?: von)?)\s+(\d+|ein(?:e[rnm]?)?|zwei|drei|vier|sechs|zwölf)\s*(tag\w*|woch\w*|monat\w*|jahr\w*)/);
+  const words: Record<string, number> = {
+    ein: 1,
+    eine: 1,
+    einer: 1,
+    einem: 1,
+    einen: 1,
+    zwei: 2,
+    drei: 3,
+    vier: 4,
+    sechs: 6,
+    zwölf: 12,
+  };
+  const match = text.match(
+    /\b(?:in|nach|innerhalb(?: von)?)\s+(\d+|ein(?:e[rnm]?)?|zwei|drei|vier|sechs|zwölf)\s*(tag\w*|woch\w*|monat\w*|jahr\w*)/,
+  );
   if (!match) return null;
   const amount = words[match[1]] ?? Number(match[1]);
   if (!Number.isInteger(amount) || amount < 0 || amount > 1200) return null;
@@ -25,7 +38,9 @@ export function deriveDueDate(docDate: string, phrase: string | null): DerivedDu
     const day = date.getUTCDate();
     date.setUTCDate(1);
     date.setUTCMonth(date.getUTCMonth() + months);
-    const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+    const lastDay = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0),
+    ).getUTCDate();
     date.setUTCDate(Math.min(day, lastDay));
     return { dueDate: date.toISOString().slice(0, 7), datePrecision: "approx" };
   }

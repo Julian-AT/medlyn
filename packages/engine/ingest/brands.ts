@@ -11,10 +11,15 @@ const BRANDS = [
 ] as const;
 
 function words(s: string): string {
-  return s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  return s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 }
 
-export function brandToGeneric(brandOrLine: string): { generic: string; brand: string; atc: string } | null {
+export function brandToGeneric(
+  brandOrLine: string,
+): { generic: string; brand: string; atc: string } | null {
   const line = ` ${words(brandOrLine)} `;
   const match = BRANDS.find(([brand]) => line.includes(` ${words(brand)} `));
   return match ? { brand: match[0], generic: match[1], atc: match[2] } : null;

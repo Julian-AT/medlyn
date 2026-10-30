@@ -1,17 +1,17 @@
-import { createReadStream, existsSync } from "node:fs";
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
-import { createInterface } from "node:readline";
-import path from "node:path";
+import { createReadStream, existsSync } from "node:fs";
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import path from "node:path";
+import { createInterface } from "node:readline";
 import { setTimeout as delay } from "node:timers/promises";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { getDb } from "../db/client.ts";
 import { computeFindings, storeFindings } from "../findings/index.ts";
 import { loadCorpus } from "./corpus.ts";
-import { clusterEntities } from "./entities.ts";
 import { embedCorpus } from "./embed-step.ts";
-import { dedupeFacts, extractFacts, VALIDATOR_VERSION, type DropLog } from "./extract.ts";
+import { clusterEntities } from "./entities.ts";
+import { type DropLog, dedupeFacts, extractFacts, VALIDATOR_VERSION } from "./extract.ts";
 import { sha256 } from "./hash.ts";
 import { parseMedicationTables } from "./medication.ts";
 import { recallFacts } from "./recall.ts";
@@ -33,8 +33,11 @@ export function parseSynthArgs(args: string[]) {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--no-embed") noEmbed = true;
-    else if (["--patients", "--from", "--wait-seconds"].includes(arg)
-      && args[i + 1] && !args[i + 1].startsWith("--")) {
+    else if (
+      ["--patients", "--from", "--wait-seconds"].includes(arg) &&
+      args[i + 1] &&
+      !args[i + 1].startsWith("--")
+    ) {
       const value = args[++i];
       if (arg === "--patients") patients = value;
       if (arg === "--from") from = value;
@@ -62,15 +65,18 @@ export async function* readSyntheticPatients(root: string): AsyncGenerator<Synth
     const lines = createInterface({ input: stream, crlfDelay: Infinity });
     try {
       for await (const line of lines) if (line.trim()) yield JSON.parse(line) as SyntheticPatient;
-    } finally { lines.close(); stream.destroy(); }
+    } finally {
+      lines.close();
+      stream.destroy();
+    }
   }
 }
 
 async function shardsReady(root: string) {
   const shardRoot = existsSync(path.join(root, "shards")) ? path.join(root, "shards") : root;
   if (!existsSync(shardRoot)) return false;
-  return (await readdir(shardRoot)).some((file) =>
-    file.endsWith(".jsonl") && !file.startsWith(".") && file !== "index.jsonl",
+  return (await readdir(shardRoot)).some(
+    (file) => file.endsWith(".jsonl") && !file.startsWith(".") && file !== "index.jsonl",
   );
 }
 
@@ -92,12 +98,19 @@ export async function ingestSyntheticPatient(input: SyntheticPatient, noEmbed = 
           : `${patientId}-${document.metadata.id}`,
       },
     }));
-    await writeFile(path.join(root, "documents.json"), JSON.stringify({
-      documents: documents.map((doc) => doc.metadata),
-    }));
+    await writeFile(
+      path.join(root, "documents.json"),
+      JSON.stringify({
+        documents: documents.map((doc) => doc.metadata),
+      }),
+    );
     for (const document of documents) {
-      if (!/^[a-zA-Z0-9_-]+$/.test(document.metadata.id)) throw new Error("Invalid synthetic document id");
-      await writeFile(path.join(root, "documents", `${document.metadata.id}.json`), JSON.stringify(document));
+      if (!/^[a-zA-Z0-9_-]+$/.test(document.metadata.id))
+        throw new Error("Invalid synthetic document id");
+      await writeFile(
+        path.join(root, "documents", `${document.metadata.id}.json`),
+        JSON.stringify(document),
+      );
     }
     const corpus = loadCorpus(root);
     corpus.patient.id = patientId;
@@ -112,7 +125,9 @@ export async function ingestSyntheticPatient(input: SyntheticPatient, noEmbed = 
       (documents) => ({ documents, error: null }),
       (error: unknown) => ({ documents: null, error }),
     );
-    const tables = corpus.documents.flatMap((document) => parseMedicationTables(document, VALIDATOR_VERSION));
+    const tables = corpus.documents.flatMap((document) =>
+      parseMedicationTables(document, VALIDATOR_VERSION),
+    );
     const extracted = await extractFacts(corpus.documents, drop);
     const recalled = await recallFacts(corpus.documents, [...tables, ...extracted], [], drop);
     const checked = await checkSemantics(corpus.documents, recalled, drop);
@@ -131,19 +146,27 @@ export async function ingestSyntheticPatient(input: SyntheticPatient, noEmbed = 
       documents: corpus.documents.length,
       facts: clustered.facts.length,
     };
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 }
 
 async function runPatient(input: SyntheticPatient, noEmbed: boolean) {
   const root = await mkdtemp(path.join(tmpdir(), "medlyn-synth-job-"));
   const recordPath = path.join(root, "record.json");
   try {
-    await writeFile(recordPath, JSON.stringify({
-      patient: input.patient,
-      documents: input.documents,
-    }));
+    await writeFile(
+      recordPath,
+      JSON.stringify({
+        patient: input.patient,
+        documents: input.documents,
+      }),
+    );
     const args = [
-      "--experimental-strip-types", fileURLToPath(import.meta.url), "--patient-file", recordPath,
+      "--experimental-strip-types",
+      fileURLToPath(import.meta.url),
+      "--patient-file",
+      recordPath,
       ...(noEmbed ? ["--no-embed"] : []),
     ];
     // A failed patient must terminate its outstanding model calls before the next patient starts.
@@ -155,7 +178,9 @@ async function runPatient(input: SyntheticPatient, noEmbed: boolean) {
         else reject(new Error(`Patient ingest exited with ${signal ?? code}`));
       });
     });
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 }
 
 export async function ingestSynthetic(args = process.argv.slice(2)) {
@@ -164,7 +189,7 @@ export async function ingestSynthetic(args = process.argv.slice(2)) {
   const count = /^\d+$/.test(opts.patients) ? Number(opts.patients) : Infinity;
   const wanted = Number.isFinite(count) ? null : new Set(opts.patients.split(","));
   const start = Date.now();
-  while (!await shardsReady(opts.from)) {
+  while (!(await shardsReady(opts.from))) {
     if (Date.now() - start >= opts.waitSeconds * 1000) {
       throw new Error(`Synthetic shards are not ready at ${opts.from}`);
     }
@@ -207,6 +232,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         process.exit(1);
       });
   } else {
-    ingestSynthetic().catch((error: unknown) => { console.error(error); process.exitCode = 1; });
+    ingestSynthetic().catch((error: unknown) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
   }
 }

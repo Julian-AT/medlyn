@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Document, Patient, Segment } from "../contracts.ts";
@@ -8,8 +8,19 @@ import { normalise } from "./normalise.ts";
 import { segment } from "./segment.ts";
 import { titleEn } from "./titles.ts";
 
-export type CorpusDocument = { doc: Document; rawText: string; normText: string; offsetMap: number[]; segments: (Segment & { ordinal: number })[] };
-export type Corpus = { patient: Patient; documents: CorpusDocument[]; documentsHash: string; revisionId: string };
+export type CorpusDocument = {
+  doc: Document;
+  rawText: string;
+  normText: string;
+  offsetMap: number[];
+  segments: (Segment & { ordinal: number })[];
+};
+export type Corpus = {
+  patient: Patient;
+  documents: CorpusDocument[];
+  documentsHash: string;
+  revisionId: string;
+};
 
 const REPO_ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 type Metadata = { id: string; title: string; type: string; date: string; department: string };
@@ -24,7 +35,9 @@ export function loadCorpus(dataPath?: string): Corpus {
   const patientText = read("patient.json");
   const manifest = JSON.parse(manifestText) as { documents: Metadata[] };
   const person = JSON.parse(patientText) as { name: string; sex: string; dateOfBirth: string };
-  const files = readdirSync(path.join(root, "documents")).filter((f) => f.endsWith(".json")).sort();
+  const files = readdirSync(path.join(root, "documents"))
+    .filter((f) => f.endsWith(".json"))
+    .sort();
   const sources = files.map((file) => ({ file, json: read(`documents/${file}`) }));
   const documentsHash = sha256(JSON.stringify({ manifestText, patientText, sources }));
   const revisionId = `rev-${documentsHash.slice(0, 12)}`;
@@ -37,9 +50,25 @@ export function loadCorpus(dataPath?: string): Corpus {
     }
     const { text: normText, offsetMap } = normalise(input.text);
     return {
-      doc: { id, patientId: PATIENT_ID, revisionId, title: meta.title, titleEn: titleEn(meta.title, meta.type), docType: meta.type, docDate: meta.date, department: meta.department },
-      rawText: input.text, normText, offsetMap,
-      segments: segment(normText).map((s) => ({ ...s, id: `${id}-s${s.ordinal}`, documentId: id, textEn: null })),
+      doc: {
+        id,
+        patientId: PATIENT_ID,
+        revisionId,
+        title: meta.title,
+        titleEn: titleEn(meta.title, meta.type),
+        docType: meta.type,
+        docDate: meta.date,
+        department: meta.department,
+      },
+      rawText: input.text,
+      normText,
+      offsetMap,
+      segments: segment(normText).map((s) => ({
+        ...s,
+        id: `${id}-s${s.ordinal}`,
+        documentId: id,
+        textEn: null,
+      })),
     };
   });
   const [year, month, day] = person.dateOfBirth.split("-");
@@ -48,7 +77,16 @@ export function loadCorpus(dataPath?: string): Corpus {
   const birthDateQuote = birthSegment?.text.match(birthPattern)?.[0];
   if (!birthSegment || !birthDateQuote) throw new Error("Birth date has no located source passage");
   return {
-    patient: { id: PATIENT_ID, displayName: person.name, sex: person.sex === "female" ? "F" : person.sex === "male" ? "M" : "X", birthDate: person.dateOfBirth, birthDateQuote, birthDateSegmentId: birthSegment.id },
-    documents, documentsHash, revisionId,
+    patient: {
+      id: PATIENT_ID,
+      displayName: person.name,
+      sex: person.sex === "female" ? "F" : person.sex === "male" ? "M" : "X",
+      birthDate: person.dateOfBirth,
+      birthDateQuote,
+      birthDateSegmentId: birthSegment.id,
+    },
+    documents,
+    documentsHash,
+    revisionId,
   };
 }
