@@ -5,7 +5,7 @@ import { latestDocDate } from "../store.ts";
 import { CHIPS, matchProfile } from "./needs/profiles.ts";
 import { withModelSlot } from "./select.ts";
 
-const Parsed = z.object({
+export const Parsed = z.object({
   role: z.string(),
   task: z.string(),
   setting: z.string().nullable(),
