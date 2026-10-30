@@ -31,8 +31,8 @@ export function SourceChip({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="h-8 rounded-control px-3 text-xs"
+          size="xs"
+          className="h-5 gap-1 rounded-full px-2 text-xs [&_svg]:size-3"
           aria-label={`Open source ${index ?? segmentId}`}
         >
           <HugeiconsIcon icon={File02Icon} strokeWidth={2} aria-hidden="true" />
