@@ -1,0 +1,49 @@
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}{.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[paperplot,ybar,bar width=5pt,xmin=.5,xmax=3.5,
+  xtick={1,2,3},xticklabels={BM25,Vector,Hybrid},
+  ymin=0,ymax=1,ylabel={Recall},title={(a) Retrieval},
+  legend style={at={(.5,-.22)},anchor=north,legend columns=2}]
+\RetrievalPlot
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[paperplot,ybar,bar width=12pt,xmin=.5,xmax=3.5,
+  xtick={1,2,3},xticklabels={Rules,Proxy,Local},
+  ymin=0,ymax=1,ylabel={Macro F-score},title={(b) Verifier comparison}]
+\VerifierPlot
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{13mm}
+\begin{minipage}{.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[paperplot,xmin=0,xmax=1,ymin=0,ymax=1,xlabel={Mean confidence},
+  ylabel={Accuracy},title={(c) Verifier reliability}]
+\addplot[black,dashed,domain=0:1,forget plot] {x};
+\ReliabilityPlot
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[paperplot,latencybounds,xlabel={Median latency (ms)},ylabel={Macro F-score},
+  ymin=0,ymax=1,title={(d) Latency and quality}]
+\LatencyPlot
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\caption{Comparison panels for synthetic retrieval and verifier experiments. We plot
+only measurements approved against the recorded source hashes. Pending panels contain
+no measured marks. The dashed diagonal is the calibration reference, not an observed
+curve. Latency includes the conditions of each saved evaluation run.}
+\label{fig:results}
+\end{figure}
