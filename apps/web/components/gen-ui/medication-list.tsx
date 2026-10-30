@@ -28,7 +28,7 @@ export function MedicationList({
     (item) => facts.get(item.factId),
   );
   return (
-    <CardContent className="flex flex-col gap-3 px-0 [&>[data-slot=table-container]]:max-h-[36rem]">
+    <CardContent className="flex flex-col gap-3 p-0 [&>[data-slot=table-container]]:max-h-[36rem]">
       <CardTitle className="text-sm font-semibold">{displayDates(list.listLabel)}</CardTitle>
       <Table>
         <TableHeader className="sticky top-0 z-10 bg-card">
@@ -40,12 +40,12 @@ export function MedicationList({
         </TableHeader>
         <TableBody>
           {groups.map(({ item, sources }) => (
-            <TableRow key={item.factId} data-claim-id={item.line.id}>
-              <TableCell className="max-w-80 whitespace-normal py-3 text-sm tabular-nums">
+            <TableRow className="h-10" key={item.factId} data-claim-id={item.line.id}>
+              <TableCell className="max-w-80 whitespace-normal py-2 text-sm tabular-nums">
                 <CardDescription className="text-foreground">
                   {displayDates(item.line.text)}
                 </CardDescription>
-                <CardContent className="flex flex-wrap gap-1 px-0">
+                <CardContent className="flex flex-wrap gap-1 p-0">
                   {item.line.assertion !== "present" && (
                     <Badge variant="outline" className="mt-1">
                       {item.line.assertion}
@@ -58,10 +58,10 @@ export function MedicationList({
                   )}
                 </CardContent>
               </TableCell>
-              <TableCell className="py-3 font-mono text-xs tabular-nums">
+              <TableCell className="py-2 font-mono text-xs tabular-nums">
                 {item.schedule || "—"}
               </TableCell>
-              <TableCell className="py-3">
+              <TableCell className="py-2">
                 <SourceChips
                   sources={sources.map((entry) => ({
                     segmentId: entry.segmentId,
