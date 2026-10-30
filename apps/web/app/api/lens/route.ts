@@ -1,9 +1,9 @@
-import { type LensEvent, LensRequest } from "@medlyn/engine/contracts";
+import type { LensEvent } from "@medlyn/engine/contracts";
 import { mockLensStream } from "@medlyn/engine/lens/mock";
 import { PATIENT_ID } from "@medlyn/engine/store";
 import { corpusDocument } from "@/lib/evidence-server";
-import { patientEvidence, titleOutput } from "@/lib/patient-evidence";
 import { patientIdFromRequest } from "../../../lib/active-patient.ts";
+import { parseLensRequest } from "./request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,18 +15,17 @@ export async function POST(request: Request) {
   } catch {
     return Response.json({ error: "Enter a situation to continue." }, { status: 400 });
   }
-  const parsed = LensRequest.safeParse(body);
+  const parsed = parseLensRequest(body);
   if (!parsed.success)
-    return Response.json({ error: "Enter a situation and a valid as-of date." }, { status: 400 });
-  const chipId =
-    typeof body === "object" && body !== null && "chipId" in body && typeof body.chipId === "string"
-      ? body.chipId
-      : undefined;
+    return Response.json(
+      { error: "Choose a situation or enter your role and task." },
+      { status: 400 },
+    );
   const patientId = patientIdFromRequest(request);
   const encoder = new TextEncoder();
   let cancelled = false;
   let iterator: AsyncIterator<LensEvent> | undefined;
-  let mock = process.env.MEDLYN_MOCK === "1";
+  const mock = process.env.MEDLYN_MOCK === "1";
   let stream: AsyncIterable<LensEvent>;
   try {
     if (mock && patientId !== PATIENT_ID)
@@ -38,10 +37,8 @@ export async function POST(request: Request) {
     else
       stream = (await import("@medlyn/engine/lens/stream")).streamLens({
         ...parsed.data,
-        chipId,
         patientId,
       });
-    stream = titledStream(stream, patientId);
     iterator = stream[Symbol.asyncIterator]();
     const first = await iterator.next();
     if (first.done || first.value.type === "error")
@@ -54,11 +51,22 @@ export async function POST(request: Request) {
         };
         send(firstEvent);
         try {
+          let terminal = false;
           while (!cancelled && iterator) {
             const next = await iterator.next();
             if (next.done) break;
             send(next.value);
+            if (next.value.type === "done" || next.value.type === "error") {
+              terminal = true;
+              break;
+            }
           }
+          if (!cancelled && !terminal)
+            send({
+              type: "error",
+              message: "The lens was interrupted. Retry to check all sections.",
+              retryable: true,
+            });
         } catch (error) {
           console.error(
             "Lens stream interrupted",
@@ -70,6 +78,7 @@ export async function POST(request: Request) {
             retryable: true,
           });
         } finally {
+          await iterator?.return?.();
           if (!cancelled) controller.close();
         }
       },
@@ -80,48 +89,19 @@ export async function POST(request: Request) {
     });
     return new Response(response, {
       headers: {
-        "Content-Type": "application/x-ndjson",
-        "Cache-Control": "no-store",
+        "Content-Type": "application/x-ndjson; charset=utf-8",
+        "Cache-Control": "no-store, no-transform",
+        "Content-Encoding": "identity",
         "X-Medlyn-Mode": mock ? "mock" : "live",
         "X-Accel-Buffering": "no",
       },
     });
   } catch (error) {
-    console.warn(
-      "Lens engine unavailable; replaying labelled mock",
-      error instanceof Error ? error.message : "Unknown error",
-    );
-    if (patientId !== PATIENT_ID)
-      return Response.json(
-        { error: "Evidence unavailable for the selected patient." },
-        { status: 503 },
-      );
-    mock = true;
-    const fallback = demoStream();
-    return new Response(
-      new ReadableStream<Uint8Array>({
-        async pull(controller) {
-          if (request.signal.aborted) {
-            await fallback.return(undefined);
-            controller.close();
-            return;
-          }
-          const next = await fallback.next();
-          if (next.done) controller.close();
-          else controller.enqueue(encoder.encode(`${JSON.stringify(next.value)}\n`));
-        },
-        async cancel() {
-          await fallback.return(undefined);
-        },
-      }),
-      {
-        headers: {
-          "Content-Type": "application/x-ndjson",
-          "Cache-Control": "no-store",
-          "X-Medlyn-Mode": "mock",
-          "X-Accel-Buffering": "no",
-        },
-      },
+    await iterator?.return?.();
+    console.warn("lens_unavailable", error instanceof Error ? error.name : "Unknown error");
+    return Response.json(
+      { error: "The evidence check is unavailable. Retry your situation." },
+      { status: 503 },
     );
   }
 }
@@ -149,20 +129,5 @@ async function* demoStream(): AsyncGenerator<LensEvent> {
       );
       yield event;
     }
-  }
-}
-
-async function* titledStream(
-  stream: AsyncIterable<LensEvent>,
-  patientId: string,
-): AsyncGenerator<LensEvent> {
-  let evidence: ReturnType<typeof patientEvidence> | undefined;
-  for await (const event of stream) {
-    if (event.type === "situation" && process.env.MEDLYN_MOCK !== "1") {
-      evidence = patientEvidence(patientId, event.window);
-      yield event;
-      continue;
-    }
-    yield evidence && event.type === "section" ? await titleOutput(event, await evidence) : event;
   }
 }
