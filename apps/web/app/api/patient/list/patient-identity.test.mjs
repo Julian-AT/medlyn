@@ -11,6 +11,12 @@ const patient = {
 };
 
 describe("generated document identity", () => {
+  it("preserves the registered case identity over document placeholders", () => {
+    const registered = { ...patient, id: "patient-0000-0001", displayName: "Anna Musterfrau" };
+    expect(identityFromDocuments(registered, ["Example Placeholder, geb. am 02.03.1960"])).toEqual(
+      registered,
+    );
+  });
   it("reads a name and date from a generated header", () => {
     const result = identityFromDocuments(patient, [
       "Example Person, geb. am 02.03.1960\nGeschlecht: female\n",

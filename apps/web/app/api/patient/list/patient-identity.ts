@@ -1,8 +1,12 @@
-import { readablePatientName } from "../../../../components/patient/patient-options.ts";
+import {
+  CASE_PATIENT_ID,
+  readablePatientName,
+} from "../../../../components/patient/patient-options.ts";
 import type { PatientOption } from "../../../../lib/active-patient.ts";
 
 /** Reads generated identity headers; never guesses names from clinical prose. */
 export function identityFromDocuments(patient: PatientOption, texts: string[]): PatientOption {
+  if (patient.id === CASE_PATIENT_ID) return patient;
   for (const text of texts) {
     const match = text.match(
       /(?:^|\n)\s*(?:(?:Patient(?:in)?|Name)\s*:\s*)?([\p{L}][\p{L} .’'-]{1,99}?),?\s+(?:geb\.?|born)\s*(?:am\s+)?(\d{1,2})\.(\d{1,2})\.(\d{4})\b/iu,
