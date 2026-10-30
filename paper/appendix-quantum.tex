@@ -1,0 +1,80 @@
+\appendix
+\section{Exploratory quantum experiments}
+\label{app:quantum}
+We implement two synthetic-only experiments with IBM Qiskit, separate from the
+clinical runtime and the main benchmark. Neither experiment establishes clinical
+benefit or quantum advantage. The aggregate report is
+\texttt{ml/quantum/results.json}; measurements remain automated and await human
+review. We withhold performance values from this appendix until that review.
+
+\paragraph{Claim classification.}
+We sample 400 training and 200 test examples from the frozen verifier splits.
+Patients and generation families remain disjoint. We balance supported claims
+against the union of unsupported and contradicted claims. This binary task is not
+comparable to the main three-class verifier evaluation. Pair features concatenate
+cosine similarity, element-wise products and absolute differences of claim and
+passage vectors. PCA and scaling fit only on training features. We encode eight
+components in a fully connected ZZ feature map with two repetitions, then fit an
+SVM to the fidelity kernel. RBF-SVM and logistic regression use identical features
+and fixed settings. Patient bootstrap intervals are conditional on the sampled
+families. These synthetic labels are code checked, not human gold.
+
+\begin{figure}[ht]
+\centering
+\input{figures/quantum-protocol}
+\caption{Research protocol. Every branch remains outside the clinical product.
+The semantic embedding experiment awaits quota; the offline control is distinct.}
+\label{fig:quantum-protocol}
+\end{figure}
+
+\paragraph{Execution and feature provenance.}
+The planned encoder is Gemini Embedding 2 with 768 dimensions. Its daily quota was
+exhausted during this run. We therefore completed an explicitly labelled offline
+control using character-hash vectors. The Gemini experiment remains pending.
+The full simulator computes exact statevector overlaps; a small finite-shot block
+cross-checks the same map with \texttt{FidelityQuantumKernel} and
+\texttt{ComputeUncompute}. Exact overlaps avoid a quadratic number of separately
+sampled circuits. This adjustment is recorded in the report. Same-subset LoRA and
+GPT reference predictions are unavailable; we do not substitute earlier scores.
+
+\paragraph{Evidence selection.}
+For each of five synthetic patients we choose three of eight to ten candidates.
+A QUBO maximises a lexical and embedding relevance surrogate minus pairwise
+redundancy, with a cardinality penalty larger than the objective's absolute range.
+We compare exhaustive search, greedy selection and QAOA at depths one, two and
+three on Aer. The optimiser uses ideal statevector expectations and the final
+circuit is sampled. Conditional approximation ratios, feasibility probability and
+unconditional optimal-set probability are separate quantities. Postselection does
+not establish reliable evidence selection. Exhaustive search is practical for
+these instances, and the surrogate is not a clinical relevance standard.
+
+\paragraph{Hardware and limitations.}
+The lane did not submit a hardware job. A separate orchestrator runbook constructs
+a 16 by 16 test-kernel block on a least-busy IBM backend, transpiles to its ISA and
+records backend, job identifiers, shots, depth and timing before comparison.
+A test-to-test block cannot replace the classifier's test-to-training kernel;
+held-out hardware classifier accuracy consequently remains unmeasured.
+The eight-qubit embedding is easy to simulate classically. Kernel concentration
+can suppress differences between examples, and PCA compression can remove
+important distinctions. These small synthetic experiments establish neither
+scaling behaviour nor transfer to patient care.
+
+\ifdefined\MedlynQuantumReviewed
+\begin{figure}[ht]
+\centering
+\input{figures/quantum-accuracy}
+\caption{Offline character-hash control, binary accuracy with patient-bootstrap
+intervals. This is not the planned Gemini experiment or a clinical benchmark.}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\input{figures/quantum-kernel}
+\caption{Exact and finite-shot simulator kernel blocks. IBM hardware is pending.}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\input{figures/quantum-qaoa}
+\caption{Mean QAOA conditional approximation ratio and unconditional optimal-set
+probability across five small synthetic instances.}
+\end{figure}
+\fi
