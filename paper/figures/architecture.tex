@@ -1,0 +1,27 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=6mm and 10mm,block/.style={draw,rectangle,
+  minimum height=10mm,text width=40mm,align=center,font=\small},
+  flow/.style={-{Latex[length=2mm]},semithick}]
+\node[block] (docs) {Documents\\text, PDF or scan};
+\node[block,above=of docs] (extract) {Normalise and segment\\extract and locate facts};
+\node[block,above=of extract] (store) {Immutable evidence store\\patient and revision};
+\node[block,right=of docs] (task) {Clinician situation\\role, task and as-of date};
+\node[block,above=of task] (window) {Shared evidence window\\eligible documents};
+\node[block,above=of window] (retrieve) {Retrieve evidence\\lexical and vector candidates};
+\node[block,above=of retrieve] (select) {Select fact identifiers\\render registered templates};
+\node[block,above=of select] (validate) {Shared claim boundary\\location and support checks};
+\node[block,above=of validate] (output) {Cards, chat and letters\\validated text for speech};
+\node[block,left=of validate] (compose) {Composed claims\\headlines and answers};
+\node[block,left=of output] (review) {Append-only reviews\\presentation overlay};
+\path[flow] (docs) edge (extract) (extract) edge (store)
+  (task) edge (window) (window) edge (retrieve)
+  (retrieve) edge (select) (select) edge (validate) (validate) edge (output)
+  (store) edge (retrieve) (compose) edge (validate);
+\path[flow,dashed] (review) edge (output);
+\end{tikzpicture}
+\caption{The Medlyn architecture. We store located evidence before live selection.
+Every output path crosses the claim boundary. Reviews change presentation through a
+separate ledger; they do not replace source evidence.}
+\label{fig:architecture}
+\end{figure}
