@@ -63,7 +63,7 @@ const SITUATIONS = [
 export function ChatShortcuts({ onSelect }: { onSelect: (text: string, chipId?: string) => void }) {
   return (
     <CardContent
-      className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-0"
+      className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-0"
       aria-label="Shortcuts and clinical situations"
     >
       <CardContent
@@ -80,7 +80,6 @@ export function ChatShortcuts({ onSelect }: { onSelect: (text: string, chipId?: 
         ))}
       </CardContent>
       <CardContent className="flex w-full flex-col items-center gap-3 px-0">
-        <CardDescription className="text-xs">Start with a clinical situation</CardDescription>
         <CardContent
           className="flex flex-wrap justify-center gap-3 px-0"
           role="group"
