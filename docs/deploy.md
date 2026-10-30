@@ -1,11 +1,10 @@
 # Deploy Medlyn to Vercel
 
-Two Vercel projects serve this workspace. The landing page is public; the patient
-app requires a signed demo session for pages and APIs. The proxy follows the
-[Next.js 16 `proxy.ts` convention](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
-and runs on Node.js. All existing database API routes export `runtime = "nodejs"`.
-Local development remains open when demo authentication is unconfigured;
-production always fails closed.
+Two public Vercel projects serve this workspace: the landing page on `medlyn.health` and
+the patient app on `app.medlyn.health`. The app has no demo password (user decision, see
+`docs/decisions.md`); it sends `noindex` and `X-Robots-Tag`. A Next.js 16 `proxy.ts`
+refuses to serve production traffic when mock data, the local verifier or a non-OpenAI
+model endpoint is configured. All database API routes export `runtime = "nodejs"`.
 
 | Project name | Root Directory                             | Domain              | Workspace filter |
 | ------------ | ------------------------------------------ | ------------------- | ---------------- |
@@ -72,7 +71,6 @@ Fill the root `.env`, using `.env.example` as the inventory. Never create packag
   deployment time. If unset, the helper uses `MODEL_FAST` and `MODEL_REASONING`;
   verify those are direct OpenAI IDs rather than local proxy aliases.
 - `DATABASE_URL_DEMO` for the frozen demo database, or `DATABASE_URL` otherwise.
-- `DEMO_PASSWORD` and `DEMO_SESSION_SECRET`. Generate the signing secret once with
   `openssl rand -hex 32` and put it in the root `.env`. It must be at least
   32 characters. Changing either credential revokes existing sessions.
 - `NEXT_PUBLIC_SITE_URL=https://medlyn.health` and
@@ -166,7 +164,6 @@ curl -i -X POST https://app.medlyn.health/api/chat
 
 Expect a public landing page, a `303` redirect to `/login` for the patient page,
 and `401` JSON for unauthenticated APIs. Unconfigured authentication returns `503`.
-In a browser, check wrong-password feedback and then sign in. The session cookie
 is host-only, HttpOnly, Secure in production, SameSite=Lax, and expires after seven
 days. A forged or expired cookie must fail. Exercise one situation, a source link,
 chat and a letter against the ingested database; no deployed model call was made
@@ -182,4 +179,3 @@ pnpm --dir packages/engine exec vitest run --root ../../apps/web 'app/(auth)'
 ```
 
 After the directory sweep, replace `apps/web` with `apps/app` in the test command.
-Patient-menu logout is a follow-up: clear `medlyn-demo-session` in a server action.

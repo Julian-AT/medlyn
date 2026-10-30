@@ -41,3 +41,4 @@ Dates below are 30 October 2026. These rows were moved from the root agent guide
 
 Append a dated entry whenever approved behavior departs from the PRD. Distinguish a
 design decision from verified delivery; a decision never marks a checkpoint done.
+| 30 Oct | The hosted app is public without a demo password (user decision). Risk acknowledged: challenge document text served from Neon becomes readable by anyone with the URL; the challenge rule only forbids publishing the data folder in the repo. The app keeps noindex and X-Robots-Tag. |
