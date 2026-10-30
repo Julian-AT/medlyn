@@ -4,7 +4,15 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const WINDOW = 120;
-const BLOCKED_PATHS = [/^data\//, /(^|\/)TRACK-1-/, /\.zip$/, /\.dump$/, /\.sql$/, /^\.env($|\.(?!example$))/];
+const BINARY = /\.(png|jpe?g|gif|webp|avif|ico|mp4|webm|mov|woff2?|ttf|otf|pdf|lottie|zip|gz)$/i;
+const BLOCKED_PATHS = [
+  /^data\//,
+  /(^|\/)TRACK-1-/,
+  /\.zip$/,
+  /\.dump$/,
+  /\.sql$/,
+  /^\.env($|\.(?!example$))/,
+];
 
 const dataPath =
   process.env.MEDLYN_DATA_PATH ?? "./TRACK-1-clinical-documentation/data/patient-0000-0001";
@@ -30,7 +38,8 @@ function documentWindows() {
   const windows = new Set();
   for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     const text = normalise(JSON.parse(readFileSync(join(dir, file), "utf8")).text ?? "");
-    for (let i = 0; i + WINDOW <= text.length; i += WINDOW / 2) windows.add(text.slice(i, i + WINDOW));
+    for (let i = 0; i + WINDOW <= text.length; i += WINDOW / 2)
+      windows.add(text.slice(i, i + WINDOW));
   }
   return windows;
 }
@@ -42,11 +51,15 @@ const failures = staged
 const windows = documentWindows();
 if (windows) {
   for (const path of staged) {
-    if (!existsSync(path)) continue;
-    const content = normalise(execFileSync("git", ["show", `:${path}`], { encoding: "utf8" }));
+    if (!existsSync(path) || BINARY.test(path)) continue;
+    const content = normalise(
+      execFileSync("git", ["show", `:${path}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }),
+    );
     for (const w of windows) {
       if (content.includes(w)) {
-        failures.push(`${path}: contains a ${WINDOW}-char verbatim passage from the challenge documents`);
+        failures.push(
+          `${path}: contains a ${WINDOW}-char verbatim passage from the challenge documents`,
+        );
         break;
       }
     }
