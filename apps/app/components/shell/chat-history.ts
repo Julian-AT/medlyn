@@ -3,6 +3,7 @@ export type RecentChat = {
   title: string;
   createdAt?: string;
   updatedAt?: string;
+  searchText?: string;
 };
 
 const LABELS = ["Today", "Yesterday", "Previous 7 days", "Older"] as const;
