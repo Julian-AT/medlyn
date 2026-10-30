@@ -1,10 +1,11 @@
-import type { Claim, LensEvent, Screen } from "@medlyn/engine/contracts";
+import { type Claim, LensEvent, type Screen } from "@medlyn/engine/contracts";
 
 export type LensState = {
   screen: Screen | null;
   pending: string[];
   error: string | null;
   complete: boolean;
+  findingsReceived: boolean;
 };
 
 export const emptyLens: LensState = {
@@ -12,10 +13,15 @@ export const emptyLens: LensState = {
   pending: [],
   error: null,
   complete: false,
+  findingsReceived: false,
 };
 
-export function reduceLens(state: LensState, event: LensEvent): LensState {
-  if (event.type === "error") return { ...state, error: event.message, complete: true };
+export type LensAction = LensEvent | { type: "start" };
+
+export function reduceLens(state: LensState, event: LensAction): LensState {
+  if (event.type === "start") return { ...emptyLens };
+  if (event.type === "error")
+    return { ...state, pending: [], error: event.message, complete: false };
   if (event.type === "situation") {
     return {
       screen: {
@@ -25,13 +31,7 @@ export function reduceLens(state: LensState, event: LensEvent): LensState {
         window: event.window,
         sections: event.sectionTitles.map((section) => ({
           ...section,
-          cards:
-            state.screen?.window.asOf === event.window.asOf &&
-            state.screen.window.corpusRevision === event.window.corpusRevision &&
-            JSON.stringify(state.screen.window.eligibleDocumentIds) ===
-              JSON.stringify(event.window.eligibleDocumentIds)
-              ? (state.screen.sections.find((previous) => previous.id === section.id)?.cards ?? [])
-              : [],
+          cards: [],
         })),
         critical: [],
         findings: [],
@@ -41,6 +41,7 @@ export function reduceLens(state: LensState, event: LensEvent): LensState {
       pending: event.sectionTitles.map((section) => section.id),
       error: null,
       complete: false,
+      findingsReceived: false,
     };
   }
   if (!state.screen) return state;
@@ -82,12 +83,26 @@ export function reduceLens(state: LensState, event: LensEvent): LensState {
   if (event.type === "findings")
     return {
       ...state,
+      findingsReceived: true,
       screen: {
         ...screen,
         critical: event.critical,
         findings: event.findings,
         openQuestions: event.openQuestions,
       },
+    };
+  if (state.pending.length)
+    return {
+      ...state,
+      pending: [],
+      error: "Some sections were not received. Retry to check all sources.",
+      complete: false,
+    };
+  if (!state.findingsReceived)
+    return {
+      ...state,
+      error: "Findings were not received. Retry to check all sources.",
+      complete: false,
     };
   return {
     ...state,
@@ -110,6 +125,33 @@ export class NdjsonBuffer {
     const lines = this.buffer.split("\n");
     this.buffer = final ? "" : (lines.pop() ?? "");
     return lines.filter((line) => line.trim()).map((line) => JSON.parse(line));
+  }
+}
+
+export async function readLensStream(
+  body: ReadableStream<Uint8Array>,
+  onEvent: (event: LensEvent) => void,
+): Promise<void> {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  const buffer = new NdjsonBuffer();
+  let started = false;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      for (const record of buffer.push(decoder.decode(value, { stream: !done }), done)) {
+        const event = LensEvent.parse(record);
+        if (event.type === "situation") started = true;
+        else if (!started && event.type !== "error")
+          throw new Error("The lens response arrived out of order. Retry your situation.");
+        onEvent(event);
+        if (event.type === "done" || event.type === "error") return;
+      }
+      if (done) throw new Error("The lens was interrupted. Retry to check all sections.");
+    }
+  } finally {
+    await reader.cancel();
+    reader.releaseLock();
   }
 }
 
