@@ -2,10 +2,17 @@ import { z } from "zod";
 import type { AbsenceResult, Document, EvidenceWindow, Segment } from "../contracts.ts";
 import { structured } from "../llm/client.ts";
 import { documentCount, loadDocuments, loadSegments, PATIENT_ID } from "../store.ts";
-import { searchAbsenceCandidates } from "./absence-retrieval.ts";
+import { type AbsenceRetrieval, retrieveAbsenceCandidates } from "./absence-retrieval.ts";
 import { withModelSlot } from "./select.ts";
 
 type FullDocument = Document & { normText: string };
+export type AbsenceCandidates = {
+  segmentIds: string[];
+  retrieval: AbsenceRetrieval["retrieval"];
+};
+export type AbsenceCheckResult = AbsenceResult & {
+  details?: { retrieval: AbsenceRetrieval["retrieval"] };
+};
 export type AbsenceOptions = {
   patientId?: string;
   documents?: FullDocument[];
@@ -13,7 +20,7 @@ export type AbsenceOptions = {
   total?: number;
   timeoutMs?: number;
   search?: (concept: string, documents: FullDocument[], segments: Segment[]) => Promise<string[]>;
-  candidateSearch?: (query: string) => Promise<string[]>;
+  candidateSearch?: (query: string) => Promise<string[] | AbsenceCandidates>;
 };
 const Hits = z.object({
   matches: z.array(z.object({ segmentId: z.string(), quote: z.string().min(1) })),
@@ -58,7 +65,7 @@ export async function checkDocumented(
   synonyms: string[],
   window: EvidenceWindow,
   opts: AbsenceOptions = {},
-): Promise<AbsenceResult> {
+): Promise<AbsenceCheckResult> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const searched = {
     eligible: window.eligibleDocumentIds.length,
@@ -66,7 +73,7 @@ export async function checkDocumented(
     asOf: window.asOf,
   };
   try {
-    const work = async (): Promise<AbsenceResult> => {
+    const work = async (): Promise<AbsenceCheckResult> => {
       const [documents, segments, total] = await Promise.all([
         opts.documents ?? loadDocuments(window, opts.patientId ?? PATIENT_ID),
         opts.segments ?? loadSegments(window, opts.patientId ?? PATIENT_ID),
@@ -128,19 +135,21 @@ export async function checkDocumented(
           ? []
           : opts.candidateSearch
             ? opts.candidateSearch(terms.join(" "))
-            : searchAbsenceCandidates(terms.join(" "), window, {
+            : retrieveAbsenceCandidates(terms.join(" "), window, {
                 k: 60,
                 patientId: opts.patientId ?? PATIENT_ID,
-              }).then((hits) => hits.map((hit) => hit.segmentId)),
+              }).then(({ hits, retrieval }) => ({
+                segmentIds: hits.map((hit) => hit.segmentId),
+                retrieval,
+              })),
         fullText,
       ]);
-      const candidateIds = new Set(candidates);
+      const details = Array.isArray(candidates) ? undefined : { retrieval: candidates.retrieval };
       // Similarity alone does not prove a concept is documented. Stage (b) still searches every full text.
       const lexical = segs
         .filter(
           (segment) =>
-            containsSynonym(segment.text, terms) ||
-            (candidateIds.has(segment.id) && containsSynonym(segment.textEn ?? "", terms)),
+            containsSynonym(segment.text, terms) || containsSynonym(segment.textEn ?? "", terms),
         )
         .map((segment) => segment.id);
       const allowed = new Set(segs.map((segment) => segment.id));
@@ -152,6 +161,7 @@ export async function checkDocumented(
         concept,
         searched,
         segmentIds,
+        ...(details ? { details } : {}),
       };
     };
     return await Promise.race([
