@@ -1,100 +1,64 @@
 "use client";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
 import { RecentChats } from "@/components/chat/recent-chats";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useSidebarCounts } from "./hooks/use-sidebar-counts";
 import { navigation } from "./navigation";
+import { findingCounts } from "./sidebar-counts";
 import { ShellSidebarFooter } from "./sidebar-footer";
+import { CollapsibleSidebarGroup } from "./sidebar-group";
+import { ShellSidebarHeader } from "./sidebar-header";
+import { SidebarNavItem } from "./sidebar-nav-item";
+import { useWorkspace } from "./workspace-provider";
+
 export function AppSidebar() {
-  const pathname = usePathname();
+  const { counts, findings } = useSidebarCounts();
+  const { reviews } = useWorkspace();
+  const activeFindings = findingCounts(reviews.screen?.findings ?? findings);
+  const questions = reviews.screen?.openQuestions.filter(
+    (question) => question.review?.action !== "dismissed",
+  );
+  const badges: Record<string, number | undefined> = {
+    ...counts,
+    "/open-questions": questions?.length ?? (findings.length > 0 ? activeFindings.open : undefined),
+    "/reviews": reviews.count > 0 ? reviews.count : undefined,
+  };
+
   return (
-    <Sidebar collapsible="offcanvas" className="print:hidden">
-      <SidebarHeader className="gap-4 p-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg">
-              <Link href="/" aria-label="Medlyn home">
-                Medlyn
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg">
-                  <Avatar className="size-8">
-                    <AvatarFallback>AM</AvatarFallback>
-                  </Avatar>
-                  <span>
-                    Anna Musterfrau
-                    <br />
-                    <small>57 y · 15 Apr 2016</small>
-                  </span>
-                  <HugeiconsIcon icon={ArrowDown01Icon} />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Patient workspace</DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuRadioGroup value="patient-0000-0001">
-                  <DropdownMenuRadioItem value="patient-0000-0001">
-                    Anna Musterfrau
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        {navigation.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      tooltip={item.title}
-                    >
-                      <Link href={item.href}>
-                        <HugeiconsIcon icon={item.icon} strokeWidth={1.6} />
-                        {item.title}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+    <Sidebar collapsible="icon" className="print:hidden">
+      <ShellSidebarHeader />
+      <SidebarContent className="gap-1">
+        <SidebarGroup className="py-0">
+          <SidebarMenu>
+            <SidebarNavItem item={navigation[0].items[0]} />
+          </SidebarMenu>
+        </SidebarGroup>
         <RecentChats />
+        {navigation.slice(1).map((group) => (
+          <CollapsibleSidebarGroup
+            key={group.label}
+            id={group.label.toLowerCase().replaceAll(" ", "-")}
+            label={group.label}
+            defaultOpen={group.label !== "Research"}
+          >
+            <SidebarMenu>
+              {group.items.map((item) => (
+                <SidebarNavItem
+                  key={item.href}
+                  item={item}
+                  count={badges[item.href]}
+                  warning={item.href === "/open-questions" && activeFindings.contradictions}
+                />
+              ))}
+            </SidebarMenu>
+          </CollapsibleSidebarGroup>
+        ))}
       </SidebarContent>
       <ShellSidebarFooter />
       <SidebarRail />
