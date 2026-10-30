@@ -17,20 +17,29 @@ const WorkspaceContext = createContext<Workspace | null>(null);
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { patient } = useActivePatient();
   const [sessionId, setSessionId] = useState("");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [screen, setScreen] = useState<Screen | null>(null);
   const reviews = useReviews(screen, sessionId);
   useEffect(() => {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-    const id = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? crypto.randomUUID();
-    sessionStorage.setItem(`medlyn-session:${patient.id}`, id);
+    let id: string = crypto.randomUUID();
+    try {
+      id = sessionStorage.getItem(`medlyn-session:${patient.id}`) ?? id;
+      sessionStorage.setItem(`medlyn-session:${patient.id}`, id);
+    } catch {
+      console.info("review_session_memory_only");
+    }
     setSessionId(id);
   }, [patient.id]);
   function toggleTheme() {
     const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
     document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem("medlyn-theme", next);
     setTheme(next);
+    try {
+      localStorage.setItem("medlyn-theme", next);
+    } catch {
+      console.info("theme_preference_memory_only");
+    }
   }
   return (
     <WorkspaceContext.Provider value={{ sessionId, theme, toggleTheme, setScreen, reviews }}>
