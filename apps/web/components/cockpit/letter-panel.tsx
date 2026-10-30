@@ -22,7 +22,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
-import { useLetterDraft } from "./hooks/use-letter-draft";
+import { useLetter } from "@/hooks/use-letter";
 import { LetterReferences } from "./letter-references";
 import { LetterSentence } from "./letter-sentence";
 
@@ -31,13 +31,15 @@ export function LetterPanel({
   lensKey,
   reviewVersion,
   onSource,
+  ready = true,
 }: {
   sessionId: string;
   lensKey: string | null;
   reviewVersion: number;
-  onSource: (id: string) => void;
+  onSource?: (id: string) => void;
+  ready?: boolean;
 }) {
-  const draft = useLetterDraft(sessionId, lensKey, reviewVersion);
+  const draft = useLetter(sessionId, lensKey, reviewVersion);
   const { letter, busy, error, stale } = draft;
   const citations = [
     ...new Set(
@@ -56,7 +58,7 @@ export function LetterPanel({
               className="h-9 rounded-control"
               variant="outline"
               size="sm"
-              disabled={stale}
+              disabled={stale || busy}
               onClick={() => window.print()}
             >
               <HugeiconsIcon
@@ -105,10 +107,13 @@ export function LetterPanel({
                 sentence keeps its citations.
               </EmptyDescription>
             </EmptyHeader>
+            {!ready && (
+              <CardDescription>Complete a situation to draft from its evidence.</CardDescription>
+            )}
             <Button
               className="h-9 rounded-control"
               onClick={draft.generate}
-              disabled={busy || !sessionId}
+              disabled={busy || !sessionId || !ready}
             >
               {busy ? "Checking sources & drafting…" : "Generate GP letter"}
             </Button>

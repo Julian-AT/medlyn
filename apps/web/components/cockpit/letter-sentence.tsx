@@ -15,7 +15,7 @@ import { SourceChip } from "./source-chip";
 type Props = {
   claim: LetterClaim;
   citations: string[];
-  onSource: (id: string) => void;
+  onSource?: (id: string) => void;
   onSave: (id: string, text: string) => Promise<boolean>;
   busy: boolean;
 };
