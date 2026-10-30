@@ -17,3 +17,16 @@ export function historyBeforeQuestion<T extends Message>(messages: T[], question
   );
   return visibleChatMessages(index < 0 ? messages : messages.slice(0, index));
 }
+
+/** The key is only a reference; chatContext validates its patient, revision and window. */
+export function conversationLensKey(
+  messages: { parts: { type: string; data?: unknown }[] }[],
+  explicit?: string | null,
+): string | null {
+  if (explicit) return explicit;
+  const data = messages
+    .flatMap((message) => message.parts)
+    .findLast((part) => part.type === "data-evidence-context")?.data;
+  if (!data || typeof data !== "object" || !("lensKey" in data)) return null;
+  return typeof data.lensKey === "string" && data.lensKey.length <= 300 ? data.lensKey : null;
+}
