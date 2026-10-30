@@ -11,17 +11,46 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
   const currentVersion = useRef(reviewVersion);
   currentVersion.current = reviewVersion;
   const requestId = useRef(0);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: A new session or lens invalidates the draft.
+  const storageKey = `medlyn:letter:${sessionId}:${lensKey ?? "patient"}`;
   useEffect(() => {
     requestId.current++;
     setLetter(null);
     setError(null);
     setStale(false);
     setBusy(false);
+    if (!sessionId) return;
+    const controller = new AbortController();
+    const id = requestId.current;
+    try {
+      const savedId = sessionStorage.getItem(storageKey);
+      if (savedId) {
+        setBusy(true);
+        void fetch(
+          `/api/lens/letter/${encodeURIComponent(savedId)}?sessionId=${encodeURIComponent(sessionId)}`,
+          { signal: controller.signal },
+        )
+          .then(async (response) => {
+            if (!response.ok)
+              throw new Error("The saved draft could not be restored. Retry generating it.");
+            const saved = Letter.parse(await response.json());
+            if (id === requestId.current) setLetter(saved);
+          })
+          .catch((cause) => {
+            if (!controller.signal.aborted && id === requestId.current)
+              setError(cause instanceof Error ? cause.message : "Saved draft unavailable.");
+          })
+          .finally(() => {
+            if (id === requestId.current) setBusy(false);
+          });
+      }
+    } catch (cause) {
+      console.warn("letter_storage_unavailable", cause instanceof Error ? cause.name : "Unknown");
+    }
     return () => {
       requestId.current++;
+      controller.abort();
     };
-  }, [lensKey, sessionId]);
+  }, [storageKey, sessionId]);
   useEffect(() => {
     if (previousVersion.current !== reviewVersion && letter) setStale(true);
     previousVersion.current = reviewVersion;
@@ -64,7 +93,16 @@ export function useLetter(sessionId: string, lensKey: string | null, reviewVersi
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "The letter could not be generated. Retry.");
       if (id === requestId.current) {
-        setLetter(Letter.parse(body));
+        const next = Letter.parse(body);
+        setLetter(next);
+        try {
+          sessionStorage.setItem(storageKey, next.id);
+        } catch (cause) {
+          console.warn(
+            "letter_storage_unavailable",
+            cause instanceof Error ? cause.name : "Unknown",
+          );
+        }
         setStale(version !== currentVersion.current);
       }
     } catch (cause) {
