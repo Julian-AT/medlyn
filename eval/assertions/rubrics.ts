@@ -1,4 +1,5 @@
 import type { Screen } from "@medlyn/engine/contracts";
+import { llmApiKey } from "@medlyn/engine/llm/client";
 import type {
   Assertion,
   AssertionValueFunctionContext,
@@ -15,7 +16,7 @@ export function judgeProvider(): ProviderOptions {
     throw new Error("MODEL_REASONING and OPENAI_BASE_URL are required for evaluation judging");
   return {
     id: `openai:chat:${model}`,
-    config: { apiBaseUrl, apiKey: process.env.OPENAI_API_KEY, showThinking: false },
+    config: { apiBaseUrl, apiKey: llmApiKey(), showThinking: false },
   };
 }
 

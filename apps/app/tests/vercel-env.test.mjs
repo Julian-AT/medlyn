@@ -36,6 +36,24 @@ describe("Vercel environment plans", () => {
     expect(plan.MODEL_FAST).toBe("production-fast-role");
     expect(environmentProblems("app", plan)).toEqual([]);
   });
+  it("maps Gemini production to its OpenAI-compatible endpoint and key", () => {
+    const plan = projectEnvironment("app", {
+      ...source,
+      LLM_PROVIDER_PROD: "gemini",
+      GEMINI_API_KEY: "gemini-secret",
+      MODEL_FAST_FALLBACK: "configured-fast-fallback",
+    });
+    expect(plan.OPENAI_BASE_URL).toBe("https://generativelanguage.googleapis.com/v1beta/openai");
+    expect(plan.OPENAI_API_KEY).toBe("gemini-secret");
+    expect(plan.GEMINI_API_KEY).toBe("gemini-secret");
+    expect(plan.MODEL_FAST_FALLBACK).toBe("configured-fast-fallback");
+    expect(plan).not.toHaveProperty("MODEL_REASONING_FALLBACK");
+    expect(environmentProblems("app", plan)).toEqual([]);
+  });
+  it("requires a Gemini key in Gemini production mode", () => {
+    const plan = projectEnvironment("app", { ...source, LLM_PROVIDER_PROD: "gemini" });
+    expect(environmentProblems("app", plan)).toContain("OPENAI_API_KEY is missing");
+  });
   it("sends only public origins to the landing project", () => {
     expect(Object.keys(projectEnvironment("www", source)).sort()).toEqual([
       "NEXT_PUBLIC_APP_URL",

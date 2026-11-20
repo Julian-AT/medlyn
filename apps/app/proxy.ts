@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 
+const PRODUCTION_LLM_ENDPOINTS = new Set([
+  "https://api.openai.com/v1",
+  "https://generativelanguage.googleapis.com/v1beta/openai",
+]);
+
 export function proxy() {
   if (process.env.NODE_ENV === "production") {
     if (
       process.env.MEDLYN_MOCK === "1" ||
       ["local", "cascade"].includes(process.env.MEDLYN_VERIFIER ?? "") ||
-      process.env.OPENAI_BASE_URL !== "https://api.openai.com/v1"
+      !PRODUCTION_LLM_ENDPOINTS.has(process.env.OPENAI_BASE_URL?.replace(/\/+$/, "") ?? "")
     ) {
       return NextResponse.json(
         { error: "Production services are not configured." },

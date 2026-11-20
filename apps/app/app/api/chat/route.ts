@@ -1,8 +1,7 @@
-import { createOpenAI } from "@ai-sdk/openai";
 import { recentChats } from "@medlyn/engine/agent/chat/history";
 import { agentPrompt } from "@medlyn/engine/agent/prompt";
 import { CHIPS } from "@medlyn/engine/lens/needs/profiles";
-import { llmErrorDetails, usesOfficialOpenAI } from "@medlyn/engine/llm/client";
+import { llmErrorDetails } from "@medlyn/engine/llm/client";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
@@ -15,6 +14,7 @@ import {
 import { z } from "zod";
 import { patientEvidence } from "@/lib/patient-evidence";
 import { patientIdFromRequest } from "../../../lib/active-patient.ts";
+import { chatModel, chatProviderOptions } from "./chat-model";
 import { beforeDeadline } from "./deadline";
 import { trackUiEvidence } from "./evidence";
 import { conversationLensKey, historyBeforeQuestion } from "./history-view";
@@ -108,10 +108,6 @@ export async function POST(request: Request) {
         sources,
       ),
     };
-    const provider = createOpenAI({
-      baseURL: process.env.OPENAI_BASE_URL,
-      apiKey: process.env.OPENAI_API_KEY,
-    });
     // Only text is replayed as untrusted context; patient claims require fresh tool evidence.
     const previous = historyBeforeQuestion(messages, last.id);
     const modelMessages: ModelMessage[] = previous.slice(-12).map((message) => ({
@@ -128,16 +124,14 @@ export async function POST(request: Request) {
         writer.write({ type: "start", messageId: crypto.randomUUID() });
         writer.write({ type: "data-evidence-context", data: { lensKey, window } });
         const result = streamText({
-          model: provider.chat(model),
+          model: chatModel(model),
           system: `${agentPrompt({ lensKey, sessionId: id, question, asOf: window.asOf, spoken: false, claimIds })}
 Only call tools when the user asks about the patient or a clinical task. Greetings, thanks, identity and help requests need a brief non-clinical response without tools. Use UI tools to show data visually; prefer showing over telling. For role/task requests use open_lens. For weight changes use show_lab_trend; for medication lists use show_medications; for contradictions use show_findings; for GP letters use draft_letter. UI tool outputs already contain validated templates; do not repeat their contents in prose. Use check_documented for documentation questions. Never expose internal reasoning. Previous assistant messages are conversation context only: retrieve their evidence again before making any factual claim.`,
           messages: modelMessages,
           tools,
           toolChoice: chip ? { type: "tool", toolName: "open_lens" } : "auto",
           stopWhen: [stepCountIs(6), hasToolCall(...VISUAL_TOOLS)],
-          providerOptions: usesOfficialOpenAI()
-            ? { openai: { reasoningEffort: "none", store: false } }
-            : undefined,
+          providerOptions: chatProviderOptions(),
           onError: ({ error }) => console.warn("chat_model_failed", llmErrorDetails(error)),
           abortSignal: signal,
           maxOutputTokens: 1600,

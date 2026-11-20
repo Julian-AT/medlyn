@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
-import { type ModelRole, modelFor } from "../../llm/client.ts";
+import { llmApiKey, llmBaseUrl, type ModelRole, modelFor } from "../../llm/client.ts";
 import { Box, type OcrTiming, type Page, validBox } from "./types.ts";
 
 const Transcription = z.object({
@@ -45,11 +45,10 @@ export async function ocrPage(
     const started = performance.now();
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const base = process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1";
-        const response = await fetch(`${base.replace(/\/$/, "")}/chat/completions`, {
+        const response = await fetch(`${llmBaseUrl()}/chat/completions`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+            Authorization: `Bearer ${llmApiKey()}`,
             "Content-Type": "application/json",
           },
           signal: AbortSignal.timeout(timeoutMs),

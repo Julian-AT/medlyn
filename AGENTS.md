@@ -175,8 +175,9 @@ Root `.env.example` is the configuration inventory; never print secrets.
 
 | Variable                                      | Purpose                                                                                                |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `OPENAI_BASE_URL`, `OPENAI_API_KEY`           | OpenAI-compatible proxy endpoint and credentials                                                       |
+| `OPENAI_BASE_URL`, `OPENAI_API_KEY`           | OpenAI-compatible endpoint/key; the Gemini endpoint reuses `GEMINI_API_KEY`                            |
 | `MODEL_REASONING`, `MODEL_FAST`               | Ingest/judge and fast live/semantic model roles                                                        |
+| `MODEL_*_FALLBACK`                            | Optional role fallbacks for 429, 5xx, transport errors and timeouts                                    |
 | `MODEL_STT`                                   | Leave empty; feature-detected browser recognition supplies text                                        |
 | `DATABASE_URL`, `DATABASE_URL_DEMO`           | Active Neon database / optional frozen demo connection                                                 |
 | `MEDLYN_DATA_PATH`                            | Local runtime corpus, resolved from repo root                                                          |

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { llmErrorDetails, structured, usesOfficialOpenAI } from "../llm/client.ts";
+import { llmApiKey, llmErrorDetails, structured, usesOfficialOpenAI } from "../llm/client.ts";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -126,5 +126,57 @@ describe("structured provider compatibility", () => {
   ])("identifies the official endpoint %s", (base, expected) => {
     vi.stubEnv("OPENAI_BASE_URL", base);
     expect(usesOfficialOpenAI()).toBe(expected);
+  });
+});
+
+describe("structured model fallback", () => {
+  const schema = z.object({ ok: z.boolean() });
+  const sentModels = () =>
+    vi.mocked(fetch).mock.calls.map(([, init]) => JSON.parse(String(init?.body)).model);
+
+  it.each([429, 503])("serves a %i from the role's fallback model", async (status) => {
+    configure();
+    vi.stubEnv("MODEL_FAST_FALLBACK", "synthetic-fast-fallback");
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response("busy", { status }))
+        .mockResolvedValueOnce(completion('{"ok":true}')),
+    );
+    expect(await structured("fast", "probe", schema, [])).toEqual({ ok: true });
+    expect(sentModels()).toEqual(["synthetic-fast", "synthetic-fast-fallback"]);
+  });
+
+  it("does not hide request errors behind the fallback model", async () => {
+    configure();
+    vi.stubEnv("MODEL_FAST_FALLBACK", "synthetic-fast-fallback");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("bad schema", { status: 400 })),
+    );
+    await expect(structured("fast", "probe", schema, [])).rejects.toThrow("LLM 400");
+    expect(sentModels()).toEqual(["synthetic-fast"]);
+  });
+
+  it("uses only the primary model when no fallback is configured", async () => {
+    configure();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("busy", { status: 503 })),
+    );
+    await expect(structured("fast", "probe", schema, [])).rejects.toThrow("LLM 503");
+    expect(sentModels()).toEqual(["synthetic-fast"]);
+  });
+});
+
+describe("Gemini endpoint key", () => {
+  it("reuses the Gemini key only for the Gemini endpoint", () => {
+    vi.stubEnv("OPENAI_API_KEY", "");
+    vi.stubEnv("GEMINI_API_KEY", "synthetic-gemini");
+    vi.stubEnv("OPENAI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/");
+    expect(llmApiKey()).toBe("synthetic-gemini");
+    vi.stubEnv("OPENAI_BASE_URL", "http://localhost:8317/v1");
+    expect(llmApiKey()).toBe("");
   });
 });

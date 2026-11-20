@@ -67,6 +67,11 @@ Fill the root `.env`, using `.env.example` as the inventory. Never create packag
 
 - `OPENAI_API_KEY_PROD`: a direct OpenAI key. The helper maps it to
   `OPENAI_API_KEY` and fixes `OPENAI_BASE_URL=https://api.openai.com/v1`.
+- Or `LLM_PROVIDER_PROD=gemini` with `GEMINI_API_KEY` (or `GEMINI_API_KEY_PROD`):
+  the helper sets the Gemini OpenAI-compatible `OPENAI_BASE_URL` and writes the
+  Gemini key to both `OPENAI_API_KEY` and `GEMINI_API_KEY`, replacing a stale
+  OpenAI key. `MODEL_FAST_FALLBACK` and `MODEL_REASONING_FALLBACK` (or their
+  `_PROD` overrides) are sent when set.
 - `MODEL_FAST_PROD` and `MODEL_REASONING_PROD`: OpenAI model IDs selected at
   deployment time. If unset, the helper uses `MODEL_FAST` and `MODEL_REASONING`;
   verify those are direct OpenAI IDs rather than local proxy aliases.

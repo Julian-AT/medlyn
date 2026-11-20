@@ -5,6 +5,10 @@ export type ModelRole = "reasoning" | "fast";
 export type Message = { role: "system" | "user" | "assistant"; content: string };
 
 const ROLE_ENV = { reasoning: "MODEL_REASONING", fast: "MODEL_FAST" } as const;
+const FALLBACK_ENV = {
+  reasoning: "MODEL_REASONING_FALLBACK",
+  fast: "MODEL_FAST_FALLBACK",
+} as const;
 let active = 0;
 const waiting: { resolve: () => void; lens: boolean; limit: number }[] = [];
 const priority = new AsyncLocalStorage<boolean>();
@@ -50,26 +54,60 @@ export function modelFor(role: ModelRole): string {
   return model;
 }
 
-export function usesOfficialOpenAI(): boolean {
+/** The role's model followed by its optional fallback, which serves overload and quota errors. */
+export function modelsFor(role: ModelRole): string[] {
+  const fallback = process.env[FALLBACK_ENV[role]];
+  const primary = modelFor(role);
+  return fallback && fallback !== primary ? [primary, fallback] : [primary];
+}
+
+/** Overload, quota, server and transport failures may succeed on another model; 4xx may not. */
+export function fallbackEligible(error: unknown): boolean {
+  if (error instanceof LlmHttpError) return error.status === 429 || error.status >= 500;
+  if (error instanceof StructuredOutputError) return false;
+  return error instanceof Error;
+}
+
+export const GEMINI_OPENAI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai";
+
+function endpointHost(): string | null {
   try {
-    return (
-      new URL(process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1").hostname ===
-      "api.openai.com"
-    );
+    return new URL(llmBaseUrl()).hostname;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function llmBaseUrl(): string {
+  return (process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1").replace(/\/+$/, "");
+}
+
+export function usesOfficialOpenAI(): boolean {
+  return endpointHost() === "api.openai.com";
+}
+
+export function usesGemini(): boolean {
+  return endpointHost() === new URL(GEMINI_OPENAI_BASE_URL).hostname;
+}
+
+/** Gemini's OpenAI-compatible endpoint accepts the same key as Gemini embeddings. */
+export function llmApiKey(): string {
+  return process.env.OPENAI_API_KEY || (usesGemini() ? process.env.GEMINI_API_KEY : "") || "";
 }
 
 /** Log only diagnostic fields, never provider request bodies or credentials. */
 export function llmErrorDetails(error: unknown): { name: string; message: string } {
   let message = error instanceof Error ? error.message : "Unknown error";
-  for (const key of [process.env.OPENAI_API_KEY, process.env.OPENAI_API_KEY_PROD]) {
+  for (const key of [
+    process.env.OPENAI_API_KEY,
+    process.env.OPENAI_API_KEY_PROD,
+    process.env.GEMINI_API_KEY,
+  ]) {
     if (key) message = message.replaceAll(key, "[redacted]");
   }
   return {
     name: error instanceof Error ? error.name : "Unknown",
-    message: message.replace(/Bearer\s+\S+|sk-[\w-]+/gi, "[redacted]").slice(0, 1000),
+    message: message.replace(/Bearer\s+\S+|sk-[\w-]+|AIza[\w-]+/gi, "[redacted]").slice(0, 1000),
   };
 }
 
@@ -85,19 +123,21 @@ async function complete(
     const started = performance.now();
     let status: number | undefined;
     try {
-      const base = (process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1").replace(/\/+$/, "");
-      const url = `${base}/chat/completions`;
-      const res = await fetch(url, {
+      const res = await fetch(`${llmBaseUrl()}/chat/completions`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+          Authorization: `Bearer ${llmApiKey()}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ model, messages, ...body }),
         signal: AbortSignal.timeout(timeoutMs),
       });
       status = res.status;
-      if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      if (!res.ok)
+        throw new LlmHttpError(
+          res.status,
+          `LLM ${res.status}: ${(await res.text()).slice(0, 300)}`,
+        );
       const json = await res.json();
       const choice = json.choices?.[0];
       if (choice?.message?.refusal)
@@ -136,7 +176,26 @@ export async function structured<T extends z.ZodType>(
   messages: Message[],
   { timeoutMs = 30_000 }: { timeoutMs?: number } = {},
 ): Promise<z.infer<T>> {
-  const model = modelFor(role);
+  const models = modelsFor(role);
+  for (const [index, model] of models.entries()) {
+    try {
+      return await structuredWith(role, model, name, schema, messages, timeoutMs);
+    } catch (error) {
+      if (index === models.length - 1 || !fallbackEligible(error)) throw error;
+      console.warn("llm_model_fallback", { operation: name, role, ...llmErrorDetails(error) });
+    }
+  }
+  throw new Error(`LLM ${name}: no model configured`);
+}
+
+async function structuredWith<T extends z.ZodType>(
+  role: ModelRole,
+  model: string,
+  name: string,
+  schema: T,
+  messages: Message[],
+  timeoutMs: number,
+): Promise<z.infer<T>> {
   const response_format = {
     type: "json_schema",
     json_schema: { name, strict: true, schema: z.toJSONSchema(schema, { target: "draft-7" }) },
@@ -163,3 +222,11 @@ export async function structured<T extends z.ZodType>(
 }
 
 export class StructuredOutputError extends Error {}
+
+export class LlmHttpError extends Error {
+  readonly status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}

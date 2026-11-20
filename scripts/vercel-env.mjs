@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { parseArgs, parseEnv } from "node:util";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
+const OPENAI_BASE_URL = "https://api.openai.com/v1";
+const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai";
 const secretNames = new Set([
   "DATABASE_URL",
   "OPENAI_API_KEY",
@@ -20,13 +22,22 @@ export function projectEnvironment(project, source) {
   };
   if (project === "www") return publicEnv;
   if (project !== "app") throw new Error("Project must be app or www");
+  const gemini = source.LLM_PROVIDER_PROD === "gemini";
+  const geminiKey = source.GEMINI_API_KEY_PROD || source.GEMINI_API_KEY || "";
+  const fallbacks = Object.fromEntries(
+    ["MODEL_FAST_FALLBACK", "MODEL_REASONING_FALLBACK"]
+      .map((name) => [name, source[`${name}_PROD`] || source[name]])
+      .filter(([, value]) => value),
+  );
   return {
     ...publicEnv,
     DATABASE_URL: source.DATABASE_URL_DEMO || source.DATABASE_URL || "",
-    OPENAI_BASE_URL: "https://api.openai.com/v1",
-    OPENAI_API_KEY: source.OPENAI_API_KEY_PROD || "",
+    // Gemini mode overwrites a stale OpenAI key, which the client would otherwise prefer.
+    OPENAI_BASE_URL: gemini ? GEMINI_BASE_URL : OPENAI_BASE_URL,
+    OPENAI_API_KEY: gemini ? geminiKey : source.OPENAI_API_KEY_PROD || "",
     MODEL_FAST: source.MODEL_FAST_PROD || source.MODEL_FAST || "",
     MODEL_REASONING: source.MODEL_REASONING_PROD || source.MODEL_REASONING || "",
+    ...fallbacks,
     MEDLYN_MOCK: "0",
     MEDLYN_VERIFIER: "gpt",
     MEDLYN_LLM_CONCURRENCY: source.MEDLYN_LLM_CONCURRENCY || "8",
@@ -36,6 +47,7 @@ export function projectEnvironment(project, source) {
         .filter((name) => source[name])
         .map((name) => [name, source[name]]),
     ),
+    ...(gemini ? { GEMINI_API_KEY: geminiKey } : {}),
   };
 }
 

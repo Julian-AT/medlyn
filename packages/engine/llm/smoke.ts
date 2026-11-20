@@ -1,7 +1,8 @@
 import { required } from "../required.ts";
+import { llmApiKey, llmBaseUrl } from "./client.ts";
 
-const BASE = process.env.OPENAI_BASE_URL ?? "http://localhost:8317/v1";
-const KEY = process.env.OPENAI_API_KEY ?? "";
+const BASE = llmBaseUrl();
+const KEY = llmApiKey();
 const headers = { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
 type Result = {
   model: string;
